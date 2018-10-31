@@ -15,20 +15,20 @@ public class Main {
     private static final int documentBufferSize = 10;
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
-    private static final String pathToDocumentsFolder = "/documents"; //TODO temporary! should come from UI
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
     private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
     private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
         createIndex();
     }
 
-    private static void createIndex() {
+    private static void createIndex() throws InterruptedException {
 
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
-        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
+        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(100000);//documentBufferSize);
         BlockingQueue<List<Term>> termListsBuffer = new ArrayBlockingQueue<List<Term>>(termBufferSize);
         BlockingQueue<Term> stemmedTermListsBuffer = new ArrayBlockingQueue<Term>(stemmedTermBufferSize);
 
@@ -37,7 +37,12 @@ public class Main {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
         tReader.start();
+        tReader.join();
+        while (!documentBuffer.isEmpty()){
+            System.out.println(documentBuffer.poll());
+        }
 
+/*
         Thread tParser = new Thread(new Parse(pathToStopwordsFile, documentBuffer, termListsBuffer));
         tParser.start();
 
@@ -46,6 +51,6 @@ public class Main {
 
         Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermListsBuffer));
         tIndexer.start();
-
+*/
     }
 }
