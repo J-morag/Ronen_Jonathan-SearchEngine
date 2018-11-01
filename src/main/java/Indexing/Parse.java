@@ -1,9 +1,8 @@
 package Indexing;
 
 import Elements.Document;
-import Elements.Term;
+import Elements.TermDocument;
 
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -13,21 +12,21 @@ public class Parse implements Runnable{
 
     private String pathTostopwordsFile;
     private BlockingQueue<Document> sourceDocumentsQueue;
-    private BlockingQueue<List<Term>> sinkTermLists;
+    private BlockingQueue<TermDocument> sinkTermDocumentQueue;
 
     /**
      * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with null text field.
-     * @param sinkTermLists - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
+     * @param sinkTermDocumentQueue - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
-    public Parse(String pathTostopwordsFile, BlockingQueue<Document> sourceDocumentsQueue, BlockingQueue<List<Term>> sinkTermLists) {
+    public Parse(String pathTostopwordsFile, BlockingQueue<Document> sourceDocumentsQueue, BlockingQueue<TermDocument> sinkTermDocumentQueue) {
         this.pathTostopwordsFile = pathTostopwordsFile;
         this.sourceDocumentsQueue = sourceDocumentsQueue;
-        this.sinkTermLists = sinkTermLists;
+        this.sinkTermDocumentQueue = sinkTermDocumentQueue;
     }
 
     /**
-     * takes Documents, tokenizes and parses them. does not perform stemming.
+     * takes Documents, tokenizes and parses them into terms. does not perform stemming.
      * End of queue will be marked by a "poison" List with just a null Term.
      */
     public void parse(){

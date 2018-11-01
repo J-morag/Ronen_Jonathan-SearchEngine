@@ -1,12 +1,13 @@
 package Elements;
 
 public class Document {
+    private int serialID;
     public String docId;
     public String header;
     public String text;
 
-    public Document(){
-
+    public Document(/*int serialID*/){
+        //this.serialID = serialID;
     }
 
     public void setHeader(String header) {
