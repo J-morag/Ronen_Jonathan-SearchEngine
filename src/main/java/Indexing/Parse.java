@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class Parse implements Runnable{
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
     private String pathTostopwordsFile;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
@@ -39,7 +39,7 @@ public class Parse implements Runnable{
         boolean done = false;
         while (!done) { //extract from buffer until poison element is encountered
             Document currDoc = sourceDocumentsQueue.take();
-            if (null == currDoc.getText()) break; //end of files (poison element)
+            if (null == currDoc.getText()) done=true; //end of files (poison element)
             else{
                 TermDocument currTermDoc = tokenize(currDoc);
                 parseWorker(currTermDoc);

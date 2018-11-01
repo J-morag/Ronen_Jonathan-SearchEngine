@@ -6,18 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ParseTest {
 
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
-    ArrayBlockingQueue<TermDocument> termdocs = new ArrayBlockingQueue<TermDocument>(10);
+    ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
 
     @Test
     void parse() {
 
         Parse p = new Parse("C:\\Users\\John\\Google Drive\\Documents\\1Uni\\Semester E\\information retrieval 37214406\\Assignements\\Ass1",
-                docs, termdocs);
+                docs, termDocs);
         Document doc1 = new Document();
         doc1.setHeader("Alice's Adventures in Wonderland");
         doc1.setDocId("Alice01");
@@ -27,9 +25,21 @@ class ParseTest {
         doc2.setDocId("Tech01");
         doc2.setText(technicalDocument);
 
+        Thread parser = new Thread(p);
+        parser.start();
+        long startTime = System.currentTimeMillis();
+
         try {
-            docs.put(doc1);
-            docs.put(doc2);
+            int i =0;
+            while (i<1000) {
+                docs.put(doc1);
+                docs.put(doc2);
+                i++;
+                if(docs.isEmpty()){
+                    termDocs.take();
+                    termDocs.take();
+                }
+            }
             Document poison = new Document();
             poison.setText(null);
             docs.put(poison);
@@ -37,12 +47,7 @@ class ParseTest {
             e.printStackTrace();
         }
 
-        try {
-            p.parse();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        System.out.println(System.currentTimeMillis() - startTime);
 
     }
 
@@ -68,7 +73,11 @@ class ParseTest {
             "\n" +
             "There were doors all round the hall, but they were all locked; and when Alice had been all the way down one side and up the other, trying every door, she walked sadly down the middle, wondering how she was ever to get out again.\n" +
             "\n" +
-            "Suddenly she came upon a little three-legged table, all made of solid glass; there was nothing on it except a tiny golden key, and Alice's first thought was that it might belong to one of the doors of the hall; but, alas! either the locks were too large, or the key was too small, but at any rate it would not open any of them. However, on the second time round, she came upon a low curtain she had not noticed before, and behind it was a little door about fifteen inches high: she tried the little golden key in the lock, and to her great delight it fitted! ";
+            "Suddenly she came upon a little three-legged table, all made of solid glass; there was nothing on it except a tiny golden key, and Alice's first thought was that it might belong to one of the doors of the hall; but, alas! either the locks were too large, or the key was too small, but at any rate it would not open any of them. However, on the second time round, she came upon a low curtain she had not noticed before, and behind it was a little door about fifteen inches high: she tried the little golden key in the lock, and to her great delight it fitted!  " +
+            "Alice opened the door and found that it led into a small passage, not much larger than a rat-hole: she knelt down and looked along the passage into the loveliest garden you ever saw. How she longed to get out of that dark hall, and wander about among those beds of bright flowers and those cool fountains, but she could not even get her head though the doorway; `and even if my head would go through,' thought poor Alice, `it would be of very little use without my shoulders. Oh, how I wish I could shut up like a telescope! I think I could, if I only know how to begin.' For, you see, so many out-of-the-way things had happened lately, that Alice had begun to think that very few things indeed were really impossible.\n" +
+            "\n" +
+            "There seemed to be no use in waiting by the little door, so she went back to the table, half hoping she might find another key on it, or at any rate a book of rules for shutting people up like telescopes: this time she found a little bottle on it, (`which certainly was not here before,' said Alice,) and round the neck of the bottle was a paper label, with the words `DRINK ME' beautifully printed on it in large letters. ";
+
 
     static final String technicalDocument = "The second session of the eighth Heilongjiang \n" +
             "Provincial people's congress ended in Harbin this afternoon \n" +
