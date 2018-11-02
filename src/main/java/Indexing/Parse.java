@@ -3,6 +3,7 @@ package Indexing;
 import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
+import com.sun.istack.internal.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ public class Parse implements Runnable{
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
     private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
-    private static final HashSet<String> whiteSpaces = new HashSet<>();
 
 
     /**
@@ -32,9 +32,6 @@ public class Parse implements Runnable{
         this.pathTostopwordsFile = pathTostopwordsFile;
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
-        this.whiteSpaces.add(" ");
-        this.whiteSpaces.add("\t");
-        this.whiteSpaces.add("\n");
     }
 
     /**
@@ -123,38 +120,131 @@ public class Parse implements Runnable{
         return listOfTokens;
     }
 
-    private boolean isProtectedChar(char c){
-        return (c == '-' || c == '.' ||  c == '$' || c == ' ' || c == '\n' || c == '%' || c == '/' || (c>='0' && c<='9'));
+    private static boolean isProtectedChar(char c){
+        return (isSymbol(c) || isWhitespace(c) || (c>='0' && c<='9'));
     }
+
+    private static boolean isWhitespace(char c){
+        return c == ' ' || c == '\n' || c == '\t';
+    }
+    private static boolean isSymbol(char c){
+        return c == '-' || c == '.' ||  c == '$' || c == '%' || c == '/';
+    }
+    private static boolean isLetter(char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');}
 
 
     private List<Term> parseWorker(List<String> lStrings){
         List<Term> terms = new ArrayList<>();
-        for (int i=0 ; i<lStrings.size(); i++) {
+        for (int i=0 ; i<lStrings.size();) {
             String string = lStrings.get(i);
-            StringBuilder sb = new StringBuilder();
-            sb.append(string);
+            TokenType type = TokenType.classify(string);
 
-            if(isWhiteSpace(string)); //do nothing
-            else if(string.matches(".*\\d.*")){ // contains digits
-                if(string.matches("\\d+")){ //is number
-                    while( lStrings.get(i+1).matches("\\d+")){
-                        sb.append(lStrings.get(++i));
+            if(type == TokenType.WHITESPACE); //whitespace, do nothing
 
-                    }
-                    System.out.println(sb.toString());
+            else if(type == TokenType.NUMBER){
+                StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
+                String decimals = null;
+                String formattedNumber;
+                while(type == TokenType.NUMBER){
+                    sb.append(string);
+                    i++;
+                    string = lStrings.get(i);
+                    type = TokenType.classify(string); //may result in classifying the same string twice. is acceptable?
                 }
+                if(type == TokenType.SYMBOL && string.equals(".")){ //decimal point or end of line
+                    i++;
+                    string = lStrings.get(i);
+                    type = TokenType.classify(string);
+                    if(type == TokenType.NUMBER){ // decimal digits
+                        decimals = string;
+                    }
+                    formattedNumber = formatNumber(sb.toString(), decimals);
+                    sb.append(formattedNumber);
+                }
+                else if(type == TokenType.WHITESPACE && string.equals(" ")){ // check for word after number
+                    i++;
+                    string = lStrings.get(i);
+                    type = TokenType.classify(string);
+                    formattedNumber = formatNumber(sb.toString(), decimals);
+                    sb.append(formattedNumber);
+                    if(type == TokenType.WORD && string.equals("Thousand")){
+                        sb.append('K');
+                    }
+                    if(type == TokenType.WORD && string.equals("Million")){
+                        sb.append('M');
+                    }
+                    if(type == TokenType.WORD && string.equals("Billion")){
+                        sb.append('B');
+                    }
+                    if(type == TokenType.WORD && string.equals("Trillion")){
+                        sb.append("000B");
+                    }
+                    if(type == TokenType.WORD && string.equals("Dollar")){
+                        sb.append("Dollars");
+                    }
+                    //TODO not finished.......
+                }
+                terms.add(new Term(sb.toString()));
             }
+        }
+        for (Term t:
+             terms) {
+            System.out.println(t);
         }
         return null;
     }
 
-    private enum tokenType{
+    private String formatNumber(@NotNull String num, String decimals){
+        int numOfThousands = (num.length()-1)/3; //rounds down - so one to three digits is 0, four to six is 1...
+        StringBuilder sb = new StringBuilder();
+        sb.append(num, 0, num.length()-(numOfThousands*3) /*end index is exclusive*/); //leftmost digits
+        if(numOfThousands > 0){
+            sb.append('.'); //decimal point
+            sb.append(num, num.length()-(numOfThousands*3), num.length()); //remainder
+            if(null != decimals)
+                sb.append(decimals); //original decimals
+            if(numOfThousands == 1){
+                sb.append('K');
+            }
+            else if (numOfThousands == 2){
+                sb.append('M');
+            }
+            else
+                sb.append('B');
+        }
+        return sb.toString();
+    }
+
+    private enum TokenType {
         NUMBER, WORD, ALPHANUMERIC, SYMBOL, WHITESPACE;
 
-        public tokenType classify(String str){
-            //TODO
-            return null;
+        /**
+         * classifies a token (string) to a type of token
+         * @param str - token to classify
+         * @return - a TokenType enum value
+         */
+        public static TokenType classify(String str){
+            int length = str.length();
+            if (1 == length){
+                if(isWhitespace(str.charAt(0)))
+                    return WHITESPACE;
+                else //is one char and not whitespace, must be a symbol
+                    return SYMBOL;
+            }
+            else{ //more than one character
+                if(str.charAt(0) <= '9' && str.charAt(0) >= '0'){ //first char is digit
+                    for(int i=0; i<length; i++){
+                        if(isLetter(str.charAt(i))) return ALPHANUMERIC;
+                    }
+                    return NUMBER; // all chars are digits
+                }
+                else { //first char is letter (symbols should not appear in words since they are used as separators
+                    for(int i=0; i<length; i++){
+                        if(str.charAt(i) <= '9' && str.charAt(i) >= '0') return ALPHANUMERIC;
+                    }
+                    return WORD; //all chars are letters
+                }
+            }
         }
     }
 
@@ -192,5 +282,4 @@ public class Parse implements Runnable{
 
         return stopWords;
     }
-    private boolean isWhiteSpace(String s) {return whiteSpaces.contains(s);}
 }
