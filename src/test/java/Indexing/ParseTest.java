@@ -78,6 +78,23 @@ class ParseTest {
 
     }
 
+    @Test
+    void parseSerialized(){
+        Parse p = new Parse("C:\\Users\\John\\Google Drive\\Documents\\1Uni\\Semester E\\information retrieval 37214406\\Assignements\\Ass1",
+                docs, termDocs);
+        Parse.debug = true;
+        Document doc1 = new Document();
+        doc1.setHeader("Test Cases for Parsing");
+        doc1.setDocId("testCases");
+        doc1.setText(testCases);
+
+        long startTime = System.currentTimeMillis();
+
+        p.parseOneDocument(doc1);
+
+//        System.out.println(System.currentTimeMillis() - startTime);
+    }
+
 
     static final String alice = "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, `and what is the use of a book,' thought Alice `without pictures or conversation?'\n" +
             "\n" +
@@ -166,5 +183,38 @@ class ParseTest {
             "economic development throughout the whole province. \n" +
             "  The congress session ended with the solemn playing of the \n" +
             "national anthem. \n";
+
+    static final String testCases =
+            "1,000,000 Dollars 1 M Dollars\n" +
+                    "$450,000,000\n" +
+                    "450 M Dollars\n" +
+                    "$100 million 100 M Dollars\n" +
+                    "20.6m Dollars\n" +
+                    "20.6 M Dollars\n" +
+                    "$100 billion, 100000 M Dollars \n" +
+                    "100bn Dollars, 100000 M Dollars\n" +
+                    "100 billion U.S. dollars. 100000 M Dollars\n" +
+                    "320 million U.S. dollars. 320 M Dollars\n" +
+                    "1 trillion U.S. dollars. 1000000 M Dollars " +
+
+                    "1.7320 Dollars: 1.7320 Dollars\n" +
+                    "22 3/4 Dollars: 22 3/4 Dollars\n" +
+                    "$450,000: 450,000 Dollars " +
+
+                    " 6%\n" +
+                    "10.6 percent    10.6%\n" +
+                    "10.6 percentage     10.6%\n" +
+
+                    "10,123 10.123K\n" +
+                    "123 Thousand 123.456K\n" +
+                    "1010.56 1.01056K\n" +
+
+                    "10,123,000 10.123M\n" +
+                    "55 Million 55M\n" +
+                    ".56 1.01056K\n" +
+
+                    "10,123,000,000 10.123B\n" +
+                    "55 Billion 55B\n" +
+                    "7 Trillion 700B";
 
 }

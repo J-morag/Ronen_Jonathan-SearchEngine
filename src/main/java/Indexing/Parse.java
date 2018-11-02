@@ -4,7 +4,7 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 
-import javax.print.Doc;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,11 +15,13 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Parse implements Runnable{
 
-    private static boolean debug = false;
+    public static boolean debug = false;
     private String pathTostopwordsFile;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
     private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
+    private static final HashSet<String> whiteSpaces = new HashSet<>();
+
 
     /**
      * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with null text field.
@@ -30,6 +32,9 @@ public class Parse implements Runnable{
         this.pathTostopwordsFile = pathTostopwordsFile;
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
+        this.whiteSpaces.add(" ");
+        this.whiteSpaces.add("\t");
+        this.whiteSpaces.add("\n");
     }
 
     /**
@@ -38,25 +43,7 @@ public class Parse implements Runnable{
      */
     private void parse() throws InterruptedException {
 
-//        InputStream is = new FileInputStream("manifest.mf");
-//        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
-//
-//        String line = buf.readLine();
-//        StringBuilder sb = new StringBuilder();
-//
-//        while(line != null){
-//            sb.append(line).append("\n");
-//            line = buf.readLine();
-//        }
-//
-//        String fileAsString = sb.toString();
-//        System.out.println("Contents : " + fileAsString);
-//
-//
-//        Read more: https://javarevisited.blogspot.com/2015/09/how-to-read-file-into-string-in-java-7.html#ixzz5Vi53YUho
-
-
-        HashSet<String> stopWords = new HashSet<>();
+        HashSet<String> stopWords = getStopWords(pathTostopwordsFile);
 
         boolean done = false;
         while (!done) { //extract from buffer until poison element is encountered
@@ -102,9 +89,9 @@ public class Parse implements Runnable{
 
         String[] stringAsTokens = string.split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
 
-        List<String> lstringAsTokens = tokenizeSecondPass(stringAsTokens);
+        List<String> lStringAsTokens = tokenizeSecondPass(stringAsTokens);
 
-        return lstringAsTokens;
+        return lStringAsTokens;
     }
 
     /**
@@ -119,8 +106,9 @@ public class Parse implements Runnable{
         //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
              ) {
-            if(!(string.isEmpty() || (string.length() == 1 && isProtectedChar(string.charAt(0))) ))
+            if((string.length() == 1 && isProtectedChar(string.charAt(0))) || (string.length() > 1) )
                 listOfTokens.add(string);
+
         }
 
         //TESTING
@@ -136,14 +124,31 @@ public class Parse implements Runnable{
     }
 
     private boolean isProtectedChar(char c){
-        return c == '-' || c == '.' || c == '$' || c == ' ' || c == '\n';
+        return (c == '-' || c == '.' ||  c == '$' || c == ' ' || c == '\n' || c == '%' || c == '/' || (c>='0' && c<='9'));
     }
 
 
     private List<Term> parseWorker(List<String> lStrings){
-        //TODO not implemented
+        List<Term> terms = new ArrayList<>();
+        for (int i=0 ; i<lStrings.size(); i++) {
+            String string = lStrings.get(i);
+            StringBuilder sb = new StringBuilder();
+            sb.append(string);
+
+            if(isWhiteSpace(string)); //do nothing
+            else if(string.matches(".*\\d.*")){ // contains digits
+                if(string.matches("\\d+")){ //is number
+                    while( lStrings.get(i+1).matches("\\d+")){
+                        sb.append(lStrings.get(++i));
+
+                    }
+                    System.out.println(sb.toString());
+                }
+            }
+        }
         return null;
     }
+
 
     public void run() {
         try {
@@ -153,5 +158,30 @@ public class Parse implements Runnable{
         }
     }
 
+    private HashSet<String> getStopWords(String pathTostopwordsFile) {
+        HashSet<String> stopWords = new HashSet<>();
 
+        InputStream is = null;
+        try {
+            is = new FileInputStream(pathTostopwordsFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
+
+        String line = null;
+        try {
+            line = buffer.readLine();
+
+            while(line != null){
+                stopWords.add(line);
+                buffer.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return stopWords;
+    }
+    private boolean isWhiteSpace(String s) {return whiteSpaces.contains(s);}
 }
