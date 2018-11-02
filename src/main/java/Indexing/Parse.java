@@ -5,10 +5,8 @@ import Elements.Term;
 import Elements.TermDocument;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
-import java.util.regex.Pattern;
 
 /**
  * takes Documents, tokenizes and parses them. does not perform stemming.
@@ -19,6 +17,7 @@ public class Parse implements Runnable{
     private String pathTostopwordsFile;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
+    private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
 
     /**
      * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with null text field.
@@ -45,8 +44,9 @@ public class Parse implements Runnable{
                 parseWorker(currTermDoc);
 
             }
-
         }
+        TermDocument poison = new TermDocument(-1,null);
+        sinkTermDocumentQueue.put(poison);
 
     }
 
@@ -57,12 +57,13 @@ public class Parse implements Runnable{
      * @return a Term Document that is tokenized.
      */
     private TermDocument tokenize(Document doc){
-        final String splitterRegex = "[\t-#%-&(-,/-/:-@\\x5B-`{-~]"; //marks chars to split on
+//        final String splitterRegex = "[\t-#%-&(-,/-/:-@\\x5B-`{-~]"; //marks chars to split on. without . - $
+        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
 
         TermDocument termDocument = new TermDocument(doc);
 
-        String[] headerAsTokens = doc.getHeader().split( splitterRegex /*delimiters regex*/);
-        String[] textAsTokens = doc.getText().split( splitterRegex /*delimiters regex*/);
+        String[] headerAsTokens = doc.getHeader().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
+        String[] textAsTokens = doc.getText().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
 
         termDocument.setHeader(tokenizeSecondPass(headerAsTokens));
         termDocument.setText(tokenizeSecondPass(textAsTokens));
@@ -77,23 +78,12 @@ public class Parse implements Runnable{
      */
     private ArrayList<Term> tokenizeSecondPass(String[] textAsTokens) {
 
-        final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
-
         ArrayList<Term> listOfTokens = new ArrayList<>();
 
+        //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
              ) {
-            if(string.isEmpty()) continue; //clean up empty strings
-
-            if(string.matches(".*[.\\-$].*")){ //string contains one of: '.' '-' '$'
-                //split on delimiters and keep them as strings
-                String[] splitStrings = string.split(String.format(keepDelimiters, "[.\\-$]"));
-                for (String splitString: splitStrings
-                     ) {
-                    listOfTokens.add(new Term(splitString));
-                }
-            }
-            else listOfTokens.add(new Term(string));
+            if(!(string.isEmpty() || (string.length() == 1 && charIsToBeRemoved(string.charAt(0))) )) listOfTokens.add(new Term(string));;
         }
 
         //TESTING
@@ -107,6 +97,11 @@ public class Parse implements Runnable{
 
         return listOfTokens;
     }
+
+    private boolean charIsToBeRemoved(char c){
+        return c != '-' && c != '.' && c != '$';
+    }
+
 
     private void parseWorker(TermDocument doc){
         //TODO not implemented
