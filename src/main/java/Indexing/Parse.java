@@ -149,6 +149,15 @@ public class Parse implements Runnable{
         return null;
     }
 
+    private enum tokenType{
+        NUMBER, WORD, ALPHANUMERIC, SYMBOL, WHITESPACE;
+
+        public tokenType classify(String str){
+            //TODO
+            return null;
+        }
+    }
+
 
     public void run() {
         try {
