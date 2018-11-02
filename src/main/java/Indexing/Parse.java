@@ -4,8 +4,8 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 
+import javax.print.Doc;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -33,17 +33,15 @@ public class Parse implements Runnable{
 
     /**
      * takes Documents, tokenizes and parses them into terms. does not perform stemming.
-     * End of queue will be marked by a "poison" List with just a null Term.
+     * End of queue will be marked by a "poison" TermDocument with null docID.
      */
-    public void parse() throws InterruptedException {
+    private void parse() throws InterruptedException {
         boolean done = false;
         while (!done) { //extract from buffer until poison element is encountered
             Document currDoc = sourceDocumentsQueue.take();
             if (null == currDoc.getText()) done=true; //end of files (poison element)
             else{
-                TermDocument currTermDoc = tokenize(currDoc);
-                parseWorker(currTermDoc);
-
+                sinkTermDocumentQueue.put(parseOneDocument(currDoc));
             }
         }
         TermDocument poison = new TermDocument(-1,null);
@@ -52,42 +50,54 @@ public class Parse implements Runnable{
     }
 
     /**
-     * Tokenizes the strings within the give Document, creating a TermDocument containing the token lists as Term Lists.
-     * These Terms are still just tokens, not actual terms, at this stage.
-     * @param doc - the Document to tokenize
-     * @return a Term Document that is tokenized.
+     * fully parses a single Document and returns a Term Document.
+     * Should be used if wanting to parse in a serial manner, rather than in a separate thread.
+     * @param doc - the Document to parse.
+     * @return - a parsed TermDocument.
      */
-    private TermDocument tokenize(Document doc){
-//        final String splitterRegex = "[\t-#%-&(-,/-/:-@\\x5B-`{-~]"; //marks chars to split on. without . - $
-        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
+    public TermDocument parseOneDocument(Document doc){
+        List<String> tokenizedHeader = tokenize(doc.getHeader());
+        List<String> tokenizedText = tokenize(doc.getText());
+
+        List<Term> headerAsTerms = parseWorker(tokenizedHeader);
+        List<Term> textAsTerms = parseWorker(tokenizedText);
 
         TermDocument termDocument = new TermDocument(doc);
-
-        String[] headerAsTokens = doc.getHeader().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
-        String[] textAsTokens = doc.getText().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
-
-        List<String> lHeaderAsTokens = tokenizeSecondPass(headerAsTokens);
-        List<String> lTextAsTokens = tokenizeSecondPass(textAsTokens);
-
-//        termDocument.setHeader(tokenizeSecondPass(headerAsTokens));
-//        termDocument.setText(tokenizeSecondPass(textAsTokens));
+        termDocument.setHeader(headerAsTerms);
+        termDocument.setText(textAsTerms);
 
         return termDocument;
     }
 
     /**
+     * Tokenizes the strings within the given String.
+     * @param string - the string to tokenize
+     * @return a list of strings (tokens).
+     */
+    private List<String> tokenize(String string){
+//        final String splitterRegex = "[\t-#%-&(-,/-/:-@\\x5B-`{-~]"; //marks chars to split on. without . - $
+        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
+
+        String[] stringAsTokens = string.split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
+
+        List<String> lstringAsTokens = tokenizeSecondPass(stringAsTokens);
+
+        return lstringAsTokens;
+    }
+
+    /**
      * helper funtion for {@code tokenize} which cleans up empty strings, and separates or cleans leftover delimiters.
      * @param textAsTokens - a list of tokenized strings to clean up
-     * @return - a cleaned up list of Terms.
+     * @return - a cleaned up list of tokens.
      */
     private ArrayList<String> tokenizeSecondPass(String[] textAsTokens) {
 
-        ArrayList<String> listOfTokens = new ArrayList<>();
+        ArrayList<String> listOfTokens = new ArrayList<>(textAsTokens.length/2);
 
         //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
              ) {
-            if(!(string.isEmpty() || (string.length() == 1 && charIsToBeRemoved(string.charAt(0))) ))
+            if(!(string.isEmpty() || (string.length() == 1 && isProtectedChar(string.charAt(0))) ))
                 listOfTokens.add(string);
         }
 
@@ -103,13 +113,14 @@ public class Parse implements Runnable{
         return listOfTokens;
     }
 
-    private boolean charIsToBeRemoved(char c){
-        return c != '-' && c != '.' && c != '$';
+    private boolean isProtectedChar(char c){
+        return c == '-' || c == '.' || c == '$' || c == ' ' || c == '\n';
     }
 
 
-    private void parseWorker(TermDocument doc){
+    private List<Term> parseWorker(List<String> lStrings){
         //TODO not implemented
+        return null;
     }
 
     public void run() {
