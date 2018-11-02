@@ -27,19 +27,19 @@ class ParseTest {
 
         Thread parser1 = new Thread(p);
         parser1.start();
-        Thread parser2 = new Thread(p);
-        parser2.start();
+//        Thread parser2 = new Thread(p);
+//        parser2.start();
 //        Thread parser3 = new Thread(p);
 //        parser3.start();
 
 
         Thread dummyConsumer = new Thread(() -> {
             try {
-                boolean done1=false, done2=false, done3=true;
+                boolean done1=false, done2=true, done3=true;
                 while(!done1 || !done2 || !done3){
                     if(termDocs.take().getDocId() == null){
                         if(!done1) done1 = true;
-                        else if(!done2) done2 = true;
+//                        else if(!done2) done2 = true;
 //                        else done3 = true;
                     }
                 }
@@ -62,7 +62,7 @@ class ParseTest {
             Document poison = new Document();
             poison.setText(null);
             docs.put(poison);
-            docs.put(poison);
+//            docs.put(poison);
 //            docs.put(poison);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -6,6 +6,7 @@ import Elements.TermDocument;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -65,8 +66,11 @@ public class Parse implements Runnable{
         String[] headerAsTokens = doc.getHeader().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
         String[] textAsTokens = doc.getText().split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
 
-        termDocument.setHeader(tokenizeSecondPass(headerAsTokens));
-        termDocument.setText(tokenizeSecondPass(textAsTokens));
+        List<String> lHeaderAsTokens = tokenizeSecondPass(headerAsTokens);
+        List<String> lTextAsTokens = tokenizeSecondPass(textAsTokens);
+
+//        termDocument.setHeader(tokenizeSecondPass(headerAsTokens));
+//        termDocument.setText(tokenizeSecondPass(textAsTokens));
 
         return termDocument;
     }
@@ -76,21 +80,22 @@ public class Parse implements Runnable{
      * @param textAsTokens - a list of tokenized strings to clean up
      * @return - a cleaned up list of Terms.
      */
-    private ArrayList<Term> tokenizeSecondPass(String[] textAsTokens) {
+    private ArrayList<String> tokenizeSecondPass(String[] textAsTokens) {
 
-        ArrayList<Term> listOfTokens = new ArrayList<>();
+        ArrayList<String> listOfTokens = new ArrayList<>();
 
         //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
              ) {
-            if(!(string.isEmpty() || (string.length() == 1 && charIsToBeRemoved(string.charAt(0))) )) listOfTokens.add(new Term(string));;
+            if(!(string.isEmpty() || (string.length() == 1 && charIsToBeRemoved(string.charAt(0))) ))
+                listOfTokens.add(string);
         }
 
         //TESTING
         if(debug){
-            for (Term t:
+            for (String t:
                     listOfTokens) {
-                System.out.println(t.toString());
+                System.out.println(t);
             }
         }
         //TESTING
