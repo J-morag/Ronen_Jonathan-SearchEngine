@@ -139,8 +139,10 @@ public class Parse implements Runnable{
             String string = lStrings.get(i);
             TokenType type = TokenType.classify(string);
 
-            if(type == TokenType.WHITESPACE); //whitespace, do nothing
+            // whitespace
+            if(type == TokenType.WHITESPACE) i++; //whitespace, do nothing
 
+            //number
             else if(type == TokenType.NUMBER){
                 StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
                 String decimals = null;
@@ -186,10 +188,18 @@ public class Parse implements Runnable{
                 }
                 terms.add(new Term(sb.toString()));
             }
+
+
+            //  unidentified
+            else
+                i++;
         }
-        for (Term t:
-             terms) {
-            System.out.println(t);
+
+        if(debug){
+            for (Term t:
+                    terms) {
+                System.out.println(t);
+            }
         }
         return null;
     }
