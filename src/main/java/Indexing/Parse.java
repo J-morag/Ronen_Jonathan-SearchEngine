@@ -6,6 +6,7 @@ import Elements.TermDocument;
 
 import javax.print.Doc;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Parse implements Runnable{
 
-    private static final boolean debug = false;
+    private static boolean debug = false;
     private String pathTostopwordsFile;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
@@ -36,6 +37,27 @@ public class Parse implements Runnable{
      * End of queue will be marked by a "poison" TermDocument with null docID.
      */
     private void parse() throws InterruptedException {
+
+//        InputStream is = new FileInputStream("manifest.mf");
+//        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+//
+//        String line = buf.readLine();
+//        StringBuilder sb = new StringBuilder();
+//
+//        while(line != null){
+//            sb.append(line).append("\n");
+//            line = buf.readLine();
+//        }
+//
+//        String fileAsString = sb.toString();
+//        System.out.println("Contents : " + fileAsString);
+//
+//
+//        Read more: https://javarevisited.blogspot.com/2015/09/how-to-read-file-into-string-in-java-7.html#ixzz5Vi53YUho
+
+
+        HashSet<String> stopWords = new HashSet<>();
+
         boolean done = false;
         while (!done) { //extract from buffer until poison element is encountered
             Document currDoc = sourceDocumentsQueue.take();
@@ -130,4 +152,6 @@ public class Parse implements Runnable{
             e.printStackTrace();
         }
     }
+
+
 }
