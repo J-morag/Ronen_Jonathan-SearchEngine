@@ -18,19 +18,21 @@ import java.util.concurrent.BlockingQueue;
 public class Parse implements Runnable{
 
     public static boolean debug = false;
-    private String pathTostopwordsFile;
+    private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
     private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
 
 
     /**
+     * @param stopWords - a set of stopwords to ignore when parsing. if a term is generated when parsing and it consists of just a stopword, it will be eliminated.
+     *                  the set is copied to a local copy.
      * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with null text field.
      * @param sinkTermDocumentQueue - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
-    public Parse(String pathTostopwordsFile, BlockingQueue<Document> sourceDocumentsQueue, BlockingQueue<TermDocument> sinkTermDocumentQueue) {
-        this.pathTostopwordsFile = pathTostopwordsFile;
+    public Parse(HashSet<String> stopWords, BlockingQueue<Document> sourceDocumentsQueue, BlockingQueue<TermDocument> sinkTermDocumentQueue) {
+        this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
     }
@@ -40,8 +42,6 @@ public class Parse implements Runnable{
      * End of queue will be marked by a "poison" TermDocument with null docID.
      */
     private void parse() throws InterruptedException {
-
-        HashSet<String> stopWords = getStopWords(pathTostopwordsFile);
 
         boolean done = false;
         while (!done) { //extract from buffer until poison element is encountered
@@ -208,8 +208,8 @@ public class Parse implements Runnable{
             if(type == TokenType.WORD && (string.equalsIgnoreCase("Trillion") || string.equalsIgnoreCase("T")) ){
                 result.append("000B");
             }
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Dollar") || string.equalsIgnoreCase("Dollars"))){
-                result.append(" Dollars");
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Dollar") || string.equalsIgnoreCase("Dollars"))){ //TODO more dollar cases
+                result.append(" Dollars"); //TODO reformat number when encountering dollars???
             }
 
             //TODO not finished....... dollars, percents....
@@ -306,28 +306,26 @@ public class Parse implements Runnable{
         }
     }
 
-    private HashSet<String> getStopWords(String pathTostopwordsFile) {
+
+    public static HashSet<String> getStopWords(String pathTostopwordsFile) {
         HashSet<String> stopWords = new HashSet<>();
 
-        InputStream is = null;
         try {
+            InputStream is = null;
             is = new FileInputStream(pathTostopwordsFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
-
-        String line = null;
-        try {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
+            String line = null;
             line = buffer.readLine();
-
             while(line != null){
                 stopWords.add(line);
                 buffer.readLine();
             }
-        } catch (IOException e) {
+        } catch (FileNotFoundException e) {
+            System.out.println("stopwords file not found in the specified path. running without stopwords");
+        } catch (IOException e){
             e.printStackTrace();
         }
+
 
         return stopWords;
     }

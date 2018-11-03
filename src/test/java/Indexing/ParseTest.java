@@ -10,11 +10,12 @@ class ParseTest {
 
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
+    private static final String pathToStopwords = "sdfds";
 
     @Test
     void parseConcurrent() {
 
-        Parse p = new Parse("C:\\Users\\John\\Google Drive\\Documents\\1Uni\\Semester E\\information retrieval 37214406\\Assignements\\Ass1",
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Document doc1 = new Document();
         doc1.setHeader("Alice's Adventures in Wonderland");
@@ -80,7 +81,7 @@ class ParseTest {
 
     @Test
     void parseSerialized(){
-        Parse p = new Parse("C:\\Users\\John\\Google Drive\\Documents\\1Uni\\Semester E\\information retrieval 37214406\\Assignements\\Ass1",
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
         Document doc1 = new Document();

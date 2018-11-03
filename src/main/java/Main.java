@@ -6,6 +6,8 @@ import Indexing.Parse;
 import Indexing.ReadFile;
 import Indexing.Stemmer;
 
+import java.io.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -44,8 +46,9 @@ public class Main {
             System.out.println(documentBuffer.poll());
         }
 
+        HashSet<String> stopwords = Parse.getStopWords(pathToStopwordsFile);
 
-        Thread tParser = new Thread(new Parse(pathToStopwordsFile, documentBuffer, termDocumentsBuffer));
+        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
         tParser.start();
 
         Thread tStemmer = new Thread(new Stemmer(termDocumentsBuffer, stemmedTermDocumentsBuffer));
@@ -55,4 +58,5 @@ public class Main {
         tIndexer.start();
 
     }
+
 }
