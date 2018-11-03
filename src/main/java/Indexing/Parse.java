@@ -169,7 +169,7 @@ public class Parse implements Runnable{
         return null;
     }
 
-    private void parseNumber(@NotNull Iterator<String> iterator,@NotNull String number,@NotNull List<Term> termList){
+    private void parseNumber(@NotNull Iterator<String> iterator,@NotNull String number,@NotNull List<Term> termList){ //TODO remove termList, get and return a string builder
         String string = number;
         TokenType type = TokenType.NUMBER;
 
