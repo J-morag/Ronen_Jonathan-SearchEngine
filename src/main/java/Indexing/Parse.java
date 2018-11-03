@@ -8,6 +8,7 @@ import com.sun.istack.internal.NotNull;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
@@ -110,10 +111,12 @@ public class Parse implements Runnable{
 
         //TESTING
         if(debug){
+            System.out.println("-----------start tokenize output-------------");
             for (String t:
                     listOfTokens) {
                 System.out.println(t);
             }
+            System.out.println("-----------end tokenize output-------------");
         }
         //TESTING
 
@@ -121,7 +124,8 @@ public class Parse implements Runnable{
     }
 
     private static boolean isProtectedChar(char c){
-        return (isSymbol(c) || isWhitespace(c) || (c>='0' && c<='9'));
+        return (isSymbol(c) || isWhitespace(c) || (c>='0' && c<='9') || (isLetter(c)));
+        //TODO optimize by rewersing this statement? (check that it is not a trash char like ',')
     }
 
     private static boolean isWhitespace(char c){
@@ -135,84 +139,108 @@ public class Parse implements Runnable{
 
     private List<Term> parseWorker(List<String> lStrings){
         List<Term> terms = new ArrayList<>();
-        for (int i=0 ; i<lStrings.size();) {
-            String string = lStrings.get(i);
+        Iterator<String> iterator = lStrings.iterator();
+        while (iterator.hasNext()) {
+            String string = iterator.next();
             TokenType type = TokenType.classify(string);
 
+            //TODO first split alphanumerics into numbers and words
+
+            //             ROOT CASES
             // whitespace
-            if(type == TokenType.WHITESPACE) i++; //whitespace, do nothing
+            if(type == TokenType.WHITESPACE) ; //whitespace, do nothing
 
             //number
             else if(type == TokenType.NUMBER){
-                StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
-                String decimals = null;
-                String formattedNumber;
-                while(type == TokenType.NUMBER){
-                    sb.append(string);
-                    i++;
-                    string = lStrings.get(i);
-                    type = TokenType.classify(string); //may result in classifying the same string twice. is acceptable?
-                }
-                if(type == TokenType.SYMBOL && string.equals(".")){ //decimal point or end of line
-                    i++;
-                    string = lStrings.get(i);
-                    type = TokenType.classify(string);
-                    if(type == TokenType.NUMBER){ // decimal digits
-                        decimals = string;
-                    }
-                    formattedNumber = formatNumber(sb.toString(), decimals);
-                    sb.append(formattedNumber);
-                }
-                else if(type == TokenType.WHITESPACE && string.equals(" ")){ // check for word after number
-                    i++;
-                    string = lStrings.get(i);
-                    type = TokenType.classify(string);
-                    formattedNumber = formatNumber(sb.toString(), decimals);
-                    sb.append(formattedNumber);
-                    if(type == TokenType.WORD && string.equals("Thousand")){
-                        sb.append('K');
-                    }
-                    if(type == TokenType.WORD && string.equals("Million")){
-                        sb.append('M');
-                    }
-                    if(type == TokenType.WORD && string.equals("Billion")){
-                        sb.append('B');
-                    }
-                    if(type == TokenType.WORD && string.equals("Trillion")){
-                        sb.append("000B");
-                    }
-                    if(type == TokenType.WORD && string.equals("Dollar")){
-                        sb.append("Dollars");
-                    }
-                    //TODO not finished.......
-                }
-                terms.add(new Term(sb.toString()));
+                parseNumber(iterator, string, terms);
             }
+            //TODO not finished with root cases
 
-
-            //  unidentified
-            else
-                i++;
         }
 
         if(debug){
+            System.out.println("-----------start parse output-------------");
             for (Term t:
                     terms) {
                 System.out.println(t);
             }
+            System.out.println("-----------end parse output-------------");
         }
         return null;
+    }
+
+    private void parseNumber(@NotNull Iterator<String> iterator,@NotNull String number,@NotNull List<Term> termList){
+        String string = number;
+        TokenType type = TokenType.NUMBER;
+
+        StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
+        StringBuilder result = new StringBuilder(); //build resulting term here
+        String decimals = null;
+        String formattedNumber;
+        while(type == TokenType.NUMBER){
+            sb.append(string);
+            string = iterator.next();
+            type = TokenType.classify(string); //may result in classifying the same string twice. is acceptable?
+        }
+        if(type == TokenType.SYMBOL && string.equals(".")){ //decimal point or end of line
+            string = iterator.next();
+            type = TokenType.classify(string);
+            if(type == TokenType.NUMBER){ // decimal digits
+                decimals = string;
+            }
+            formattedNumber = formatNumber(sb.toString(), decimals);
+            result.append(formattedNumber);
+        }
+        else if(type == TokenType.WHITESPACE && string.equals(" ")){ // check for word after number
+            string = iterator.next();
+            type = TokenType.classify(string);
+            formattedNumber = formatNumber(sb.toString(), decimals);
+            result.append(formattedNumber);
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Thousand") || string.equalsIgnoreCase("K")) ){
+                result.append('K');
+            }
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Million") || string.equalsIgnoreCase("M")) ) {
+                result.append('M');
+            }
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Billion") || string.equalsIgnoreCase("B")) ){
+                result.append('B');
+            }
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Trillion") || string.equalsIgnoreCase("T")) ){
+                result.append("000B");
+            }
+            if(type == TokenType.WORD && (string.equalsIgnoreCase("Dollar") || string.equalsIgnoreCase("Dollars"))){
+                result.append(" Dollars");
+            }
+
+            //TODO not finished....... dollars, percents....
+        }
+
+        termList.add(new Term(result.toString()));
     }
 
     private String formatNumber(@NotNull String num, String decimals){
         int numOfThousands = (num.length()-1)/3; //rounds down - so one to three digits is 0, four to six is 1...
         StringBuilder sb = new StringBuilder();
         sb.append(num, 0, num.length()-(numOfThousands*3) /*end index is exclusive*/); //leftmost digits
+
         if(numOfThousands > 0){
-            sb.append('.'); //decimal point
-            sb.append(num, num.length()-(numOfThousands*3), num.length()); //remainder
-            if(null != decimals)
+            int indexOfLeftmostTrailingZero = num.length()-1; //index of rightmost char
+            while (num.charAt(indexOfLeftmostTrailingZero) == '0') indexOfLeftmostTrailingZero--; //look for non zero char
+            indexOfLeftmostTrailingZero++; //return to the zero
+
+            int indexOfCharAfterLeftmostNumberSection = num.length()-(numOfThousands*3);
+
+            if (indexOfLeftmostTrailingZero > indexOfCharAfterLeftmostNumberSection) { //something other than zeros after the decimal point after shortening
+                sb.append('.'); //decimal point
+                sb.append(num, indexOfCharAfterLeftmostNumberSection, indexOfLeftmostTrailingZero ); //remainder
+                if(null != decimals)
+                    sb.append(decimals); //original decimals
+            }
+            else if(null != decimals){ //no decimals from shortening number, but original decimals exist
+                sb.append('.'); //decimal point
                 sb.append(decimals); //original decimals
+            }
+
             if(numOfThousands == 1){
                 sb.append('K');
             }
@@ -222,6 +250,13 @@ public class Parse implements Runnable{
             else
                 sb.append('B');
         }
+
+        else if(null != decimals){ // number is smaller than 1000, but lets add original decimals
+            sb.append('.'); //decimal point
+            sb.append(decimals); //original decimals
+        }
+
+
         return sb.toString();
     }
 
@@ -235,10 +270,14 @@ public class Parse implements Runnable{
          */
         public static TokenType classify(String str){
             int length = str.length();
-            if (1 == length){
+            if (1 == length){ // one char long
                 if(isWhitespace(str.charAt(0)))
                     return WHITESPACE;
-                else //is one char and not whitespace, must be a symbol
+                else if (str.charAt(0) <= '9' && str.charAt(0) >= '0')  //number
+                    return NUMBER;
+                else if(isLetter(str.charAt(0))) // one letter word
+                    return WORD;
+                else //is one char and not whitespace or number or letter, must be a symbol.
                     return SYMBOL;
             }
             else{ //more than one character

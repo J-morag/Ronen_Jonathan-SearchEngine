@@ -84,7 +84,7 @@ class ParseTest {
                 docs, termDocs);
         Parse.debug = true;
         Document doc1 = new Document();
-        doc1.setHeader("Test Cases for Parsing");
+        doc1.setHeader("");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
 
