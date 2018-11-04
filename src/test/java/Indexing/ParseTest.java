@@ -1,9 +1,12 @@
 package Indexing;
 
 import Elements.Document;
+import Elements.Term;
 import Elements.TermDocument;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 class ParseTest {
@@ -88,12 +91,21 @@ class ParseTest {
         doc1.setHeader("");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
+        int numTerms1 = 0;
+        int numTermsExpected1 = 48;
 
         long startTime = System.currentTimeMillis();
+        TermDocument td = p.parseOneDocument(doc1);
+        long time = System.currentTimeMillis() - startTime;
 
-        p.parseOneDocument(doc1);
-
-//        System.out.println(System.currentTimeMillis() - startTime);
+        numTerms1 = td.getHeader().size() + td.getText().size();
+        System.out.println("----- RESULTS -----");
+        System.out.println("Elapsed time(ms): " + (time));
+        System.out.println("Terms parsed: " + (numTerms1) + "/" + numTermsExpected1);
+        List<Term> terms = td.getText();
+        for (int i = 0; i < terms.size() ; i++) {
+//            assertEquals(terms.get(i++), terms.get(i++));
+        }
     }
 
 
@@ -202,7 +214,7 @@ class ParseTest {
                     "22 3/4 Dollars: 22 3/4 Dollars\n" +
                     "$450,000: 450,000 Dollars " +
 
-                    " 6%\n" +
+                    " 6% 6%\n" +
                     "10.6 percent    10.6%\n" +
                     "10.6 percentage     10.6%\n" +
 
@@ -212,10 +224,13 @@ class ParseTest {
 
                     "10,123,000 10.123M\n" +
                     "55 Million 55M\n" +
-                    ".56 1.01056K\n" +
+                    "1010.56 1.01056K\n" +
 
                     "10,123,000,000 10.123B\n" +
                     "55 Billion 55B\n" +
-                    "7 Trillion 700B";
+                    "7 Trillion 700B " +
+                    "14 MAY, 14 May\n" +
+                    "June 4, JUNE 4 " +
+                    "May 1994, MAY 1994\n";
 
 }
