@@ -95,14 +95,35 @@ public class Parse implements Runnable{
      * @return a list of strings (tokens).
      */
     private List<String> tokenize(String string){
-//        final String splitterRegex = "[\t-#%-&(-,/-/:-@\\x5B-`{-~]"; //marks chars to split on. without . - $
-        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
+//        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
 
-        String[] stringAsTokens = string.split(String.format(keepDelimiters, splitterRegex /*delimiters regex*/));
+        List<String> lTokens = new ArrayList<>();
+        //TODO split alphanumerics
+        int from = 0;
+        int to = 0;
+        int length = string.length();
+        while (to < length) {
+            if(isDelimiter(string.charAt(to))){
+                //add token before delimiter
+                lTokens.add(string.substring(from, to));
+                from = to;
+                to++;
+                //add the delimiter
+                lTokens.add(string.substring(from, to));
+                from = to;
+            }
+            else
+                to++;
+        }
 
-        List<String> lStringAsTokens = tokenizeSecondPass(stringAsTokens);
+        return tokenizeSecondPass(lTokens);
+    }
 
-        return lStringAsTokens;
+
+    private boolean isDelimiter(char c){
+//        return ("" + c).matches("[\t-&(-,.-/:-@\\x5B-`{-~]");
+        return (c > 0 && c < '&') || (c > '(' && c < ',')|| (c > '.' && c < '/')|| (c > ':' && c < '@')
+                || (c > '[' && c < '`') || (c > '{' && c < '~');
     }
 
     /**
@@ -110,9 +131,9 @@ public class Parse implements Runnable{
      * @param textAsTokens - a list of tokenized strings to clean up
      * @return - a cleaned up list of tokens.
      */
-    private ArrayList<String> tokenizeSecondPass(String[] textAsTokens) {
+    private ArrayList<String> tokenizeSecondPass(List<String> textAsTokens) {
 
-        ArrayList<String> listOfTokens = new ArrayList<>(textAsTokens.length/2);
+        ArrayList<String> listOfTokens = new ArrayList<>(textAsTokens.size()/2);
 
         //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
@@ -573,13 +594,12 @@ public class Parse implements Runnable{
 
         try {
             InputStream is = null;
-            is = new FileInputStream(pathTostopwordsFile);
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
+            BufferedReader buffer = new BufferedReader(new FileReader(pathTostopwordsFile));
             String line = null;
             line = buffer.readLine();
             while(line != null){
                 stopWords.add(line);
-                buffer.readLine();
+                line = buffer.readLine();
             }
         } catch (FileNotFoundException e) {
             System.out.println("stopwords file not found in the specified path. running without stopwords");

@@ -13,7 +13,7 @@ class ParseTest {
 
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
-    private static final String pathToStopwords = "sdfds";
+    private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
 
     @Test
     void parseConcurrent() {
