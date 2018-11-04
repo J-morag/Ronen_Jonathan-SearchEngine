@@ -1,14 +1,11 @@
 import Elements.Document;
-import Elements.Term;
 import Elements.TermDocument;
 import Indexing.Indexer;
 import Indexing.Parse;
 import Indexing.ReadFile;
 import Indexing.Stemmer;
 
-import java.io.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 

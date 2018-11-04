@@ -4,12 +4,10 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 import com.sun.istack.internal.NotNull;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -22,6 +20,7 @@ public class Parse implements Runnable{
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
     private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
+    private String currString = "";
 
 
     /**
@@ -125,7 +124,7 @@ public class Parse implements Runnable{
 
     private static boolean isProtectedChar(char c){
         return (isSymbol(c) || isWhitespace(c) || (c>='0' && c<='9') || (isLetter(c)));
-        //TODO optimize by rewersing this statement? (check that it is not a trash char like ',')
+        //TODO optimize by reversing this statement? (check that it is not a trash char like ',')
     }
 
     private static boolean isWhitespace(char c){
@@ -139,22 +138,28 @@ public class Parse implements Runnable{
 
     private List<Term> parseWorker(List<String> lStrings){
         List<Term> terms = new ArrayList<>();
-        Iterator<String> iterator = lStrings.iterator();
+        ListIterator<String> iterator = lStrings.listIterator(0);
+
+         if (iterator.hasNext()) // check for case of parsing something empty
+             currString = iterator.next();
+
         while (iterator.hasNext()) {
-            String string = iterator.next();
-            TokenType type = TokenType.classify(string);
+            TokenType type = TokenType.classify(currString);
 
             //TODO first split alphanumerics into numbers and words
 
             //             ROOT CASES
             // whitespace
-            if(type == TokenType.WHITESPACE) ; //whitespace, do nothing
+            if(type == TokenType.WHITESPACE) currString = iterator.next(); //whitespace, do nothing
 
             //number
             else if(type == TokenType.NUMBER){
-                parseNumber(iterator, string, terms);
+                terms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), false).toString() )));
             }
             //TODO not finished with root cases
+
+            else //if completely failed to identify a token (unlikely)
+                currString = iterator.next();
 
         }
 
@@ -169,53 +174,181 @@ public class Parse implements Runnable{
         return null;
     }
 
-    private void parseNumber(@NotNull Iterator<String> iterator,@NotNull String number,@NotNull List<Term> termList){ //TODO remove termList, return a string builder
-        String string = number;
+    /**
+     * parses a number. always assignes currString to the next token to be parsed (wasn't successfully parsed here).
+     * @param iterator iterator from which to get strings to work on
+     * @param number - the number to work on.
+     * @param result - a string builder to add the result onto. may be empty or contain prior information.
+     * @param isPrice - indicates that the number should be treated as a price, regardless of the next token.
+     *                should be set to true if a '$' was encountered before the number. should be set to false if unsure.
+     * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
+     */
+    private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean isPrice){
+        currString = number;
         TokenType type = TokenType.NUMBER;
 
         StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
-        StringBuilder result = new StringBuilder(); //build resulting term here
         String decimals = null;
         String formattedNumber;
         while(type == TokenType.NUMBER){
-            sb.append(string);
-            string = iterator.next();
-            type = TokenType.classify(string); //may result in classifying the same string twice. is acceptable?
+            sb.append(currString);
+            currString = iterator.next();
+            type = TokenType.classify(currString); //may result in classifying the same string twice. is acceptable?
         }
-        if(type == TokenType.SYMBOL && string.equals(".")){ //decimal point or end of line
-            string = iterator.next();
-            type = TokenType.classify(string);
+
+        // format NUMBER.NUMBER
+        if(type == TokenType.SYMBOL && currString.equals(".")){ //decimal point or end of line
+            currString = iterator.next();
+            type = TokenType.classify(currString);
             if(type == TokenType.NUMBER){ // decimal digits
-                decimals = string;
+                decimals = currString;
+                currString = iterator.next();
+                type = TokenType.classify(currString);
             }
             formattedNumber = formatNumber(sb.toString(), decimals);
             result.append(formattedNumber);
         }
-        else if(type == TokenType.WHITESPACE && string.equals(" ")){ // check for word after number
-            string = iterator.next();
-            type = TokenType.classify(string);
-            formattedNumber = formatNumber(sb.toString(), decimals);
-            result.append(formattedNumber);
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Thousand") || string.equalsIgnoreCase("K")) ){
+        // format NUMBER NUMBER/NUMBER
+        else if(type == TokenType.WHITESPACE && currString.equals(" ")) {
+            tryParseFraction(iterator, sb);
+            result.append(sb.toString());
+        }
+        else result.append(formatNumber(sb.toString(), null)); // no decimals or fractions, just append formatted number
+
+        // format of NUMBER %
+        if(type == TokenType.SYMBOL && currString.equals("%")){
+            result.append('%');
+            currString = iterator.next();
+        }
+        // space, so check for word after number
+        else if(type == TokenType.WHITESPACE && !currString.equals("\n")){
+            currString = iterator.next();
+            type = TokenType.classify(currString);
+
+
+            if(type == TokenType.WORD && (currString.equalsIgnoreCase("Thousand") || currString.equalsIgnoreCase("K")) ){
                 result.append('K');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
             }
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Million") || string.equalsIgnoreCase("M")) ) {
+            else if(type == TokenType.WORD && (currString.equalsIgnoreCase("Million") || currString.equalsIgnoreCase("M")) ) {
                 result.append('M');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
             }
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Billion") || string.equalsIgnoreCase("B")) ){
+            else if(type == TokenType.WORD &&
+                    (currString.equalsIgnoreCase("Billion") || currString.equalsIgnoreCase("B") || currString.equals("bn")) ){
                 result.append('B');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
             }
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Trillion") || string.equalsIgnoreCase("T")) ){
+            else if(type == TokenType.WORD && (currString.equalsIgnoreCase("Trillion") || currString.equalsIgnoreCase("T")) ){
                 result.append("000B");
+                currString = iterator.next();
+                type = TokenType.classify(currString);
             }
-            if(type == TokenType.WORD && (string.equalsIgnoreCase("Dollar") || string.equalsIgnoreCase("Dollars"))){ //TODO more dollar cases
-                result.append(" Dollars"); //TODO reformat number when encountering dollars???
+            // if its NUMBER DOLLAR and not NUMBER M/B/K DOLLARS
+            else if( isPrice || (type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){ //TODO more dollar cases
+                result.append(" Dollars");
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+            }
+            // format of NUMBER PERCENT
+            else if(type == TokenType.WORD && (currString.equals("percent") || currString.equals("percentage"))){
+                result.append('%');
+                currString = iterator.next(); //end of parsing number
             }
 
-            //TODO not finished....... dollars, percents....
+            // format of NUMBER K/M/B U.S. Dollars  or  NUMBER K/M/B DOLLARS
+            // there is a " " again because of parsing the K/M/B parsing
+            if(type == TokenType.WHITESPACE && currString.equals(" ")){
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+                // format of NUMBER K/M/B U.S. Dollars
+                if (type == TokenType.WORD && currString.equals("U")){
+                    tryParseUSDollars(iterator, result);
+                }
+                // format of NUMBER K/M/B DOLLARS
+                else if( isPrice || (type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){ //TODO more dollar cases
+                    result.append(" Dollars"); //TODO reformat number when encountering dollars???
+                }
+                //end of parsing number
+            }
+            // format of NUMBER U.S. Dollars
+            else if (type == TokenType.WORD && currString.equals("U")){
+                tryParseUSDollars(iterator, result);
+            }
+
         }
 
-        termList.add(new Term(result.toString()));
+        return result;
+    }
+
+    /**
+     * assumes the previously encountered string was " ".
+     * if successfull, also appends the " " at the start of the result.
+     * * if unsuccessful, reverts to currString == " ", with iterator.next() pointing to the next token after " ".
+     * @param iterator
+     * @param result
+     */
+    private void tryParseFraction(ListIterator<String> iterator, StringBuilder result) {
+        // assumes the previously encountered string was " ".
+        currString = iterator.next();
+        TokenType type = TokenType.classify(currString);
+        String firstNumber = "";
+        if(type == TokenType.NUMBER){
+            firstNumber = currString;
+            currString = iterator.next();
+            type = TokenType.classify(currString);
+            if(currString.equals("/")){
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+                if(TokenType.NUMBER == type){
+                    result.append(' ');
+                    result.append(firstNumber);
+                    result.append('/');
+                    result.append(currString);
+                    currString = iterator.next();
+                }
+                else currString = iterator.previous(); // currString == "/"
+            }
+            else currString = iterator.previous(); // currString == some number
+        }
+        else currString = iterator.previous(); // currString == " "
+    }
+
+    /**
+     * assumes the previously encountered string was "U".
+     * if successful, also appends the "U" at the start of the result.
+     * if unsuccessful, reverts to currString == "U", with iterator.next() pointing to the next token after "U".
+     * @param iterator
+     * @param result
+     */
+    private void tryParseUSDollars(ListIterator<String> iterator, StringBuilder result) {
+        //assumes the previously encountered string was "U".
+        currString = iterator.next();
+        TokenType type = TokenType.classify(currString);
+        if(currString.equals(".")){
+            currString = iterator.next();
+            if (currString.equals("S")){
+                currString = iterator.next();
+                if(currString.equals(".")){
+                    currString = iterator.next();
+                    if(currString.equals(" ")){
+                        currString = iterator.next();
+                        if((type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){ //TODO more dollar cases
+                            result.append(" Dollars");
+                            currString = iterator.next(); // move to next because parsing this term is idone
+                        }
+                        else currString = iterator.previous(); // currString == " "
+                    }
+                    else currString = iterator.previous();// currString == "."
+                }
+                else currString = iterator.previous(); // currString == "S"
+            }
+            else currString = iterator.previous(); // currString == "."
+        }
+        else currString = iterator.previous(); // currString == "U"
     }
 
     private String formatNumber(@NotNull String num, String decimals){
@@ -269,6 +402,7 @@ public class Parse implements Runnable{
          * @return - a TokenType enum value
          */
         public static TokenType classify(String str){
+            if(str == null || str.isEmpty()) return null;
             int length = str.length();
             if (1 == length){ // one char long
                 if(isWhitespace(str.charAt(0)))

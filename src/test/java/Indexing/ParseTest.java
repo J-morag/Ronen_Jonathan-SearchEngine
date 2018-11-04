@@ -190,10 +190,10 @@ class ParseTest {
                     "$450,000,000\n" +
                     "450 M Dollars\n" +
                     "$100 million 100 M Dollars\n" +
-                    "20.6m Dollars\n" +
+                    "20.6 m Dollars\n" +
                     "20.6 M Dollars\n" +
                     "$100 billion, 100000 M Dollars \n" +
-                    "100bn Dollars, 100000 M Dollars\n" +
+                    "100 bn Dollars, 100000 M Dollars\n" +
                     "100 billion U.S. dollars. 100000 M Dollars\n" +
                     "320 million U.S. dollars. 320 M Dollars\n" +
                     "1 trillion U.S. dollars. 1000000 M Dollars " +
