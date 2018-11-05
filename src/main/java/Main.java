@@ -29,7 +29,7 @@ public class Main {
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
-        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(100000);//documentBufferSize);
+        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
         BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
 
@@ -38,10 +38,13 @@ public class Main {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
         tReader.start();
-        tReader.join();
+        Thread.sleep(500);
         while (!documentBuffer.isEmpty()){
-            System.out.println(documentBuffer.poll());
+            System.out.println(documentBuffer.poll().getText());
         }
+        tReader.join();
+        //TODO make sure that it's work properly
+
 
         HashSet<String> stopwords = Parse.getStopWords(pathToStopwordsFile);
 
