@@ -10,6 +10,13 @@ public class Document {
         //this.serialID = serialID;
     }
 
+    public String[] getAllParsableFields(){
+        String[] fields = new String[2];
+        fields[0] = header;
+        fields[1] = text;
+        return fields;
+    }
+
     public void setHeader(String header) {
         this.header = header;
     }

@@ -76,17 +76,15 @@ public class Parse implements Runnable{
      * @return - a parsed TermDocument.
      */
     public TermDocument parseOneDocument(Document doc){
-        List<String> tokenizedHeader = tokenize(doc.getHeader());
-        List<String> tokenizedText = tokenize(doc.getText());
 
-        List<Term> headerAsTerms = parseWorker(tokenizedHeader);
-        List<Term> textAsTerms = parseWorker(tokenizedText);
+        String[] originalFields = doc.getAllParsableFields();
+        List<Term>[] parsedFields = new List[originalFields.length];
 
-        TermDocument termDocument = new TermDocument(doc);
-        termDocument.setHeader(headerAsTerms);
-        termDocument.setText(textAsTerms);
+        for (int i = 0; i < originalFields.length; i++) {
+            parsedFields[i] = parseWorker(tokenize(originalFields[i]));
+        }
 
-        return termDocument;
+        return new TermDocument(doc, parsedFields);
     }
 
     /**
@@ -102,7 +100,28 @@ public class Parse implements Runnable{
         int from = 0;
         int to = 0;
         int length = string.length();
+
+        boolean foundLetters = false;
+        boolean foundDigits = false;
+
         while (to < length) {
+
+            //check alphanumeric
+            if(isLetter(string.charAt(to))){
+                foundLetters = true;
+            }
+            else if((string.charAt(to)>='0' && string.charAt(to)<='9')){
+                foundDigits = true;
+            }
+            //split if alphanumeric
+            if(foundLetters && foundDigits){
+                lTokens.add(string.substring(from, to));
+                from = to;
+                foundDigits = false;
+                foundLetters = false;
+            }
+
+            // split and keep delimiter if delimiter
             if(isDelimiter(string.charAt(to))){
                 //add token before delimiter
                 lTokens.add(string.substring(from, to));
@@ -122,8 +141,8 @@ public class Parse implements Runnable{
 
     private boolean isDelimiter(char c){
 //        return ("" + c).matches("[\t-&(-,.-/:-@\\x5B-`{-~]");
-        return (c > 0 && c < '&') || (c > '(' && c < ',')|| (c > '.' && c < '/')|| (c > ':' && c < '@')
-                || (c > '[' && c < '`') || (c > '{' && c < '~');
+        return (c <= '&') || (c >= '(' && c <= ',')|| (c >= '.' && c <= '/')|| (c >= ':' && c <= '@')
+                || (c >= '[' && c <= '`') || (c >= '{' && c <= '~');
     }
 
     /**
@@ -236,12 +255,13 @@ public class Parse implements Runnable{
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean isPrice){
         currString = number;
         TokenType type = TokenType.NUMBER;
-
-        StringBuilder sb = new StringBuilder(); //start concatenating number parts to build full number
-        String decimals = null;
+        String KMB = "";
         String formattedNumber;
+
+        StringBuilder unformattedNumber = new StringBuilder(); //start concatenating number parts to build full number
+        String decimals = null;
         while(type == TokenType.NUMBER){
-            sb.append(currString);
+            unformattedNumber.append(currString);
             currString = iterator.next();
             type = TokenType.classify(currString); //may result in classifying the same string twice
         }
@@ -255,20 +275,20 @@ public class Parse implements Runnable{
                 currString = iterator.next();
                 type = TokenType.classify(currString);
             }
-            formattedNumber = formatNumber(sb.toString(), decimals);
+            formattedNumber = formatNumber(unformattedNumber.toString(), decimals); //TODO move number formatting to after knowing if price or number
             result.append(formattedNumber);
         }
         // NUMBER -> " " + NUMBER/NUMBER
         else if(type == TokenType.WHITESPACE && currString.equals(" ")) {
-            boolean isFractional = tryParseFraction(iterator, sb);
+            boolean isFractional = tryParseFraction(iterator, unformattedNumber);
             if(isFractional)
-                result.append(sb.toString());
+                result.append(unformattedNumber.toString());
             else {
-                formattedNumber = formatNumber(sb.toString(), null);
+                formattedNumber = formatNumber(unformattedNumber.toString(), null);
                 result.append(formattedNumber);
             }
         }
-        else result.append(formatNumber(sb.toString(), null)); // no decimals or fractions, just append formatted number
+        else result.append(formatNumber(unformattedNumber.toString(), null)); // no decimals or fractions, just append formatted number
 
         // NUMBER -> %
         if(type == TokenType.SYMBOL && currString.equals("%")){
@@ -340,23 +360,23 @@ public class Parse implements Runnable{
             }
             // NUMBER -> MONTH
             else if(TokenType.WORD == type && months.containsKey(currString)){
-                if(result.length() > 2){ // number is year
+                if(unformattedNumber.length() > 2){ // number is year
                     result.delete(0, result.length()); //remove formatted number
-                    result.append(sb); //reinsert number without format
+                    result.append(unformattedNumber); //reinsert number without format
                     result.append("-");
                     result.append(months.get(currString));
                 }
-                else if (currString.length() == 2){ //number is day
+                else if (unformattedNumber.length() == 2){ //number is day
                     result.delete(0, result.length());
                     result.append(months.get(currString));
                     result.append("-");
-                    result.append(sb);
+                    result.append(unformattedNumber);
                 }
                 else{ // number is day and <=9
                     result.delete(0, result.length());
                     result.append(months.get(currString));
                     result.append("-0");
-                    result.append(sb);
+                    result.append(unformattedNumber);
                 }
                 currString = iterator.next();
             }
@@ -364,6 +384,24 @@ public class Parse implements Runnable{
         // "$" + NUMBER -> NUMBER Dollars
         else if(isPrice){
             result.append(" Dollars");
+        }
+        // NUMBER -> NUMBER + K/M/B
+        else if (type == TokenType.WORD){
+            if(currString.equalsIgnoreCase("K") ){
+                result.append('K');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+            }
+            else if(currString.equalsIgnoreCase("M") ) {
+                result.append('M');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+            }
+            else if(currString.equalsIgnoreCase("B") || currString.equals("bn") ){
+                result.append('B');
+                currString = iterator.next();
+                type = TokenType.classify(currString);
+            }
         }
 
 

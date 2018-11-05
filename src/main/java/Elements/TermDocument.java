@@ -18,6 +18,13 @@ public class TermDocument {
         this.docId = doc.getDocId();
     }
 
+    public TermDocument(Document doc, List<Term>[] fields) {
+        this.serialID = doc.getSerialID();
+        this.docId = doc.getDocId();
+        this.header = fields[0];
+        this.text = fields[1];
+    }
+
     public int getSerialID() {
         return serialID;
     }
