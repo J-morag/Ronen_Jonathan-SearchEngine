@@ -96,7 +96,6 @@ public class Parse implements Runnable{
 //        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
 
         List<String> lTokens = new ArrayList<>();
-        //TODO split alphanumerics
         int from = 0;
         int to = 0;
         int length = string.length();
