@@ -211,7 +211,10 @@ public class Parse implements Runnable{
             }
             // WORD ->
             else if (TokenType.WORD == type){
-                terms.add(new Term(( parseWord(iterator, currString, new StringBuilder()).toString() )) );
+                String term = parseWord(iterator, currString, new StringBuilder()).toString();
+                if(!term.isEmpty()){
+                    terms.add(new Term(term));
+                }
             }
             // NUMBER ->
             else if(type == TokenType.NUMBER){
