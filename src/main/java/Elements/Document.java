@@ -15,6 +15,13 @@ public class Document {
     public void setTitle(String header) {
         this.title = header;
     }
+    public String[] getAllParsableFields(){
+        String[] fields = new String[2];
+        fields[0] = title;
+        fields[1] = text;
+        return fields;
+    }
+
 
     public void setText(String text) {
         this.text = text;

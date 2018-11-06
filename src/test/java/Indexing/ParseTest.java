@@ -4,10 +4,12 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.RepeatedTest;
 
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+
 
 class ParseTest {
 
@@ -103,8 +105,8 @@ class ParseTest {
         System.out.println("Elapsed time(ms): " + (time));
         System.out.println("Terms parsed: " + (numTerms1) + "/" + numTermsExpected1);
         List<Term> terms = td.getText();
-        for (int i = 0; i < terms.size() ; i++) {
-//            assertEquals(terms.get(i++), terms.get(i++));
+        for (int i = 0; i < terms.size() ;) {
+            assertEquals(terms.get(i++), terms.get(i++));
         }
     }
 
@@ -224,7 +226,7 @@ class ParseTest {
 
                     "10,123,000 10.123M\n" +
                     "55 Million 55M\n" +
-                    "1010.56 1.01056K\n" +
+                    "1,010,560 1.01056M\n" +
 
                     "10,123,000,000 10.123B\n" +
                     "55 Billion 55B\n" +

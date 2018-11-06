@@ -18,4 +18,19 @@ public class Term {
     public String toString() {
         return string;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Term term = (Term) o;
+
+        return string != null ? string.equals(term.string) : term.string == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return string != null ? string.hashCode() : 0;
+    }
 }
