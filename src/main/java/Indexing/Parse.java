@@ -31,7 +31,7 @@ public class Parse implements Runnable{
      * @param sinkTermDocumentQueue - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
-    public Parse(HashSet<String> stopWords, BlockingQueue<Document> sourceDocumentsQueue, BlockingQueue<TermDocument> sinkTermDocumentQueue) {
+    public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue) {
         this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
@@ -75,7 +75,7 @@ public class Parse implements Runnable{
      * @param doc - the Document to parse.
      * @return - a parsed TermDocument.
      */
-    public TermDocument parseOneDocument(Document doc){
+    public TermDocument parseOneDocument(@NotNull Document doc){
 
         String[] originalFields = doc.getAllParsableFields();
         List<Term>[] parsedFields = new List[originalFields.length];
@@ -255,6 +255,11 @@ public class Parse implements Runnable{
      * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean isPrice){
+        /*TODO move number formatting to after knowing if price or number.
+        TODO keep K/M/B/T as a number representing how much the decimal point should be moved.
+        TODO add parameter determining if the number should be formatted for a price or a number, or split into two functions.
+        TODO mark fraction as such
+         */
         currString = number;
         TokenType type = TokenType.NUMBER;
         String KMB = "";
@@ -277,7 +282,7 @@ public class Parse implements Runnable{
                 currString = iterator.next();
                 type = TokenType.classify(currString);
             }
-            formattedNumber = formatNumber(unformattedNumber.toString(), decimals); //TODO move number formatting to after knowing if price or number
+            formattedNumber = formatNumber(unformattedNumber.toString(), decimals);
             result.append(formattedNumber);
         }
         // NUMBER -> " " + NUMBER/NUMBER
@@ -468,7 +473,7 @@ public class Parse implements Runnable{
      * @param iterator
      * @param result
      */
-    private boolean tryParseFraction(ListIterator<String> iterator, StringBuilder result) {
+    private boolean tryParseFraction(@NotNull ListIterator<String> iterator,@NotNull StringBuilder result) {
         // assumes the previously encountered string was " ".
         currString = iterator.next();
         TokenType type = TokenType.classify(currString);
@@ -506,7 +511,7 @@ public class Parse implements Runnable{
      * @param iterator
      * @param result
      */
-    private boolean tryParseUSDollars(ListIterator<String> iterator, StringBuilder result) {
+    private boolean tryParseUSDollars(@NotNull ListIterator<String> iterator,@NotNull  StringBuilder result) {
         //assumes the previously encountered string was "U".
         currString = iterator.next();
         TokenType type = TokenType.classify(currString);
@@ -540,6 +545,8 @@ public class Parse implements Runnable{
     }
 
     private String formatNumber(@NotNull String num, String decimals){
+        //TODO represent number as a double
+        //TODO find num of thousands with modulu
         int numOfThousands = (num.length()-1)/3; //rounds down - so one to three digits is 0, four to six is 1...
         StringBuilder sb = new StringBuilder();
         sb.append(num, 0, num.length()-(numOfThousands*3) /*end index is exclusive*/); //leftmost digits
