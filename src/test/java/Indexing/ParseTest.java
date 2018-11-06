@@ -90,6 +90,7 @@ class ParseTest {
                 docs, termDocs);
         Parse.debug = true;
         Document doc1 = new Document();
+        doc1.setDate("AUGUST 2");
         doc1.setTitle("");
         doc1.setDocId("testCases");
         doc1.setText(testCases);

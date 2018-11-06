@@ -7,6 +7,7 @@ public class TermDocument {
     private String docId;
     private List<Term> header;
     private List<Term> text;
+    private List<Term> date;
 
     public TermDocument(int serialID, String docId) {
         this.serialID = serialID;
@@ -23,6 +24,7 @@ public class TermDocument {
         this.docId = doc.getDocId();
         this.header = fields[0];
         this.text = fields[1];
+        this.date = fields[2];
     }
 
     public int getSerialID() {
