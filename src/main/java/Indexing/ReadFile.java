@@ -49,10 +49,10 @@ public class ReadFile implements Runnable {
         File[] allSubFiles = f.listFiles();
         for (File file : allSubFiles) {
             if (file.isDirectory()) {
-                File [] documentsFiles = file.listFiles();
-                for (File fileToGenerate: documentsFiles) {
+                File[] documentsFiles = file.listFiles();
+                for (File fileToGenerate : documentsFiles) {
                     docs = separateDocs(fileToGenerate);
-                    if(docs != null){
+                    if (docs != null) {
                         generateDocs(docs);
                     }
                 }
@@ -69,18 +69,17 @@ public class ReadFile implements Runnable {
      * @param fileToGenerate - a file that contains a bunch of Documents that needs to be separated
      * @return Elements object ( a list of Elements that each element is a document)
      */
-    private Elements separateDocs(File fileToGenerate)
-    {
+    private Elements separateDocs(File fileToGenerate) {
         FileInputStream fi = null;
-        Elements toReturn=null;
+        Elements toReturn = null;
 
         try {
             fi = new FileInputStream(fileToGenerate);
-            BufferedReader br =new BufferedReader(new InputStreamReader(fi));
+            BufferedReader br = new BufferedReader(new InputStreamReader(fi));
             StringBuilder sb = new StringBuilder();
             String line = null;
             line = br.readLine();
-            while (line!=null) {
+            while (line != null) {
                 sb.append(line);
                 line = br.readLine();
             }
@@ -97,10 +96,8 @@ public class ReadFile implements Runnable {
      * parses each element into a SaxParser that creates a Documents objects and insert them to the buffer.
      * @param elems - a list of separated documents that needs to be generated
      */
-    private void generateDocs(Elements elems)
-    {
-        for (Element elm: elems)
-        {
+    private void generateDocs(Elements elems) {
+        for (Element elm : elems) {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = null;
             try {
@@ -108,9 +105,9 @@ public class ReadFile implements Runnable {
                 saxParser = factory.newSAXParser();
                 UserHandler userhandler = new UserHandler();
 
-                String st =elm.toString();
-                InputStream is =new ByteArrayInputStream(st.getBytes());
-                saxParser.parse( is, userhandler);
+                String st = elm.toString();
+                InputStream is = new ByteArrayInputStream(st.getBytes());
+                saxParser.parse(is,userhandler);
             } catch (SAXException e) {
                 e.printStackTrace();
 
@@ -140,9 +137,12 @@ public class ReadFile implements Runnable {
     class UserHandler extends DefaultHandler {
         //boolean startDoc = false;
         boolean docId = false;
-        boolean header = false;
+        boolean title = false;
         boolean text = false;
+        boolean others =false;
+        boolean date = false;
         Document doc = null;
+        StringBuilder textString;
 
 
         @Override
@@ -151,14 +151,21 @@ public class ReadFile implements Runnable {
                 throws SAXException {
 
             if (qName.equalsIgnoreCase("DOCNO")) {
-                doc =new Document();
+                doc = new Document();
                 docId = true;
-            } else if (qName.equalsIgnoreCase("HEADER")) {
-                header = true;
+            }
+            else if (qName.equalsIgnoreCase("TI")){
+                title=true;
+            }
+            else if (qName.equalsIgnoreCase("DATE") || qName.equalsIgnoreCase("DATE1")) {
+                date = true;
             } else if (qName.equalsIgnoreCase("TEXT")) {
                 text = true;
+                textString = new StringBuilder();
+            } else if( text) {
+
+                others =true;
             }
-            else return;
 
 
         }
@@ -168,10 +175,15 @@ public class ReadFile implements Runnable {
                                String localName, String qName) throws SAXException {
             if (qName.equalsIgnoreCase("DOC")) {
                 try {
-                    ReadFile.documentBuffer.put(doc);
+                    documentBuffer.put(doc);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+            } else if (qName.equalsIgnoreCase("TEXT")){
+                text = false;
+                doc.setText(textString.toString());
+                textString=null;
             }
         }
 
@@ -181,16 +193,25 @@ public class ReadFile implements Runnable {
 
             if (docId) {
                 doc.setDocId(new String(ch, start, length));
-                //System.out.println(doc.getDocId()+"\n------------------------");
                 docId = false;
-            } else if (header) {
-                doc.setHeader(new String(ch, start, length));
-                header = false;
-            } else if (text) {
-                System.out.println(new String(ch, start, length)); //@TODO fix it!! it is copying only until the first sub Tag
-                doc.setText(new String(ch, start, length));
-                text = false;
+            } else if (date) {
+                doc.setDate(new String(ch, start, length));
+                date = false;
+
             }
+            else if(title){
+                doc.setTitle(new String(ch, start, length));
+                title=false;
+            }
+            else if(text && others){
+                textString.append( new String(ch, start, length) );
+                others=false;
+
+            } else if (text) {
+                //  System.out.println(new String(ch, start, length)); //@TODO fix it!! it is copying only until the first sub Tag
+                textString.append(new String(ch, start, length));
+            }
+
         }
 
     }

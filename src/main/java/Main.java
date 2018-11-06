@@ -12,11 +12,11 @@ import java.util.concurrent.BlockingQueue;
 public class Main {
 
     // GLOBAL PARAMETERS
-    private static final int documentBufferSize = 10;
+    private static final int documentBufferSize = 1000000;
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
     private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
 
@@ -38,13 +38,7 @@ public class Main {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
         tReader.start();
-        Thread.sleep(500);
-        while (!documentBuffer.isEmpty()){
-            System.out.println(documentBuffer.poll().getText());
-        }
         tReader.join();
-        //TODO make sure that it's work properly
-
 
         HashSet<String> stopwords = Parse.getStopWords(pathToStopwordsFile);
 
@@ -56,7 +50,6 @@ public class Main {
 
         Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermDocumentsBuffer));
         tIndexer.start();
-
     }
 
 }

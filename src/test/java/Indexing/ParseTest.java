@@ -21,11 +21,11 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Document doc1 = new Document();
-        doc1.setHeader("Alice's Adventures in Wonderland");
+        doc1.setTitle("Alice's Adventures in Wonderland");
         doc1.setDocId("Alice01");
         doc1.setText(alice);
         Document doc2 = new Document();
-        doc2.setHeader("Technical Document Test");
+        doc2.setTitle("Technical Document Test");
         doc2.setDocId("Tech01");
         doc2.setText(technicalDocument);
 
@@ -88,7 +88,7 @@ class ParseTest {
                 docs, termDocs);
         Parse.debug = true;
         Document doc1 = new Document();
-        doc1.setHeader("");
+        doc1.setTitle("");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
         int numTerms1 = 0;
