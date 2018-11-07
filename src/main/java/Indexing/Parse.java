@@ -204,11 +204,7 @@ public class Parse implements Runnable{
 
             //             ROOT CASES
             // whitespace
-            if (TokenType.ALPHANUMERIC == type){ //TODO split somehow
-//                splitAlphanumericInList(iterator, lStrings, currString);
-                currString = iterator.next();
-            }
-            else if(type == TokenType.WHITESPACE) {
+            if(type == TokenType.WHITESPACE) {
                 currString = iterator.next(); //whitespace, do nothing
             }
             // WORD ->
@@ -228,7 +224,7 @@ public class Parse implements Runnable{
                 type = TokenType.classify(currString);
                 terms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), true).toString() )));
             }
-            //TODO not finished with root cases
+            //TODO not finished with root cases. add betweens. add something original?
 
             else //if completely failed to identify a token (unlikely)
                 currString = iterator.next();
@@ -367,31 +363,7 @@ public class Parse implements Runnable{
             // NUMBER -> MONTH
             else if(TokenType.WORD == type && months.containsKey(currString)){
                 isDate = true;
-                //TODO move this logic into the filanization function
-                if(unformattedNumber.length() > 2){ // number is year
-                    result.delete(0, result.length()); //remove formatted number
-                    result.append(unformattedNumber); //reinsert number without format
-                    result.append("-");
-                    result.append(months.get(currString));
-                    currString = iterator.next();
-                    return result;
-                }
-                else if (unformattedNumber.length() == 2){ //number is day
-                    result.delete(0, result.length());
-                    result.append(months.get(currString));
-                    result.append("-");
-                    result.append(unformattedNumber);
-                    currString = iterator.next();
-                    return result;
-                }
-                else{ // number is day and <=9
-                    result.delete(0, result.length());
-                    result.append(months.get(currString));
-                    result.append("-0");
-                    result.append(unformattedNumber);
-                    currString = iterator.next();
-                    return result;
-                }
+                currString = iterator.next();
             }
         }
         // "$" + NUMBER -> NUMBER Dollars
@@ -419,6 +391,10 @@ public class Parse implements Runnable{
 
         finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, isDate);
         return result;
+    }
+
+    private void safeIterateAndCheckType(ListIterator<String> iterator){
+        //TODO not implemented
     }
 
     /**
@@ -497,89 +473,108 @@ public class Parse implements Runnable{
         return false;
     }
 
-    private String formatNumber(@NotNull String num, String decimals){
-        //TODO represent number as a double
-        //TODO find num of thousands with modulu
-        int numOfThousands = (num.length()-1)/3; //rounds down - so one to three digits is 0, four to six is 1...
-        StringBuilder sb = new StringBuilder();
-        sb.append(num, 0, num.length()-(numOfThousands*3) /*end index is exclusive*/); //leftmost digits
-
-        if(numOfThousands > 0){
-            int indexOfLeftmostTrailingZero = num.length()-1; //index of rightmost char
-            while (num.charAt(indexOfLeftmostTrailingZero) == '0') indexOfLeftmostTrailingZero--; //look for non zero char
-            indexOfLeftmostTrailingZero++; //return to the zero
-
-            int indexOfCharAfterLeftmostNumberSection = num.length()-(numOfThousands*3);
-
-            if (indexOfLeftmostTrailingZero > indexOfCharAfterLeftmostNumberSection) { //something other than zeros after the decimal point after shortening
-                sb.append('.'); //decimal point
-                sb.append(num, indexOfCharAfterLeftmostNumberSection, indexOfLeftmostTrailingZero ); //remainder
-                if(null != decimals)
-                    sb.append(decimals); //original decimals
-            }
-            else if(null != decimals){ //no decimals from shortening number, but original decimals exist
-                sb.append('.'); //decimal point
-                sb.append(decimals); //original decimals
-            }
-
-            if(numOfThousands == 1){
-                sb.append('K');
-            }
-            else if (numOfThousands == 2){
-                sb.append('M');
-            }
-            else
-                sb.append('B');
-        }
-
-        else if(null != decimals){ // number is smaller than 1000, but lets add original decimals
-            sb.append('.'); //decimal point
-            sb.append(decimals); //original decimals
-        }
-
-
-        return sb.toString();
-    }
-
     /**
+     * after all the information regarding the number being parsed has been collected, finalize it into a properly formatted number.
      * may lose some rightmost digits if a number is both a fraction and very large (trillions)
      * @param unformattedNumber
-     * @param result
-     * @param kmbtMultiplier
-     * @param decimals
+     * @param result - formatting result will be appended onto here. will not override existing content.
+     * @param kmbtMultiplier >= 1
+     * @param decimals - if null, will be treated as no decimals exist.
      * @param isPrice
      * @param isPercent
      * @param isFractional
      * @param isDate
      */
-    private void finalizeNumber(StringBuilder unformattedNumber, StringBuilder result, long kmbtMultiplier,
+    private void finalizeNumber(@NotNull StringBuilder unformattedNumber,@NotNull StringBuilder result, long kmbtMultiplier,
                                 String decimals, boolean isPrice, boolean isPercent, boolean isFractional, boolean isDate)
     {
+        String stringDollars = " Dollars";
+
         if(isFractional){
             result.append(unformattedNumber);
             if(isPercent){
                 result.append('%');
             }
+            else if (isPrice){
+                result.append(stringDollars);
+            }
         }
         else {
-            if(null != decimals) unformattedNumber.append(decimals);
+            if(null != decimals){
+                unformattedNumber.append('.');
+                unformattedNumber.append(decimals);
+            }
             double number = Double.parseDouble(unformattedNumber.toString());
             number *= kmbtMultiplier;
 
             if(isPrice){
-                //TODO not implemented
+                if (number<1000){ // too small to matter
+                    appendWhileTrimmingDecimals(result, number);
+                }
+                else if (number>=1000 && number<1000000){ //thousands
+                    number /= 1000;
+                    appendWhileTrimmingDecimals(result, number);
+                    result.append(" K");
+                }
+                else { //millions or larger
+                    number /= 1000000;
+                    appendWhileTrimmingDecimals(result, number);
+                    result.append(" M");
+                }
+
+                result.append(stringDollars);
 
             }
             else if(isDate){
-                //TODO not implemented
+                if(unformattedNumber.length() > 2){ // number is year
+                    result.append(unformattedNumber); //insert number without format
+                    result.append("-");
+                    result.append(months.get(currString));
+                }
+                else if (unformattedNumber.length() == 2){ //number is day
+                    result.append(months.get(currString));
+                    result.append("-");
+                    result.append(unformattedNumber);
+                }
+                else{ // number is day and <=9
+                    result.append(months.get(currString));
+                    result.append("-0");
+                    result.append(unformattedNumber);
+                }
             }
-            else{ //just a number
-                //TODO not implemented
+            else{ //regular number
+                if (number<1000){ // too small to matter
+                    appendWhileTrimmingDecimals(result, number);
+                }
+                else if (number>=1000 && number<1000000){ //thousands
+                    number /= 1000;
+                    appendWhileTrimmingDecimals(result, number);
+                    result.append("K");
+                }
+                else if (number>=1000000 && number<1000000000){ //millions
+                    number /= 1000000;
+                    appendWhileTrimmingDecimals(result, number);
+                    result.append("M");
+                }
+                else { //billions or larger
+                    number /= 1000000000;
+                    appendWhileTrimmingDecimals(result, number);
+                    result.append("B");
+                }
+
                 if(isPercent){
                     result.append('%');
                 }
             }
         }
+    }
+
+    private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, double number){
+        if( number % 1 == 0 ){
+            long numberWithoutDecimals = ((long)number);
+            result.append(numberWithoutDecimals);
+        }
+        else result.append(number);
     }
 
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result){
@@ -633,8 +628,12 @@ public class Parse implements Runnable{
         return result;
     }
 
+
+    /**
+     * slphanumerics are also treated as a word
+      */
     private enum TokenType {
-        NUMBER, WORD, ALPHANUMERIC, SYMBOL, WHITESPACE;
+        NUMBER, WORD, SYMBOL, WHITESPACE;
 
         /**
          * classifies a token (string) to a type of token
@@ -657,14 +656,11 @@ public class Parse implements Runnable{
             else{ //more than one character
                 if(str.charAt(0) <= '9' && str.charAt(0) >= '0'){ //first char is digit
                     for(int i=0; i<length; i++){
-                        if(isLetter(str.charAt(i))) return ALPHANUMERIC;
+                        if(isLetter(str.charAt(i)) || isSymbol(str.charAt(i))) return WORD;
                     }
                     return NUMBER; // all chars are digits
                 }
-                else { //first char is letter (symbols should not appear in words since they are used as separators
-                    for(int i=0; i<length; i++){
-                        if(str.charAt(i) <= '9' && str.charAt(i) >= '0') return ALPHANUMERIC;
-                    }
+                else { //first char is letter
                     return WORD; //all chars are letters
                 }
             }

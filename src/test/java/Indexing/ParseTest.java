@@ -18,7 +18,7 @@ class ParseTest {
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
 
     @Test
-    void parseConcurrent() {
+    void parseConcurrentTestPerformance() {
 
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
@@ -91,7 +91,7 @@ class ParseTest {
         Parse.debug = true;
         Document doc1 = new Document();
         doc1.setDate("AUGUST 2");
-        doc1.setTitle("");
+        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
         int numTerms1 = 0;
@@ -222,7 +222,7 @@ class ParseTest {
                     "10.6 percentage     10.6%\n" +
 
                     "10,123 10.123K\n" +
-                    "123 Thousand 123.456K\n" +
+                    "123 Thousand 123K\n" +
                     "1010.56 1.01056K\n" +
 
                     "10,123,000 10.123M\n" +
@@ -231,7 +231,7 @@ class ParseTest {
 
                     "10,123,000,000 10.123B\n" +
                     "55 Billion 55B\n" +
-                    "7 Trillion 700B " +
+                    "7 Trillion 7000B " +
                     "14 MAY, 14 May\n" +
                     "June 4, JUNE 4 " +
                     "May 1994, MAY 1994\n";
