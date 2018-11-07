@@ -16,6 +16,7 @@ class ParseTest {
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
+    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\corpus";
 
     @Test
     void parseConcurrentTestPerformance() {
@@ -85,7 +86,70 @@ class ParseTest {
     }
 
     @Test
-    void parseSerialized(){
+    void parseConcurrentWithReadFileOneThreadTestTime(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        Thread dummyConsumer = new Thread(() -> {
+            try {
+                while(termDocs.take().getText() != null){
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        dummyConsumer.start();
+        long startTime = System.currentTimeMillis();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(System.currentTimeMillis() - startTime);
+    }
+
+    @Test
+    void parseSerialWithReadFile(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        reader.start();
+
+        boolean done = false;
+        int counter = 1;
+        while(!done){
+            try {
+                if(counter%1000 == 0) System.out.println(counter);
+                counter++;
+
+                Document doc = docs.take();
+                if(doc.getText() == null) done = true;
+                else p.parseOneDocument(docs.take());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    @Test
+    void parseSerializedTestCases(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;

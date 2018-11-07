@@ -22,6 +22,7 @@ public class Parse implements Runnable{
     private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
     private String currString = "";
     private HashMap<String, String> months;
+    private TokenType type;
 
 
     /**
@@ -94,7 +95,6 @@ public class Parse implements Runnable{
      */
     private List<String> tokenize(String string){
 //        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
-
         List<String> lTokens = new ArrayList<>();
         int from = 0;
         int to = 0;
@@ -142,25 +142,31 @@ public class Parse implements Runnable{
 
     private boolean isDelimiter(char c){
 //        return ("" + c).matches("[\t-&(-,.-/:-@\\x5B-`{-~]");
-        return (c <= '&') || (c >= '(' && c <= ',')|| (c >= '.' && c <= '/')|| (c >= ':' && c <= '@')
+        return (c <= '&') || (c >= '(' && c <= '/')|| (c >= ':' && c <= '@')
                 || (c >= '[' && c <= '`') || (c >= '{' && c <= '~');
     }
 
     /**
      * helper funtion for {@code tokenize} which cleans up empty strings, and separates or cleans leftover delimiters.
+     * removes delimiters stuck to end of strings.
      * @param textAsTokens - a list of tokenized strings to clean up
      * @return - a cleaned up list of tokens.
      */
     private ArrayList<String> tokenizeSecondPass(List<String> textAsTokens) {
-
         ArrayList<String> listOfTokens = new ArrayList<>(textAsTokens.size()/2);
 
-        //clean up empty strings and strings that only contain a delimiter
         for (String string: textAsTokens
              ) {
-            if((string.length() > 1 || (string.length() == 1 && isProtectedChar(string.charAt(0))) ) )
+            //clean up empty strings and strings that only contain a delimiter
+            if( string.length() == 1 && isProtectedChar(string.charAt(0)) )
                 listOfTokens.add(string);
-
+            else if(string.length() > 1){
+                //removes delimiters stuck to end of strings.
+                if(isDelimiter(string.charAt(string.length()-1)))
+                    listOfTokens.add(string.substring(0, string.length()-1)); //remove last char (delimiter)
+                else
+                    listOfTokens.add(string);
+            }
         }
 
         //TESTING
@@ -186,62 +192,70 @@ public class Parse implements Runnable{
         return c == ' ' || c == '\n' || c == '\t';
     }
     private static boolean isSymbol(char c){
-        return c == '-' || c == '.' ||  c == '$' || c == '%' || c == '/';
+        return c == '-' || c == '.' ||  c == '$' || c == '%' || c == '/' || c == '\'';
     }
     private static boolean isLetter(char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');}
 
 
     private List<Term> parseWorker(List<String> lStrings){
-        List<Term> terms = new ArrayList<>();
+        List<Term> lTerms = new ArrayList<>();
         ListIterator<String> iterator = lStrings.listIterator(0);
 
          if (iterator.hasNext()) // check for case of parsing something empty
-             currString = iterator.next();
+             safeIterateAndCheckType(iterator);
 
         while (iterator.hasNext()) {
-            TokenType type = TokenType.classify(currString);
+            type = TokenType.classify(currString);
 
 
             //             ROOT CASES
             // whitespace
             if(type == TokenType.WHITESPACE) {
-                currString = iterator.next(); //whitespace, do nothing
+                safeIterateAndCheckType(iterator); //whitespace, do nothing
             }
             // WORD ->
             else if (TokenType.WORD == type){
-                String term = parseWord(iterator, currString, new StringBuilder()).toString();
+                String term = parseWord(iterator, currString, new StringBuilder(), lTerms).toString();
                 if(!term.isEmpty()){
-                    terms.add(new Term(term));
+                    lTerms.add(new Term(term));
                 }
             }
             // NUMBER ->
             else if(type == TokenType.NUMBER){
-                terms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), false).toString() )));
+                lTerms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), false).toString() )));
             }
             // $ -> NUMBER(price) ->
             else if(TokenType.SYMBOL == type && currString.equals("$")){
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
-                terms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), true).toString() )));
+                if(TokenType.NUMBER == type){
+                    lTerms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), true).toString() )));
+                }
+                else{ //a word starting with a dollar sign
+                    currString = '$'+currString;
+                    String term = parseWord(iterator, currString, new StringBuilder(), lTerms).toString();
+                    if(!term.isEmpty()){
+                        lTerms.add(new Term(term));
+                    }
+                }
             }
             //TODO not finished with root cases. add betweens. add something original?
 
             else //if completely failed to identify a token (unlikely)
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
 
         }
 
         if(debug){
             System.out.println("-----------start parse output-------------");
             for (Term t:
-                    terms) {
+                    lTerms) {
                 System.out.println(t);
             }
             System.out.println("-----------end parse output-------------");
         }
-        return terms;
+        return lTerms;
     }
-
 
     /**
      * parses a number. always assignes currString to the next token to be parsed (wasn't successfully parsed here).
@@ -253,37 +267,30 @@ public class Parse implements Runnable{
      * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean has$){
-        /*TODO move number formatting to after knowing if price or number.
-        TODO keep K/M/B/T as a number representing how much the decimal point should be moved.
-        TODO add parameter determining if the number should be formatted for a price or a number, or split into two functions.
-        TODO mark fraction as such
-         */
+        //TODO add COMPOUND-WORD
 
         long kmbtMultiplier = 1;
-        String formattedNumber;
         String decimals = null;
         StringBuilder unformattedNumber = new StringBuilder(); //start concatenating number parts to build full number
         boolean isFractional = false;
         boolean isPercent = false;
         boolean isPrice = has$;
-        boolean isDate = false;
+        String dateMonth = null;
 
         currString = number;
-        TokenType type = TokenType.NUMBER;
+        type = TokenType.NUMBER;
 
         while(type == TokenType.NUMBER){
             unformattedNumber.append(currString);
-            currString = iterator.next();
-            type = TokenType.classify(currString); //may result in classifying the same string twice
+            safeIterateAndCheckType(iterator); //may result in classifying the same string twice
         }
 
         // NUMBER -> . -> NUMBER
         if(type == TokenType.SYMBOL && currString.equals(".")){ //decimal point or end of line
-            currString = iterator.next();
-            type = TokenType.classify(currString);
+            safeIterateAndCheckType(iterator);
             if(type == TokenType.NUMBER){ // decimal digits
                 decimals = currString;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
         }
@@ -295,39 +302,38 @@ public class Parse implements Runnable{
         // NUMBER -> %
         if(type == TokenType.SYMBOL && currString.equals("%")){
             isPercent = true;
-            currString = iterator.next();
+            safeIterateAndCheckType(iterator);
         }
         // NUMBER ->  " "
         else if(type == TokenType.WHITESPACE && !currString.equals("\n")){
-            currString = iterator.next();
-            type = TokenType.classify(currString);
+            safeIterateAndCheckType(iterator);
 
             // NUMBER + " " -> WORD
             if(type == TokenType.WORD && (currString.equalsIgnoreCase("Thousand") || currString.equalsIgnoreCase("K")) ){
                 kmbtMultiplier = 1000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             else if(type == TokenType.WORD && (currString.equalsIgnoreCase("Million") || currString.equalsIgnoreCase("M")) ) {
                 kmbtMultiplier = 1000000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             else if(type == TokenType.WORD &&
                     (currString.equalsIgnoreCase("Billion") || currString.equalsIgnoreCase("B") || currString.equals("bn")) ){
                 kmbtMultiplier = 1000000000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             else if(type == TokenType.WORD && (currString.equalsIgnoreCase("Trillion") || currString.equalsIgnoreCase("T")) ){
                 kmbtMultiplier = 1000000000000L;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             // NUMBER + " " -> DOLLAR (and not NUMBER M/B/K DOLLARS)
             else if( has$ || (type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){
                 if (!has$){ //string contains a form of "dollars", not a '$'
-                    currString = iterator.next(); // skip that "dollars"
+                    safeIterateAndCheckType(iterator); // skip that "dollars"
                 }
                 isPrice = true; // mark term as price term
                 type = TokenType.classify(currString);
@@ -335,13 +341,13 @@ public class Parse implements Runnable{
             // NUMBER + " " -> PERCENT
             else if(type == TokenType.WORD && (currString.equals("percent") || currString.equals("percentage"))){
                 isPercent = true;
-                currString = iterator.next(); //end of parsing number
+                safeIterateAndCheckType(iterator); //end of parsing number
             }
 
             // NUMBER + " " + K/M/B -> U.S. Dollars  or  NUMBER + " " + K/M/B -> DOLLARS
             // there is a " " again because of parsing the K/M/B
             if(type == TokenType.WHITESPACE && currString.equals(" ")){
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
                 // NUMBER + " " + K/M/B -> U.S. Dollars
                 if (type == TokenType.WORD && currString.equals("U")){
@@ -350,7 +356,7 @@ public class Parse implements Runnable{
                 // NUMBER + " " + K/M/B -> DOLLARS
                 else if( has$ || (type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){
                     if (!has$){ //string contains a form of "dollars", not a '$'
-                        currString = iterator.next(); // skip that "dollars"
+                        safeIterateAndCheckType(iterator); // skip that "dollars"
                     }
                     isPrice = true;
                 }
@@ -362,8 +368,8 @@ public class Parse implements Runnable{
             }
             // NUMBER -> MONTH
             else if(TokenType.WORD == type && months.containsKey(currString)){
-                isDate = true;
-                currString = iterator.next();
+                dateMonth = currString;
+                safeIterateAndCheckType(iterator);
             }
         }
         // "$" + NUMBER -> NUMBER Dollars
@@ -374,27 +380,31 @@ public class Parse implements Runnable{
         else if (type == TokenType.WORD){
             if(currString.equalsIgnoreCase("K") ){
                 kmbtMultiplier = 1000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             else if(currString.equalsIgnoreCase("M") ) {
                 kmbtMultiplier = 1000000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
             else if(currString.equalsIgnoreCase("B") || currString.equals("bn") ){
                 kmbtMultiplier = 1000000000;
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
             }
         }
+        //TODO just number???? number at end of string
 
-        finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, isDate);
+        finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, dateMonth);
         return result;
     }
 
     private void safeIterateAndCheckType(ListIterator<String> iterator){
-        //TODO not implemented
+        if(iterator.hasNext()){
+            currString = iterator.next();
+            type = TokenType.classify(currString);
+        }
     }
 
     /**
@@ -406,22 +416,21 @@ public class Parse implements Runnable{
      */
     private boolean tryParseFraction(@NotNull ListIterator<String> iterator,@NotNull StringBuilder result) {
         // assumes the previously encountered string was " ".
-        currString = iterator.next();
-        TokenType type = TokenType.classify(currString);
+        safeIterateAndCheckType(iterator);
+        type = TokenType.classify(currString);
         String firstNumber = "";
         if(type == TokenType.NUMBER){
             firstNumber = currString;
-            currString = iterator.next();
-            type = TokenType.classify(currString);
+            safeIterateAndCheckType(iterator);
             if(currString.equals("/")){
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
                 if(TokenType.NUMBER == type){
                     result.append(' ');
                     result.append(firstNumber);
                     result.append('/');
                     result.append(currString);
-                    currString = iterator.next();
+                    safeIterateAndCheckType(iterator);
                     return true;
                 }
                 currString = iterator.previous(); // currString == unknown
@@ -431,7 +440,7 @@ public class Parse implements Runnable{
         //this weird section resets the iterator to the way it was before starting this function
         currString = iterator.previous(); // currString == some number
         currString = iterator.previous(); // currString == " "
-        currString = iterator.next(); // currString == " "
+        safeIterateAndCheckType(iterator); // currString == " "
         return false;
     }
 
@@ -443,19 +452,19 @@ public class Parse implements Runnable{
      */
     private boolean tryParseUSDollars(@NotNull ListIterator<String> iterator) {
         //assumes the previously encountered string was "U".
-        currString = iterator.next();
-        TokenType type = TokenType.classify(currString);
+        safeIterateAndCheckType(iterator);
+        type = TokenType.classify(currString);
         if(currString.equals(".")){
-            currString = iterator.next();
+            safeIterateAndCheckType(iterator);
             if (currString.equals("S")){
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
                 if(currString.equals(".")){
-                    currString = iterator.next();
+                    safeIterateAndCheckType(iterator);
                     if(currString.equals(" ")){
-                        currString = iterator.next();
+                        safeIterateAndCheckType(iterator);
                         type = TokenType.classify(currString);
-                        if((type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){ //TODO more dollar cases
-                            currString = iterator.next(); // move to next because parsing this term is idone
+                        if((type == TokenType.WORD && (currString.equalsIgnoreCase("Dollar") || currString.equalsIgnoreCase("Dollars")))){
+                            safeIterateAndCheckType(iterator); // move to next because parsing this term is idone
                             return true;
                         }
                         currString = iterator.previous(); // currString == unknown
@@ -469,7 +478,7 @@ public class Parse implements Runnable{
         //this weird section resets the iterator to the way it was before starting this function
         currString = iterator.previous(); // currString == "."
         currString = iterator.previous(); // currString == "U"
-        currString = iterator.next(); // currString == "U"
+        safeIterateAndCheckType(iterator); // currString == "U"
         return false;
     }
 
@@ -483,11 +492,11 @@ public class Parse implements Runnable{
      * @param isPrice
      * @param isPercent
      * @param isFractional
-     * @param isDate
      */
     private void finalizeNumber(@NotNull StringBuilder unformattedNumber,@NotNull StringBuilder result, long kmbtMultiplier,
-                                String decimals, boolean isPrice, boolean isPercent, boolean isFractional, boolean isDate)
+                                String decimals, boolean isPrice, boolean isPercent, boolean isFractional, String dateMonth)
     {
+        boolean isDate = dateMonth != null;
         String stringDollars = " Dollars";
 
         if(isFractional){
@@ -529,15 +538,15 @@ public class Parse implements Runnable{
                 if(unformattedNumber.length() > 2){ // number is year
                     result.append(unformattedNumber); //insert number without format
                     result.append("-");
-                    result.append(months.get(currString));
+                    result.append(months.get(dateMonth));
                 }
                 else if (unformattedNumber.length() == 2){ //number is day
-                    result.append(months.get(currString));
+                    result.append(months.get(dateMonth));
                     result.append("-");
                     result.append(unformattedNumber);
                 }
                 else{ // number is day and <=9
-                    result.append(months.get(currString));
+                    result.append(months.get(dateMonth));
                     result.append("-0");
                     result.append(unformattedNumber);
                 }
@@ -577,19 +586,16 @@ public class Parse implements Runnable{
         else result.append(number);
     }
 
-    private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result){
+    private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
         //TODO add cases for words with '-'
         //TODO add cases for words containing more than one word, containing (or just starting with?) stopwords
-
-        TokenType type;
+        
         // MONTH -> MM-DD
         if (months.containsKey(word)){
             String month = months.get(word);
-            currString = iterator.next();
-            type = TokenType.classify(currString);
+            safeIterateAndCheckType(iterator);
             if(TokenType.WHITESPACE == type && currString.equals(" ")){
-                currString = iterator.next();
-                type = TokenType.classify(currString);
+                safeIterateAndCheckType(iterator);
                 if(TokenType.NUMBER == type){
                     if(currString.length() > 2){ // number is year
                         result.append(currString);
@@ -606,26 +612,76 @@ public class Parse implements Runnable{
                         result.append("-0");
                         result.append(currString);
                     }
-                    if(iterator.hasNext()) currString = iterator.next();
+                    if(iterator.hasNext()) safeIterateAndCheckType(iterator);
                 }
                 else{ // just some word
                     result.append(currString);
-                    currString = iterator.next();
+                    safeIterateAndCheckType(iterator);
                 }
             }
             else{ // just some word
                 result.append(currString);
-                currString = iterator.next();
+                safeIterateAndCheckType(iterator);
             }
         }
-        else if(stopWords.contains(currString)){ // just a stopword alone, throw it away
-            currString = iterator.next();
+        else { //regular word or stopword
+            result.append(currString); //add word to result
+            List<String> lCompoundWordParts = new ArrayList<>();
+            lCompoundWordParts.add(currString); // word might be first part of a compound word
+
+            safeIterateAndCheckType(iterator);
+
+            //string together words (or numbers) separated by '-'
+            if(currString.equals("-")){
+                while(currString.equals("-")){
+                    safeIterateAndCheckType(iterator);
+                    type = TokenType.classify(currString);
+                    if(TokenType.WORD == type || TokenType.NUMBER == type){
+                        lCompoundWordParts.add(currString);
+                        result.append("-");
+                        result.append(currString);
+                        safeIterateAndCheckType(iterator);
+                    }
+                }
+                if(lCompoundWordParts.size() > 1){
+                    for (String compoundWordPart:
+                            lCompoundWordParts) {
+                        if(!stopWords.contains(compoundWordPart)) lTerms.add(new Term(compoundWordPart));
+                    }
+                }
+            }
+            // range with "between X and Y" format
+            else if (currString.equalsIgnoreCase("Between")){
+                if(tryParseBetweenXandY(iterator, result, lCompoundWordParts)){
+                    for (String compoundWordPart:
+                            lCompoundWordParts) {
+                        if(!stopWords.contains(compoundWordPart)) lTerms.add(new Term(compoundWordPart));
+                    }
+                }
+            }
+
+            // add component parts to Term list (output) if they exist
+            // just a stopword alone, throw it away (was not compound word)
+            if(stopWords.contains(result)){
+                result.delete(0, result.length()); //clear word from result
+                safeIterateAndCheckType(iterator);
+            }
         }
-        else{ // just some word
-            result.append(currString);
-            currString = iterator.next();
-        }
+
         return result;
+    }
+
+    /**
+     * assumes the previously encountered string was "Between" or "between", and that that string was already appended to result.
+     * rewinds iterator if unsuccessful. leaves iterator on the next string after this term if successfully parsed.
+     * @param iterator
+     * @param result
+     * @param lCompoundWordParts - puts the X and Y of "between X and Y" here.
+     * @return true if successfully parsed, else returns false.
+     */
+    private boolean tryParseBetweenXandY(@NotNull ListIterator<String> iterator, @NotNull StringBuilder result, @NotNull List<String> lCompoundWordParts){
+        //TODO not implemented
+        return false;
     }
 
 
@@ -656,7 +712,7 @@ public class Parse implements Runnable{
             else{ //more than one character
                 if(str.charAt(0) <= '9' && str.charAt(0) >= '0'){ //first char is digit
                     for(int i=0; i<length; i++){
-                        if(isLetter(str.charAt(i)) || isSymbol(str.charAt(i))) return WORD;
+                        if(!(str.charAt(i)>='0' && str.charAt(i)<='9')) return WORD;
                     }
                     return NUMBER; // all chars are digits
                 }

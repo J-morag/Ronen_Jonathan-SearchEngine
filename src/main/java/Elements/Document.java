@@ -3,9 +3,9 @@ package Elements;
 public class Document {
     private int serialID;
     private  String docId;
-    private String title;
-    private String text;
-    private  String date;
+    private String title = "";
+    private String text = "";
+    private  String date = "";
 
 
     public Document(/*int serialID*/){
