@@ -16,9 +16,10 @@ class ParseTest {
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
+    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\corpus";
 
     @Test
-    void parseConcurrent() {
+    void parseConcurrentTestPerformance() {
 
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
@@ -85,12 +86,76 @@ class ParseTest {
     }
 
     @Test
-    void parseSerialized(){
+    void parseConcurrentWithReadFileOneThreadTestTime(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        Thread dummyConsumer = new Thread(() -> {
+            try {
+                while(termDocs.take().getText() != null){
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        dummyConsumer.start();
+        long startTime = System.currentTimeMillis();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(System.currentTimeMillis() - startTime);
+    }
+
+    @Test
+    void parseSerialWithReadFile(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        reader.start();
+
+        boolean done = false;
+        int counter = 1;
+        while(!done){
+            try {
+                if(counter%1000 == 0) System.out.println(counter);
+                counter++;
+
+                Document doc = docs.take();
+                if(doc.getText() == null) done = true;
+                else p.parseOneDocument(docs.take());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
+    @Test
+    void parseSerializedTestCases(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
         Document doc1 = new Document();
-        doc1.setTitle("");
+        doc1.setDate("AUGUST 2");
+        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
         int numTerms1 = 0;
@@ -221,7 +286,7 @@ class ParseTest {
                     "10.6 percentage     10.6%\n" +
 
                     "10,123 10.123K\n" +
-                    "123 Thousand 123.456K\n" +
+                    "123 Thousand 123K\n" +
                     "1010.56 1.01056K\n" +
 
                     "10,123,000 10.123M\n" +
@@ -230,7 +295,7 @@ class ParseTest {
 
                     "10,123,000,000 10.123B\n" +
                     "55 Billion 55B\n" +
-                    "7 Trillion 700B " +
+                    "7 Trillion 7000B " +
                     "14 MAY, 14 May\n" +
                     "June 4, JUNE 4 " +
                     "May 1994, MAY 1994\n";
