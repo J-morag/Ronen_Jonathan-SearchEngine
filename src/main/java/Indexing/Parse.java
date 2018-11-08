@@ -94,6 +94,7 @@ public class Parse implements Runnable{
      * @return a list of strings (tokens).
      */
     private List<String> tokenize(String string){
+        //TODO get rid of '\''
 //        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
         List<String> lTokens = new ArrayList<>();
         int from = 0;
@@ -161,6 +162,7 @@ public class Parse implements Runnable{
             if( string.length() == 1 && isProtectedChar(string.charAt(0)) )
                 listOfTokens.add(string);
             else if(string.length() > 1){
+                //TODO cancel?
                 //removes delimiters stuck to end of strings.
                 if(isDelimiter(string.charAt(string.length()-1)))
                     listOfTokens.add(string.substring(0, string.length()-1)); //remove last char (delimiter)

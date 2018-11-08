@@ -5,7 +5,7 @@ import java.util.List;
 public class TermDocument {
     private int serialID;
     private String docId;
-    private List<Term> header;
+    private List<Term> title;
     private List<Term> text;
     private List<Term> date;
 
@@ -22,7 +22,7 @@ public class TermDocument {
     public TermDocument(Document doc, List<Term>[] fields) {
         this.serialID = doc.getSerialID();
         this.docId = doc.getDocId();
-        this.header = fields[0];
+        this.title = fields[0];
         this.text = fields[1];
         this.date = fields[2];
     }
@@ -35,8 +35,8 @@ public class TermDocument {
         return docId;
     }
 
-    public List<Term> getHeader() {
-        return header;
+    public List<Term> getTitle() {
+        return title;
     }
 
     public List<Term> getText() {
@@ -47,8 +47,8 @@ public class TermDocument {
         this.docId = docId;
     }
 
-    public void setHeader(List<Term> header) {
-        this.header = header;
+    public void setTitle(List<Term> title) {
+        this.title = title;
     }
 
     public void setText(List<Term> text) {

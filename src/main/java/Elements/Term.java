@@ -33,4 +33,9 @@ public class Term {
     public int hashCode() {
         return string != null ? string.hashCode() : 0;
     }
+
+    public int compareTo(Term other){
+        return this.toString().compareTo(other.toString());
+    }
+
 }

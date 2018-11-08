@@ -12,6 +12,14 @@ public class Document {
         //this.serialID = serialID;
     }
 
+    public Document(int serialID, String docId, String title, String text, String date) {
+        this.serialID = serialID;
+        this.docId = docId;
+        this.title = title;
+        this.text = text;
+        this.date = date;
+    }
+
     public void setTitle(String header) {
         this.title = header;
     }

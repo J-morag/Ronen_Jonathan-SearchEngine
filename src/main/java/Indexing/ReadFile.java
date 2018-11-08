@@ -60,7 +60,12 @@ public class ReadFile implements Runnable {
             }
 
         }
-
+        // when done, insert poison element
+        try {
+            documentBuffer.put(new Document(-1, null, null, null, null));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

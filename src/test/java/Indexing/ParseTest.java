@@ -3,11 +3,11 @@ package Indexing;
 import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
+import javafx.collections.transformation.SortedList;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.RepeatedTest;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
 
@@ -120,6 +120,60 @@ class ParseTest {
     }
 
     @Test
+    void parseConcurrentPrintTerms(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        List<Term> terms = new ArrayList<>();
+
+        Thread termAccumulator = new Thread(() -> {
+            try {
+                boolean done = false;
+                while( !done){
+                    TermDocument termDoc = termDocs.take();
+                    if(termDoc.getText() == null){
+                        done = true;
+                    }
+                    else{
+                        terms.addAll(termDocs.take().getText());
+                        terms.addAll(termDocs.take().getTitle());
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        terms.sort(new Comparator<Term>() {
+//            public int compare(Term t1, Term t2) {
+//                return t1.toString().compareTo(t2.toString());
+//            }
+//        });
+        for (Term t:
+             terms) {
+            System.out.println(t);
+        }
+        System.out.println("total number of terms: " + terms.size());
+    }
+
+    @Test
     void parseSerialWithReadFile(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
@@ -165,7 +219,7 @@ class ParseTest {
         TermDocument td = p.parseOneDocument(doc1);
         long time = System.currentTimeMillis() - startTime;
 
-        numTerms1 = td.getHeader().size() + td.getText().size();
+        numTerms1 = td.getTitle().size() + td.getText().size();
         System.out.println("----- RESULTS -----");
         System.out.println("Elapsed time(ms): " + (time));
         System.out.println("Terms parsed: " + (numTerms1) + "/" + numTermsExpected1);
