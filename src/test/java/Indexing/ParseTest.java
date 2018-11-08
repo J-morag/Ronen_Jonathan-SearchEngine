@@ -126,7 +126,7 @@ class ParseTest {
         Parse.debug = false;
         Thread parser1 = new Thread(p);
 
-        List<Term> terms = new ArrayList<>();
+        Set<Term> terms = new HashSet<>();
 
         Thread termAccumulator = new Thread(() -> {
             try {
@@ -139,6 +139,7 @@ class ParseTest {
                     else{
                         terms.addAll(termDocs.take().getText());
                         terms.addAll(termDocs.take().getTitle());
+                        System.out.println(terms.size());
                     }
                 }
 
@@ -161,15 +162,11 @@ class ParseTest {
             e.printStackTrace();
         }
 
-//        terms.sort(new Comparator<Term>() {
-//            public int compare(Term t1, Term t2) {
-//                return t1.toString().compareTo(t2.toString());
-//            }
-//        });
-        for (Term t:
-             terms) {
-            System.out.println(t);
-        }
+//
+//        for (Term t:
+//             terms) {
+//            System.out.println(t);
+//        }
         System.out.println("total number of terms: " + terms.size());
     }
 
