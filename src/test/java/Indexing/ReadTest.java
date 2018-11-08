@@ -33,7 +33,7 @@ import Elements.Document;
 public class ReadTest {
 
 
-    private static final int documentBufferSize = 10;
+    private static final int documentBufferSize = 1000000;
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
 
@@ -90,27 +90,27 @@ public class ReadTest {
 
         private void read() {
             File f = new File(pathToDocumentsFolder);
-            ExecutorService threadPool = Executors.newCachedThreadPool();
-            //Elements docs;
+            Elements docs;
             File[] allSubFiles = f.listFiles();
             for (File file : allSubFiles) {
                 if (file.isDirectory()) {
                     File[] documentsFiles = file.listFiles();
                     for (File fileToGenerate : documentsFiles) {
-                        Elements docs = separateDocs(fileToGenerate);
+                        docs = separateDocs(fileToGenerate);
                         if (docs != null) {
-                           threadPool.execute(()-> generateDocs(docs));
-
+                            generateDocs(docs);
                         }
                     }
-                    //System.out.println(Thread.activeCount());
 
                 }
 
             }
-            threadPool.shutdown();
-            //documentBuffer.put(new Document(-1,null,null,null));
-
+            try {
+                // when done, insert poison element
+                documentBuffer.put(new Document(-1,null,null,null,null));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
 

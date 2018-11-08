@@ -5,6 +5,7 @@ import Elements.Term;
 import Elements.TermDocument;
 import com.sun.istack.internal.NotNull;
 import org.junit.jupiter.api.Test;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.io.*;
 import java.util.*;
@@ -63,6 +64,7 @@ public class Parse implements Runnable{
             if (null == currDoc.getText()) done=true; //end of files (poison element)
             else{
                 sinkTermDocumentQueue.put(parseOneDocument(currDoc));
+
             }
         }
         TermDocument poison = new TermDocument(-1,null);
