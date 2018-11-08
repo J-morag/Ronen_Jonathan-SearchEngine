@@ -2,8 +2,8 @@ package Indexing;
 
 
 import java.io.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.HashMap;
+import java.util.concurrent.*;
 
 
 import org.jsoup.Jsoup;
@@ -19,15 +19,24 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
 import Elements.Document;
 
 
 public class ReadTest {
 
 
-    private static final int documentBufferSize = 10000000;
+    private static final int documentBufferSize = 10;
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
+
 
     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
@@ -68,7 +77,7 @@ public class ReadTest {
          * @param pathToDocumentsFolder
          * @param documentBuffer        - a blocking queue where parsed documents will be outputted for further processing.
          */
-        public ReadFileTest(String pathToDocumentsFolder, BlockingQueue<Document> documentBuffer) {
+        public ReadFileTest(String pathToDocumentsFolder, BlockingQueue documentBuffer) {
             this.pathToDocumentsFolder = pathToDocumentsFolder;
             documentBuffer = documentBuffer;
         }
@@ -81,21 +90,26 @@ public class ReadTest {
 
         private void read() {
             File f = new File(pathToDocumentsFolder);
-            Elements docs;
+            ExecutorService threadPool = Executors.newCachedThreadPool();
+            //Elements docs;
             File[] allSubFiles = f.listFiles();
             for (File file : allSubFiles) {
                 if (file.isDirectory()) {
                     File[] documentsFiles = file.listFiles();
                     for (File fileToGenerate : documentsFiles) {
-                        docs = separateDocs(fileToGenerate);
+                        Elements docs = separateDocs(fileToGenerate);
                         if (docs != null) {
-                            generateDocs(docs);
+                           threadPool.execute(()-> generateDocs(docs));
+
                         }
                     }
+                    //System.out.println(Thread.activeCount());
 
                 }
 
             }
+            threadPool.shutdown();
+            //documentBuffer.put(new Document(-1,null,null,null));
 
         }
 
@@ -139,10 +153,8 @@ public class ReadTest {
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 SAXParser saxParser = null;
                 try {
-
                     saxParser = factory.newSAXParser();
                     UserHandler1 userhandler = new UserHandler1();
-
                     String st = elm.toString();
                     InputStream is = new ByteArrayInputStream(st.getBytes());
                     saxParser.parse(is,userhandler);
@@ -216,8 +228,7 @@ public class ReadTest {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
-                    } else if (qName.equalsIgnoreCase("TEXT")){
+                } else if (qName.equalsIgnoreCase("TEXT")){
                         text = false;
                         doc.setText(textString.toString());
                         textString=null;
@@ -253,6 +264,116 @@ public class ReadTest {
 
         }
     }
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+    public class ReadFileTest_2 implements Runnable {
+        private String pathToDocumentsFolder;
+
+
+        public ReadFileTest_2(String pathToDocumentsFolder, HashMap documentBuffer) {
+            this.pathToDocumentsFolder = pathToDocumentsFolder;
+            documentBuffer = documentBuffer;
+        }
+
+        public void run() {
+            read();
+        }
+
+        private void read() {
+            File f = new File(pathToDocumentsFolder);
+            Elements docs;
+            File[] allSubFiles = f.listFiles();
+            for (File file : allSubFiles) {
+                if (file.isDirectory()) {
+                    File[] documentsFiles = file.listFiles();
+                    for (File fileToGenerate : documentsFiles) {
+                        docs = separateDocs(fileToGenerate);
+                        if (docs != null) {
+                            generateDocs(docs);
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        private Elements separateDocs(File fileToGenerate) {
+            FileInputStream fi = null;
+            Elements toReturn = null;
+
+            try {
+                fi = new FileInputStream(fileToGenerate);
+                BufferedReader br = new BufferedReader(new InputStreamReader(fi));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                line = br.readLine();
+                while (line != null) {
+                    sb.append(line);
+                    line = br.readLine();
+                }
+                org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());
+                toReturn = doc.select("DOC");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return toReturn;
+        }
+
+
+        private void generateDocs(Elements elems) {
+            Document doc = new Document();
+            for (Element elm : elems) {
+                XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+                try {
+                    String st = elems.toString();
+                    XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new ByteArrayInputStream(st.getBytes()));
+                    while (xmlEventReader.hasNext()) {
+                        XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                        if (xmlEvent.isStartElement()) {
+                            StartElement startElement = xmlEvent.asStartElement();
+                            if (startElement.getName().toString().equalsIgnoreCase("DOCNO")) {
+                                doc.setDocId(xmlEvent.toString());
+                            }
+                            //set the other varibles from xml elements
+                            else if (startElement.getName().toString().equalsIgnoreCase("TI")) {
+                                xmlEvent = xmlEventReader.nextEvent();
+                                doc.setTitle(xmlEvent.toString());
+                            } else if (startElement.getName().toString().equalsIgnoreCase("DATE") || startElement.getName().getLocalPart().equals("DATE1")) {
+                                xmlEvent = xmlEventReader.nextEvent();
+                                doc.setDate(xmlEvent.toString());
+                            } else if (startElement.getName().toString().equalsIgnoreCase("TEXT")) {
+                                xmlEvent = xmlEventReader.nextEvent();
+                                doc.setText(xmlEvent.toString());
+                            }
+                        }
+                        //if Employee end element is reached, add employee object to list
+                        if (xmlEvent.isEndElement()) {
+                            EndElement endElement = xmlEvent.asEndElement();
+                            if (endElement.getName().getLocalPart().equalsIgnoreCase("DOC")) {
+                                //documentBuffer.put(doc , doc.getDocId());
+                            }
+                        }
+                    }
+
+                } catch (XMLStreamException e) {
+                    e.printStackTrace();
+                }
+            }
+            }
+
+
+
+    }
+
+
+
+
 }
 
 
