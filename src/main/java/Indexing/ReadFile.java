@@ -15,6 +15,9 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import Elements.Document;
 
 /**
@@ -45,20 +48,29 @@ public class ReadFile implements Runnable {
 
     private void read() {
         File f = new File(pathToDocumentsFolder);
-        Elements docs;
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        //Elements docs;
         File[] allSubFiles = f.listFiles();
         for (File file : allSubFiles) {
             if (file.isDirectory()) {
                 File[] documentsFiles = file.listFiles();
                 for (File fileToGenerate : documentsFiles) {
-                    docs = separateDocs(fileToGenerate);
+                    Elements docs = separateDocs(fileToGenerate);
                     if (docs != null) {
-                        generateDocs(docs);
+                        threadPool.execute(()-> generateDocs(docs));
+
                     }
                 }
+                //System.out.println(Thread.activeCount());
 
             }
 
+        }
+        threadPool.shutdown();
+        try {
+            documentBuffer.put(new Document(-1,null,null,null,null));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
