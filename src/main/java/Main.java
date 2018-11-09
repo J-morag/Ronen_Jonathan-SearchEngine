@@ -3,7 +3,6 @@ import Elements.TermDocument;
 import Indexing.Indexer;
 import Indexing.Parse;
 import Indexing.ReadFile;
-import Indexing.Stemmer;
 
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -43,9 +42,6 @@ public class Main {
 
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
         tParser.start();
-
-        Thread tStemmer = new Thread(new Stemmer(termDocumentsBuffer, stemmedTermDocumentsBuffer));
-        tStemmer.start();
 
         Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermDocumentsBuffer));
         tIndexer.start();

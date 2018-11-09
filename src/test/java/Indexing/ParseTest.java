@@ -17,7 +17,8 @@ class ParseTest {
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus";
+    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\corpus";
+    private static final Stemmer stemmer = new Stemmer();
 
     @Test
     void parseConcurrentTestPerformance() {
@@ -126,6 +127,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
+        p.useStemming = false;
         Thread parser1 = new Thread(p);
 
         Set<Term> terms = new HashSet<>();
@@ -141,7 +143,7 @@ class ParseTest {
                     else{
                         terms.addAll(termDocs.take().getText());
                         terms.addAll(termDocs.take().getTitle());
-                        System.out.println(terms.size());
+//                        System.out.println(terms.size());
                     }
                 }
 
@@ -164,12 +166,52 @@ class ParseTest {
             e.printStackTrace();
         }
 
-//
-//        for (Term t:
-//             terms) {
-//            System.out.println(t);
-//        }
+
+        for (Term t:
+             terms) {
+            System.out.println(t);
+        }
         System.out.println("total number of terms: " + terms.size());
+    }
+
+    @Test
+    void parseConcurrentDebugPrintouts(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = true;
+        Thread parser1 = new Thread(p);
+
+        Thread termAccumulator = new Thread(() -> {
+            try {
+                boolean done = false;
+                while( !done){
+                    TermDocument termDoc = termDocs.take();
+                    if(termDoc.getText() == null){
+                        done = true;
+                    }
+                    else{
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        ReadFile rf = new ReadFile("C:/Users/John/Downloads/corpus/FT932_45", docs);
+        Thread reader = new Thread(rf);
+
+        termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Test
@@ -226,6 +268,26 @@ class ParseTest {
         for (int i = 0; i < terms.size() ;) {
             assertEquals(terms.get(i++), terms.get(i++));
         }
+    }
+
+    @Test
+    void parseSerialExampleDoc(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = true;
+        Document doc1 = new Document();
+        doc1.setDate("example");
+        doc1.setTitle("example 1");
+        doc1.setDocId("Example 1");
+        doc1.setText(technicalDocument);
+
+//        long startTime = System.currentTimeMillis();
+        TermDocument td = p.parseOneDocument(doc1);
+//        long time = System.currentTimeMillis() - startTime;
+
+        System.out.println("----- RESULTS -----");
+//        System.out.println("Elapsed time(ms): " + (time));
+        List<Term> terms = td.getText();
     }
 
 

@@ -17,7 +17,7 @@ import java.util.concurrent.BlockingQueue;
 public class Parse implements Runnable{
 
     public static boolean debug = false;
-    private boolean useStemming = true; //TODO add stemming before insertions to terms list
+    public boolean useStemming = true;
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
@@ -25,7 +25,6 @@ public class Parse implements Runnable{
     private String currString = "";
     private HashMap<String, String> months;
     private TokenType type;
-
 
     /**
      * @param stopWords - a set of stopwords to ignore when parsing. if a term is generated when parsing and it consists of just a stopword, it will be eliminated.
@@ -84,6 +83,9 @@ public class Parse implements Runnable{
         String[] originalFields = doc.getAllParsableFields();
         List<Term>[] parsedFields = new List[originalFields.length];
 
+        //TESTING
+        if(debug) System.out.println("---------- Parsing document " + doc.getDocId());
+
         for (int i = 0; i < originalFields.length; i++) {
             parsedFields[i] = parseWorker(tokenize(originalFields[i]));
         }
@@ -97,7 +99,6 @@ public class Parse implements Runnable{
      * @return a list of strings (tokens).
      */
     private List<String> tokenize(String string){
-        //TODO get rid of '\''
 //        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
         List<String> lTokens = new ArrayList<>();
         int from = 0;
@@ -143,7 +144,6 @@ public class Parse implements Runnable{
         return tokenizeSecondPass(lTokens);
     }
 
-
     private boolean isDelimiter(char c){
 //        return ("" + c).matches("[\t-&(-,.-/:-@\\x5B-`{-~]");
         return (c <= '&') || (c >= '(' && c <= '/')|| (c >= ':' && c <= '@')
@@ -165,25 +165,27 @@ public class Parse implements Runnable{
             if( string.length() == 1 && isProtectedChar(string.charAt(0)) )
                 listOfTokens.add(string);
             else if(string.length() > 1){
-                //TODO cancel?
-                //removes delimiters stuck to end of strings.
-                if(isDelimiter(string.charAt(string.length()-1)))
-                    listOfTokens.add(string.substring(0, string.length()-1)); //remove last char (delimiter)
+                //removes delimiters or ' stuck to end of strings.
+                if((isDelimiter(string.charAt(0)) ||  string.charAt(0)=='\'' ) //TODO make it more efficient? put it in tokenize() ?
+                        || (isDelimiter(string.charAt(string.length()-1)) || string.charAt(string.length()-1)=='\'' ) )
+                    listOfTokens.add(string.substring(
+                            (isDelimiter(string.charAt(0)) ||  string.charAt(0)=='\'' ) ? 1 : 0 ,
+                            (isDelimiter(string.charAt(string.length()-1)) || string.charAt(string.length()-1)=='\'' ) ? string.length()-1 : string.length())); //remove last char (delimiter)
                 else
                     listOfTokens.add(string);
             }
         }
 
-        //TESTING
-        if(debug){
-            System.out.println("-----------start tokenize output-------------");
-            for (String t:
-                    listOfTokens) {
-                System.out.println(t);
-            }
-            System.out.println("-----------end tokenize output-------------");
-        }
-        //TESTING
+//        //TESTING
+//        if(debug){
+//            System.out.println("-----------start tokenize output-------------");
+//            for (String t:
+//                    listOfTokens) {
+//                System.out.println(t);
+//            }
+//            System.out.println("-----------end tokenize output-------------");
+//        }
+//        //TESTING
 
         return listOfTokens;
     }
@@ -222,25 +224,25 @@ public class Parse implements Runnable{
             else if (TokenType.WORD == type){
                 String term = parseWord(iterator, currString, new StringBuilder(), lTerms).toString();
                 if(!term.isEmpty()){
-                    lTerms.add(new Term(term));
+                    commitTermToList(term, lTerms);
                 }
             }
             // NUMBER ->
             else if(type == TokenType.NUMBER){
-                lTerms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), false).toString() )));
+                commitTermToList(parseNumber(iterator, currString, new StringBuilder(), false).toString()  , lTerms);
             }
             // $ -> NUMBER(price) ->
             else if(TokenType.SYMBOL == type && currString.equals("$")){
                 safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
                 if(TokenType.NUMBER == type){
-                    lTerms.add(new Term(( parseNumber(iterator, currString, new StringBuilder(), true).toString() )));
+                    commitTermToList(parseNumber(iterator, currString, new StringBuilder(), true).toString()   , lTerms);
                 }
                 else{ //a word starting with a dollar sign
                     currString = '$'+currString;
                     String term = parseWord(iterator, currString, new StringBuilder(), lTerms).toString();
                     if(!term.isEmpty()){
-                        lTerms.add(new Term(term));
+                        commitTermToList(term, lTerms);
                     }
                 }
             }
@@ -592,9 +594,6 @@ public class Parse implements Runnable{
     }
 
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
-        //TODO add cases for words with '-'
-        //TODO add cases for words containing more than one word, containing (or just starting with?) stopwords
-        
         // MONTH -> MM-DD
         if (months.containsKey(word)){
             String month = months.get(word);
@@ -651,7 +650,7 @@ public class Parse implements Runnable{
                 if(lCompoundWordParts.size() > 1){
                     for (String compoundWordPart:
                             lCompoundWordParts) {
-                        if(!stopWords.contains(compoundWordPart)) lTerms.add(new Term(compoundWordPart));
+                        if(!stopWords.contains(compoundWordPart)) commitTermToList(compoundWordPart, lTerms);
                     }
                 }
             }
@@ -660,7 +659,7 @@ public class Parse implements Runnable{
                 if(tryParseBetweenXandY(iterator, result, lCompoundWordParts)){
                     for (String compoundWordPart:
                             lCompoundWordParts) {
-                        if(!stopWords.contains(compoundWordPart)) lTerms.add(new Term(compoundWordPart));
+                        if(!stopWords.contains(compoundWordPart)) commitTermToList(compoundWordPart, lTerms);
                     }
                 }
             }
@@ -687,6 +686,16 @@ public class Parse implements Runnable{
     private boolean tryParseBetweenXandY(@NotNull ListIterator<String> iterator, @NotNull StringBuilder result, @NotNull List<String> lCompoundWordParts){
         //TODO not implemented
         return false;
+    }
+
+    private void commitTermToList(String term, List<Term> lTerms){
+        if(useStemming) {
+            Stemmer stemmer = new Stemmer();
+            stemmer.add(term.toCharArray(), term.length());
+            stemmer.stem();
+            term = stemmer.toString();
+        }
+        lTerms.add(new Term(term));
     }
 
 
