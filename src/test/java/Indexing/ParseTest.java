@@ -4,6 +4,7 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.Parent;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -16,7 +17,7 @@ class ParseTest {
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
-    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\corpus";
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus";
 
     @Test
     void parseConcurrentTestPerformance() {
@@ -116,7 +117,8 @@ class ParseTest {
             e.printStackTrace();
         }
 
-        System.out.println(System.currentTimeMillis() - startTime);
+        System.out.println((System.currentTimeMillis() - startTime)/1000);
+
     }
 
     @Test

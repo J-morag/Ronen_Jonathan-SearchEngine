@@ -16,7 +16,7 @@ public class Main {
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
     private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
     private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
 
@@ -38,7 +38,6 @@ public class Main {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
         tReader.start();
-        tReader.join();
 
         HashSet<String> stopwords = Parse.getStopWords(pathToStopwordsFile);
 
