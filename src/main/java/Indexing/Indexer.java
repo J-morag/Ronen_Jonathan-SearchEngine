@@ -2,6 +2,7 @@ package Indexing;
 
 import Elements.TermDocument;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -33,5 +34,18 @@ public class Indexer implements Runnable {
 
     public void run() {
         index();
+    }
+
+    private class indexEntry{
+        int numOfDocs = 0;
+        String term;
+        String postingsFileName;
+        int[] newPostings; //TODO cahnge from int to some data structure
+
+        public indexEntry(String term, String postingsFileName) {
+            this.term = term;
+            this.postingsFileName = postingsFileName;
+            this.newPostings = new int[partialGroupSize];
+        }
     }
 }

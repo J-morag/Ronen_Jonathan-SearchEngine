@@ -16,10 +16,11 @@ import java.util.concurrent.BlockingQueue;
 public class Parse implements Runnable{
 
     public static boolean debug = false;
+    private boolean useStemming = true; //TODO add stemming before insertions to terms list
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
-    private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
+//    private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
     private String currString = "";
     private HashMap<String, String> months;
     private TokenType type;
