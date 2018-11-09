@@ -38,7 +38,7 @@ public class ReadTest {
     private static final int stemmedTermBufferSize = 10;
 
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
     private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
     private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
     public static BlockingQueue<Document> documentBuffer; //@TODO: need to see how to make the queue not static.
@@ -131,7 +131,7 @@ public class ReadTest {
                 String line = null;
                 line = br.readLine();
                 while (line != null) {
-                    sb.append(line);
+                    sb.append(line+"\n");
                     line = br.readLine();
                 }
                 org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());

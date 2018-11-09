@@ -85,7 +85,7 @@ public class ReadFile implements Runnable {
             String line = null;
             line = br.readLine();
             while (line != null) {
-                sb.append(line);
+                sb.append(line+"\n");
                 line = br.readLine();
             }
             org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());
