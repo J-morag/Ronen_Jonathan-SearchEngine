@@ -15,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
  * takes Documents, tokenizes and parses them. does not perform stemming.
  */
 public class Parse implements Runnable{
-
+ // TODO add .equals("\n") where there is " "
     public static boolean debug = false;
     public boolean useStemming = true;
     private HashSet<String> stopWords;
@@ -25,6 +25,8 @@ public class Parse implements Runnable{
     private String currString = "";
     private HashMap<String, String> months;
     private TokenType type;
+
+    //          Administrative
 
     /**
      * @param stopWords - a set of stopwords to ignore when parsing. if a term is generated when parsing and it consists of just a stopword, it will be eliminated.
@@ -92,6 +94,8 @@ public class Parse implements Runnable{
 
         return new TermDocument(doc, parsedFields);
     }
+
+    //          Tokenizing
 
     /**
      * Tokenizes the strings within the given String.
@@ -203,6 +207,7 @@ public class Parse implements Runnable{
     }
     private static boolean isLetter(char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');}
 
+    //          Parsing
 
     private List<Term> parseWorker(List<String> lStrings){
         List<Term> lTerms = new ArrayList<>();
@@ -212,8 +217,6 @@ public class Parse implements Runnable{
              safeIterateAndCheckType(iterator);
 
         while (iterator.hasNext()) {
-            type = TokenType.classify(currString);
-
 
             //             ROOT CASES
             // whitespace
@@ -431,7 +434,6 @@ public class Parse implements Runnable{
             safeIterateAndCheckType(iterator);
             if(currString.equals("/")){
                 safeIterateAndCheckType(iterator);
-                type = TokenType.classify(currString);
                 if(TokenType.NUMBER == type){
                     result.append(' ');
                     result.append(firstNumber);
@@ -440,14 +442,11 @@ public class Parse implements Runnable{
                     safeIterateAndCheckType(iterator);
                     return true;
                 }
-                currString = iterator.previous(); // currString == unknown
+                else rewindIterator(iterator, 3); //these dont work withput the "else" and i dont know why
             }
-            currString = iterator.previous(); // currString == "/"
+            else rewindIterator(iterator, 2);//these dont work withput the "else" and i dont know why
         }
-        //this weird section resets the iterator to the way it was before starting this function
-        currString = iterator.previous(); // currString == some number
-        currString = iterator.previous(); // currString == " "
-        safeIterateAndCheckType(iterator); // currString == " "
+        else rewindIterator(iterator, 1);//these dont work withput the "else" and i dont know why
         return false;
     }
 
@@ -474,18 +473,15 @@ public class Parse implements Runnable{
                             safeIterateAndCheckType(iterator); // move to next because parsing this term is idone
                             return true;
                         }
-                        currString = iterator.previous(); // currString == unknown
+                        else rewindIterator(iterator, 5);
                     }
-                    currString = iterator.previous();// currString == " "
+                    else rewindIterator(iterator, 4);
                 }
-                currString = iterator.previous(); // currString == "."
+                else rewindIterator(iterator, 3);
             }
-            currString = iterator.previous(); // currString == "S"
+            else rewindIterator(iterator, 2);
         }
-        //this weird section resets the iterator to the way it was before starting this function
-        currString = iterator.previous(); // currString == "."
-        currString = iterator.previous(); // currString == "U"
-        safeIterateAndCheckType(iterator); // currString == "U"
+        else rewindIterator(iterator, 1);
         return false;
     }
 
@@ -655,7 +651,7 @@ public class Parse implements Runnable{
                 }
             }
             // range with "between X and Y" format
-            else if (currString.equalsIgnoreCase("Between")){
+            else if (result.toString().equalsIgnoreCase("Between")){
                 if(tryParseBetweenXandY(iterator, result, lCompoundWordParts)){
                     for (String compoundWordPart:
                             lCompoundWordParts) {
@@ -666,9 +662,8 @@ public class Parse implements Runnable{
 
             // add component parts to Term list (output) if they exist
             // just a stopword alone, throw it away (was not compound word)
-            if(stopWords.contains(result)){
+            if(stopWords.contains(result.toString().toLowerCase())){
                 result.delete(0, result.length()); //clear word from result
-                safeIterateAndCheckType(iterator);
             }
         }
 
@@ -684,7 +679,35 @@ public class Parse implements Runnable{
      * @return true if successfully parsed, else returns false.
      */
     private boolean tryParseBetweenXandY(@NotNull ListIterator<String> iterator, @NotNull StringBuilder result, @NotNull List<String> lCompoundWordParts){
-        //TODO not implemented
+        // assumes the previously encountered string was " ".
+        safeIterateAndCheckType(iterator);
+        String firstWord = "";
+        if(type == TokenType.NUMBER){ // first part of range
+            firstWord = currString;
+            safeIterateAndCheckType(iterator);
+            if(TokenType.WHITESPACE == type){
+                safeIterateAndCheckType(iterator);
+                if(currString.equalsIgnoreCase("and")){ // and
+                    safeIterateAndCheckType(iterator);
+                    if(TokenType.WHITESPACE == type){
+                        safeIterateAndCheckType(iterator);
+                        if(TokenType.NUMBER == type){ //second part of range
+                            result.delete(0, result.length()); // clear the "between"
+                            result.append(firstWord);
+                            result.append('-');
+                            result.append(currString);
+                            safeIterateAndCheckType(iterator);
+                            return true;
+                        }
+                        else rewindIterator(iterator, 5);
+                    }
+                    else rewindIterator(iterator, 4);
+                }
+                else rewindIterator(iterator, 3);
+            }
+            else rewindIterator(iterator, 2);
+        }
+        else rewindIterator(iterator, 1);
         return false;
     }
 
@@ -698,6 +721,24 @@ public class Parse implements Runnable{
         lTerms.add(new Term(term));
     }
 
+    /**
+     * iterate {@param steps} number of steps backwards on a list iterator.
+     * does this by calling iter.previous() steps+1 times.
+     * checks that {@param iter} has previous before each use of previous.
+     * uses {@link #safeIterateAndCheckType(ListIterator)} to iterate once forward at the end of the process.
+     * end result wll be iterator.nextIndex is set to iter.previousIndex +1 as it would have been if the itertor hadn't been iterated over {@param steps} times.
+     * @param iter - the iterator to rewind.
+     * @param steps - the number of steps to rewind the iterator.
+     */
+    private void rewindIterator(ListIterator<String> iter, int steps){
+        for (int i = 0; i < steps; i++) {
+            currString = iter.previous();
+        }
+
+        if (iter.hasPrevious())
+            currString = iter.previous();
+        safeIterateAndCheckType(iter);
+    }
 
     /**
      * slphanumerics are also treated as a word
@@ -737,6 +778,7 @@ public class Parse implements Runnable{
         }
     }
 
+    //          Administrative
 
     public void run() {
         try {

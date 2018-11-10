@@ -275,6 +275,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
+        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDate("example");
         doc1.setTitle("example 1");
