@@ -305,7 +305,7 @@ public class Parse implements Runnable{
             }
         }
         // NUMBER -> " " + NUMBER/NUMBER
-        else if(type == TokenType.WHITESPACE && currString.equals(" ")) {
+        else if(type == TokenType.WHITESPACE) {
             isFractional = tryParseFraction(iterator, unformattedNumber);
         }
 
@@ -356,7 +356,7 @@ public class Parse implements Runnable{
 
             // NUMBER + " " + K/M/B -> U.S. Dollars  or  NUMBER + " " + K/M/B -> DOLLARS
             // there is a " " again because of parsing the K/M/B
-            if(type == TokenType.WHITESPACE && currString.equals(" ")){
+            if(type == TokenType.WHITESPACE ){
                 safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
                 // NUMBER + " " + K/M/B -> U.S. Dollars
@@ -594,7 +594,7 @@ public class Parse implements Runnable{
         if (months.containsKey(word)){
             String month = months.get(word);
             safeIterateAndCheckType(iterator);
-            if(TokenType.WHITESPACE == type && currString.equals(" ")){
+            if(TokenType.WHITESPACE == type ){
                 safeIterateAndCheckType(iterator);
                 if(TokenType.NUMBER == type){
                     if(currString.length() > 2){ // number is year
@@ -646,25 +646,26 @@ public class Parse implements Runnable{
                 if(lCompoundWordParts.size() > 1){
                     for (String compoundWordPart:
                             lCompoundWordParts) {
-                        if(!stopWords.contains(compoundWordPart)) commitTermToList(compoundWordPart, lTerms);
+                        commitTermToList(compoundWordPart, lTerms);
                     }
                 }
             }
             // range with "between X and Y" format
             else if (result.toString().equalsIgnoreCase("Between")){
                 if(tryParseBetweenXandY(iterator, result, lCompoundWordParts)){
+                    // add component parts to Term list (output) if they exist
                     for (String compoundWordPart:
                             lCompoundWordParts) {
-                        if(!stopWords.contains(compoundWordPart)) commitTermToList(compoundWordPart, lTerms);
+                        commitTermToList(compoundWordPart, lTerms);
                     }
                 }
             }
 
-            // add component parts to Term list (output) if they exist
-            // just a stopword alone, throw it away (was not compound word)
-            if(stopWords.contains(result.toString().toLowerCase())){
-                result.delete(0, result.length()); //clear word from result
-            }
+
+//            // just a stopword alone, throw it away (was not compound word)
+//            if(stopWords.contains(result.toString().toLowerCase())){
+//                result.delete(0, result.length()); //clear word from result
+//            }
         }
 
         return result;
@@ -717,8 +718,9 @@ public class Parse implements Runnable{
             stemmer.add(term.toCharArray(), term.length());
             stemmer.stem();
             term = stemmer.toString();
+            if(!stopWords.contains(term.toLowerCase())) lTerms.add(new Term(term));
         }
-        lTerms.add(new Term(term));
+        else if (!stopWords.contains(term.toLowerCase())) lTerms.add(new Term(term));
     }
 
     /**

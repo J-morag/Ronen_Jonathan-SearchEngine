@@ -127,7 +127,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
-        p.useStemming = false;
+        p.useStemming = true;
         Thread parser1 = new Thread(p);
 
         Set<Term> terms = new HashSet<>();
