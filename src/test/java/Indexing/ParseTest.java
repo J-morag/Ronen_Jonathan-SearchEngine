@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -130,7 +131,8 @@ class ParseTest {
         p.useStemming = true;
         Thread parser1 = new Thread(p);
 
-        Set<Term> terms = new HashSet<>();
+//        Set<Term> terms = new HashSet<>();
+        SortedSet<Term> terms = new TreeSet<>();
 
         Thread termAccumulator = new Thread(() -> {
             try {
@@ -168,7 +170,7 @@ class ParseTest {
 
 
         for (Term t:
-             terms) {
+                terms) {
             System.out.println(t);
         }
         System.out.println("total number of terms: " + terms.size());
@@ -244,7 +246,7 @@ class ParseTest {
     }
 
     @Test
-    void parseSerializedTestCases(){
+    void parseSerialTestCases(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
@@ -381,7 +383,7 @@ class ParseTest {
             "national anthem. \n";
 
     static final String testCases =
-            "1,000,000 Dollars 1 M Dollars\n" +
+            "1,000,000 1 M Dollars\n" +
                     "$450,000,000\n" +
                     "450 M Dollars\n" +
                     "$100 million 100 M Dollars\n" +

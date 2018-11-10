@@ -2,7 +2,7 @@ package Elements;
 
 import java.util.List;
 
-public class Term {
+public class Term implements Comparable {
     String string;
 //    boolean isInHeader = false;
 //    boolean isInTitle = false;
@@ -34,8 +34,9 @@ public class Term {
         return string != null ? string.hashCode() : 0;
     }
 
-    public int compareTo(Term other){
-        return this.toString().compareTo(other.toString());
+    @Override
+    public int compareTo(Object o) {
+        if(! (o instanceof Term)) return 1;
+        else return this.toString().compareTo(((Term)o).toString());
     }
-
 }

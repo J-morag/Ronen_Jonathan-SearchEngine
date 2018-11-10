@@ -15,7 +15,6 @@ import java.util.concurrent.BlockingQueue;
  * takes Documents, tokenizes and parses them. does not perform stemming.
  */
 public class Parse implements Runnable{
- // TODO add .equals("\n") where there is " "
     public static boolean debug = false;
     public boolean useStemming = true;
     private HashSet<String> stopWords;
@@ -169,12 +168,9 @@ public class Parse implements Runnable{
             if( string.length() == 1 && isProtectedChar(string.charAt(0)) )
                 listOfTokens.add(string);
             else if(string.length() > 1){
-                //removes delimiters or ' stuck to end of strings.
-                if((isDelimiter(string.charAt(0)) ||  string.charAt(0)=='\'' ) //TODO make it more efficient? put it in tokenize() ?
-                        || (isDelimiter(string.charAt(string.length()-1)) || string.charAt(string.length()-1)=='\'' ) )
-                    listOfTokens.add(string.substring(
-                            (isDelimiter(string.charAt(0)) ||  string.charAt(0)=='\'' ) ? 1 : 0 ,
-                            (isDelimiter(string.charAt(string.length()-1)) || string.charAt(string.length()-1)=='\'' ) ? string.length()-1 : string.length())); //remove last char (delimiter)
+                //removes  ' in words.
+                if(string.contains("\'") )
+                    listOfTokens.add(string.replace("\'", "")); //
                 else
                     listOfTokens.add(string);
             }
@@ -249,7 +245,7 @@ public class Parse implements Runnable{
                     }
                 }
             }
-            //TODO not finished with root cases. add betweens. add something original?
+            //TODO add something original?
 
             else //if completely failed to identify a token (unlikely)
                 safeIterateAndCheckType(iterator);
@@ -277,7 +273,7 @@ public class Parse implements Runnable{
      * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean has$){
-        //TODO add COMPOUND-WORD
+        //TODO add NUMBER-WORD
 
         long kmbtMultiplier = 1;
         String decimals = null;
@@ -404,7 +400,7 @@ public class Parse implements Runnable{
                 type = TokenType.classify(currString);
             }
         }
-        //TODO just number???? number at end of string
+        //TODO just number???? number at end of string. number month number
 
         finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, dateMonth);
         return result;
