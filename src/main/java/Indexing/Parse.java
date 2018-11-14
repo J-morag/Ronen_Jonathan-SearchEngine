@@ -314,7 +314,7 @@ public class Parse implements Runnable{
             // NUMBER + "-" -> WORD/NUMBER
             result.append(unformattedNumber.toString());
             concatTokensSeparatedByDashes(iterator,result, lTerms, unformattedNumber.toString(), addComponentPartsOfCompoundWord);
-            if(!result.equals(unformattedNumber)) isCompound = true;
+            if(!result.toString().equals(unformattedNumber.toString())) isCompound = true;
         }
         // NUMBER ->  " "
         else if(type == TokenType.WHITESPACE && !currString.equals("\n")){
