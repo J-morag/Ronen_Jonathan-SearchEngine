@@ -275,7 +275,6 @@ public class Parse implements Runnable{
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result,
                                       boolean has$, List<Term> lTerms){
-        //TODO add NUMBER-WORD
         //TODO add negative numbers ?
 
         long kmbtMultiplier = 1;
