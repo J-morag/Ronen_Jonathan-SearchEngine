@@ -143,9 +143,8 @@ class ParseTest {
                         done = true;
                     }
                     else{
-                        terms.addAll(termDocs.take().getText());
-                        terms.addAll(termDocs.take().getTitle());
-//                        System.out.println(terms.size());
+                        terms.addAll(termDoc.getText());
+                        terms.addAll(termDoc.getTitle());
                     }
                 }
 
@@ -156,6 +155,59 @@ class ParseTest {
 
 
         ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        for (Term t:
+                terms) {
+            System.out.println(t);
+        }
+        System.out.println("total number of terms: " + terms.size());
+    }
+
+    @Test
+    void parseConcurrentPrintTermsOneFile(){
+        String fileName = "/FB396001";
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+        p.useStemming = true;
+        Thread parser1 = new Thread(p);
+
+//        Set<Term> terms = new HashSet<>();
+        SortedSet<Term> terms = new TreeSet<>();
+
+        Thread termAccumulator = new Thread(() -> {
+            try {
+                boolean done = false;
+                while( !done){
+                    TermDocument termDoc = termDocs.take();
+                    if(termDoc.getText() == null){
+                        done = true;
+                    }
+                    else{
+                        terms.addAll(termDoc.getText());
+                        terms.addAll(termDoc.getTitle());
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder+fileName, docs);
         Thread reader = new Thread(rf);
 
         termAccumulator.start();
@@ -252,7 +304,7 @@ class ParseTest {
         Parse.debug = true;
         Document doc1 = new Document();
         doc1.setDate("AUGUST 2");
-        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24");
+        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
         int numTerms1 = 0;
@@ -383,7 +435,7 @@ class ParseTest {
             "national anthem. \n";
 
     static final String testCases =
-            "1,000,000 1 M Dollars\n" +
+            "1,000,000 Dollars 1 M Dollars\n" +
                     "$450,000,000\n" +
                     "450 M Dollars\n" +
                     "$100 million 100 M Dollars\n" +

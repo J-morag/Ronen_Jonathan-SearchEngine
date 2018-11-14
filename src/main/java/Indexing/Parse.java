@@ -16,6 +16,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Parse implements Runnable{
     public static boolean debug = false;
+    private static final boolean addComponentPartsOfCompoundWord = true;
     public boolean useStemming = true;
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
@@ -228,14 +229,14 @@ public class Parse implements Runnable{
             }
             // NUMBER ->
             else if(type == TokenType.NUMBER){
-                commitTermToList(parseNumber(iterator, currString, new StringBuilder(), false).toString()  , lTerms);
+                commitTermToList(parseNumber(iterator, currString, new StringBuilder(), false, lTerms).toString()  , lTerms);
             }
             // $ -> NUMBER(price) ->
             else if(TokenType.SYMBOL == type && currString.equals("$")){
                 safeIterateAndCheckType(iterator);
                 type = TokenType.classify(currString);
                 if(TokenType.NUMBER == type){
-                    commitTermToList(parseNumber(iterator, currString, new StringBuilder(), true).toString()   , lTerms);
+                    commitTermToList(parseNumber(iterator, currString, new StringBuilder(), true, lTerms).toString()   , lTerms);
                 }
                 else{ //a word starting with a dollar sign
                     currString = '$'+currString;
@@ -272,8 +273,10 @@ public class Parse implements Runnable{
      *                should be set to true if a '$' was encountered before the number. should be set to false if unsure.
      * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
-    private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result, boolean has$){
+    private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result,
+                                      boolean has$, List<Term> lTerms){
         //TODO add NUMBER-WORD
+        //TODO add negative numbers ?
 
         long kmbtMultiplier = 1;
         String decimals = null;
@@ -281,15 +284,11 @@ public class Parse implements Runnable{
         boolean isFractional = false;
         boolean isPercent = false;
         boolean isPrice = has$;
+        boolean isCompound = false;
         String dateMonth = null;
 
-        currString = number;
-        type = TokenType.NUMBER;
 
-        while(type == TokenType.NUMBER){
-            unformattedNumber.append(currString);
-            safeIterateAndCheckType(iterator); //may result in classifying the same string twice
-        }
+        buildNumber(iterator, unformattedNumber);
 
         // NUMBER -> . -> NUMBER
         if(type == TokenType.SYMBOL && currString.equals(".")){ //decimal point or end of line
@@ -309,6 +308,13 @@ public class Parse implements Runnable{
         if(type == TokenType.SYMBOL && currString.equals("%")){
             isPercent = true;
             safeIterateAndCheckType(iterator);
+        }
+        // NUMBER -> "-"
+        else if(TokenType.SYMBOL == type && currString.equals("-")){
+            // NUMBER + "-" -> WORD/NUMBER
+            result.append(unformattedNumber.toString());
+            concatTokensSeparatedByDashes(iterator,result, lTerms, unformattedNumber.toString(), addComponentPartsOfCompoundWord);
+            if(!result.equals(unformattedNumber)) isCompound = true;
         }
         // NUMBER ->  " "
         else if(type == TokenType.WHITESPACE && !currString.equals("\n")){
@@ -402,8 +408,15 @@ public class Parse implements Runnable{
         }
         //TODO just number???? number at end of string. number month number
 
-        finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, dateMonth);
+        if(!isCompound) finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, dateMonth);
         return result;
+    }
+
+    private void buildNumber(@NotNull ListIterator<String> iterator, StringBuilder unformattedNumber) {
+        while(type == TokenType.NUMBER){
+            unformattedNumber.append(currString);
+            safeIterateAndCheckType(iterator); //may result in classifying the same string twice
+        }
     }
 
     private void safeIterateAndCheckType(ListIterator<String> iterator){
@@ -424,25 +437,24 @@ public class Parse implements Runnable{
         // assumes the previously encountered string was " ".
         safeIterateAndCheckType(iterator);
         type = TokenType.classify(currString);
-        String firstNumber = "";
         if(type == TokenType.NUMBER){
-            firstNumber = currString;
-            safeIterateAndCheckType(iterator);
+            StringBuilder firstNumber = new StringBuilder();
+            buildNumber(iterator, firstNumber);
             if(currString.equals("/")){
                 safeIterateAndCheckType(iterator);
                 if(TokenType.NUMBER == type){
                     result.append(' ');
-                    result.append(firstNumber);
+                    result.append(firstNumber.toString());
                     result.append('/');
                     result.append(currString);
                     safeIterateAndCheckType(iterator);
                     return true;
                 }
-                else rewindIterator(iterator, 3); //these dont work withput the "else" and i dont know why
+                else rewindIterator(iterator, 3); //these dont work without the "else" and i dont know why
             }
-            else rewindIterator(iterator, 2);//these dont work withput the "else" and i dont know why
+            else rewindIterator(iterator, 2);//these dont work without the "else" and i dont know why
         }
-        else rewindIterator(iterator, 1);//these dont work withput the "else" and i dont know why
+        else rewindIterator(iterator, 1);//these dont work without the "else" and i dont know why
         return false;
     }
 
@@ -586,6 +598,7 @@ public class Parse implements Runnable{
     }
 
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
+        //TODO add acronym support
         // MONTH -> MM-DD
         if (months.containsKey(word)){
             String month = months.get(word);
@@ -623,28 +636,13 @@ public class Parse implements Runnable{
         else { //regular word or stopword
             result.append(currString); //add word to result
             List<String> lCompoundWordParts = new ArrayList<>();
-            lCompoundWordParts.add(currString); // word might be first part of a compound word
+            String firstToken = currString; // word might be first part of a compound word
 
             safeIterateAndCheckType(iterator);
 
             //string together words (or numbers) separated by '-'
             if(currString.equals("-")){
-                while(currString.equals("-")){
-                    safeIterateAndCheckType(iterator);
-                    type = TokenType.classify(currString);
-                    if(TokenType.WORD == type || TokenType.NUMBER == type){
-                        lCompoundWordParts.add(currString);
-                        result.append("-");
-                        result.append(currString);
-                        safeIterateAndCheckType(iterator);
-                    }
-                }
-                if(lCompoundWordParts.size() > 1){
-                    for (String compoundWordPart:
-                            lCompoundWordParts) {
-                        commitTermToList(compoundWordPart, lTerms);
-                    }
-                }
+                concatTokensSeparatedByDashes(iterator, result, lTerms, firstToken, addComponentPartsOfCompoundWord);
             }
             // range with "between X and Y" format
             else if (result.toString().equalsIgnoreCase("Between")){
@@ -657,14 +655,40 @@ public class Parse implements Runnable{
                 }
             }
 
-
-//            // just a stopword alone, throw it away (was not compound word)
-//            if(stopWords.contains(result.toString().toLowerCase())){
-//                result.delete(0, result.length()); //clear word from result
-//            }
         }
 
         return result;
+    }
+
+    /**
+     * strings together words or numbers separated by "-". length is unbounded.
+     * assumnes the firstToken has already been added to result.
+     * @param iterator
+     * @param result
+     * @param addComponents - whether or not to add the component parts of the compound expression into {@param lTerms}.
+     * @param lTerms - inserts the individual parts of the token chain into here, if {@param addComponents} is true;
+     * @param firstToken - puts the individual words/numbers here, so they can also be
+     */
+    private void concatTokensSeparatedByDashes(@NotNull ListIterator<String> iterator, @NotNull StringBuilder result, List<Term> lTerms,
+                                               String firstToken, boolean addComponents) {
+        List<String> lCompoundExpressionParts = new LinkedList<>();
+        lCompoundExpressionParts.add(firstToken);
+        while(currString.equals("-")){
+            safeIterateAndCheckType(iterator);
+            type = TokenType.classify(currString);
+            if(TokenType.WORD == type || TokenType.NUMBER == type){
+                lCompoundExpressionParts.add(currString);
+                result.append("-");
+                result.append(currString);
+                safeIterateAndCheckType(iterator);
+            }
+        }
+        if(addComponents && lCompoundExpressionParts.size() > 1){
+            for (String compoundWordPart:
+                    lCompoundExpressionParts) {
+                commitTermToList(compoundWordPart, lTerms);
+            }
+        }
     }
 
     /**
