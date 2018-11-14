@@ -25,6 +25,7 @@ public class Parse implements Runnable{
     private String currString = "";
     private HashMap<String, String> months;
     private TokenType type;
+    private boolean bIteratorHasNext = true;
 
     //          Administrative
 
@@ -213,7 +214,7 @@ public class Parse implements Runnable{
          if (iterator.hasNext()) // check for case of parsing something empty
              safeIterateAndCheckType(iterator);
 
-        while (iterator.hasNext()) {
+        while (bIteratorHasNext) {
 
             //             ROOT CASES
             // whitespace
@@ -261,6 +262,8 @@ public class Parse implements Runnable{
             }
             System.out.println("-----------end parse output-------------");
         }
+
+        bIteratorHasNext = true;
         return lTerms;
     }
 
@@ -405,7 +408,6 @@ public class Parse implements Runnable{
                 type = TokenType.classify(currString);
             }
         }
-        //TODO just number???? number at end of string. number month number
 
         if(!isCompound) finalizeNumber(unformattedNumber, result, kmbtMultiplier, decimals, isPrice, isPercent, isFractional, dateMonth);
         return result;
@@ -418,10 +420,20 @@ public class Parse implements Runnable{
         }
     }
 
+    /**
+     * iterates over the iterator once, and sets currString to the String from {@param iterator}. sets {@param type} to the type for current string.
+     * if iterator doesn't have next, sets {@param currString} to "\n", and sets {@param bIteratorHashNext} to false to stop parseWorker.
+     * @param iterator
+     */
     private void safeIterateAndCheckType(ListIterator<String> iterator){
         if(iterator.hasNext()){
             currString = iterator.next();
             type = TokenType.classify(currString);
+        }
+        else{
+            currString = "\n";
+            type = TokenType.WHITESPACE;
+            bIteratorHasNext = false;
         }
     }
 
@@ -620,7 +632,7 @@ public class Parse implements Runnable{
                         result.append("-0");
                         result.append(currString);
                     }
-                    if(iterator.hasNext()) safeIterateAndCheckType(iterator);
+                    safeIterateAndCheckType(iterator);
                 }
                 else{ // just some word
                     result.append(currString);

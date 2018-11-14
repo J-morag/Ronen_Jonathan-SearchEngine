@@ -468,6 +468,6 @@ class ParseTest {
                     "7 Trillion 7000B " +
                     "14 MAY, 14 May\n" +
                     "June 4, JUNE 4 " +
-                    "May 1994, MAY 1994\n";
+                    "May 1994, MAY 1994";
 
 }
