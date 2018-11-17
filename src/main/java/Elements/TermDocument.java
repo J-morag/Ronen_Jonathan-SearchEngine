@@ -5,6 +5,7 @@ import java.util.List;
 public class TermDocument {
     private int serialID;
     private String docId;
+    private Term city;
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
@@ -42,6 +43,10 @@ public class TermDocument {
     public List<Term> getText() {
         return text;
     }
+
+    public  Term getCity(){return this.city;}
+
+    public void setCity(Term city){this.city=city; }
 
     public void setDocId(String docId) {
         this.docId = docId;

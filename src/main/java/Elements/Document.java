@@ -6,6 +6,7 @@ public class Document {
     private String title = "";
     private String text = "";
     private  String date = "";
+    private String city="";
 
 
     public Document(/*int serialID*/){
@@ -18,6 +19,15 @@ public class Document {
         this.title = title;
         this.text = text;
         this.date = date;
+    }
+
+    public Document(int serialID, String docId, String title, String text, String date , String city) {
+        this.serialID = serialID;
+        this.docId = docId;
+        this.title = title;
+        this.text = text;
+        this.date = date;
+        this.city=city;
     }
 
     public void setTitle(String header) {
@@ -38,6 +48,7 @@ public class Document {
     public void setDate(String date){
         this.date = date;
     }
+    public void setCity(String city){this.city=city;}
 
     public void setDocId(String id){
         docId=id;
@@ -58,6 +69,7 @@ public class Document {
     public String getText() {
         return text;
     }
+    public String getCity(){return city;}
 
     public String getDate(){
         return date;
@@ -66,7 +78,7 @@ public class Document {
 
     @Override
     public String toString(){
-        return "docID : " + docId+"\n" + "title : " + title+"\n" +"date : "+date+"\n" + "text : " + text;
+        return "docID : " + docId+"\n" + "title : " + title+"\n" +"date : "+date+"\n" + "text : " + text + "city : "+ city;
     }
 }
 

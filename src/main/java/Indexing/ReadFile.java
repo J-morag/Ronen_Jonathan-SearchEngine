@@ -146,6 +146,7 @@ public class ReadFile implements Runnable {
         boolean text = false;
         boolean others =false;
         boolean date = false;
+        boolean city = false;
         Document doc = null;
         StringBuilder textString;
 
@@ -164,7 +165,12 @@ public class ReadFile implements Runnable {
             }
             else if (qName.equalsIgnoreCase("DATE") || qName.equalsIgnoreCase("DATE1")) {
                 date = true;
-            } else if (qName.equalsIgnoreCase("TEXT")) {
+            }else if (qName.equalsIgnoreCase("F") && (attributes.getValue("p").equalsIgnoreCase("104")))
+            {
+                city=true;
+
+            }
+            else if (qName.equalsIgnoreCase("TEXT")) {
                 text = true;
                 textString = new StringBuilder();
             } else if( text) {
@@ -203,6 +209,20 @@ public class ReadFile implements Runnable {
                 doc.setDate(new String(ch, start, length));
                 date = false;
 
+            }
+            if(city){
+                StringBuilder s =new StringBuilder();
+                for(int i=start ; i<length-1 ; i++ ){
+                    if(ch[i]!=' ' && ch[i]!='\n'){
+                        while(ch[i]!=' '){
+                            s.append(ch[i]);
+                            i++;
+                        }
+                        break;
+                    }
+                }
+                doc.setCity(s.toString().replace(" ",""));
+                city=false;
             }
             else if(title){
                 doc.setTitle(new String(ch, start, length));

@@ -11,7 +11,7 @@ import java.util.concurrent.BlockingQueue;
 public class Main {
 
     // GLOBAL PARAMETERS
-    private static final int documentBufferSize = 1000000;
+    private static final int documentBufferSize = 10;
     private static final int termBufferSize = 10;
     private static final int stemmedTermBufferSize = 10;
 
