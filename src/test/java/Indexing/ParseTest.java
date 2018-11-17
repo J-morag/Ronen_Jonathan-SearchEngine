@@ -304,7 +304,8 @@ class ParseTest {
         Parse.debug = true;
         Document doc1 = new Document();
         doc1.setDate("AUGUST 2");
-        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance");
+        doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance\n" +
+                "politicians Politicians POLITICIANS POLITICIANs");
         doc1.setDocId("testCases");
         doc1.setText(testCases);
         int numTerms1 = 0;

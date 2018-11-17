@@ -1,4 +1,4 @@
-package Indexing;
+package Indexing.Index;
 
 import Elements.TermDocument;
 

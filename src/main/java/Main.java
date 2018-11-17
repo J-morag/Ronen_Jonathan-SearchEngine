@@ -1,6 +1,6 @@
 import Elements.Document;
 import Elements.TermDocument;
-import Indexing.Indexer;
+import Indexing.Index.Indexer;
 import Indexing.Parse;
 import Indexing.ReadFile;
 
