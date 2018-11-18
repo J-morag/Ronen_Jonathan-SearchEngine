@@ -40,7 +40,7 @@ public class Indexer implements Runnable {
         int numOfDocs = 0;
         String term;
         String postingsFileName;
-        int[] newPostings; //TODO cahnge from int to some data structure
+        int[] newPostings; //TODO change from int to some data structure
 
         public indexEntry(String term, String postingsFileName) {
             this.term = term;
