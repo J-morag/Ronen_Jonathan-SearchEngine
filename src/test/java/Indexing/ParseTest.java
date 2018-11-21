@@ -133,11 +133,11 @@ class ParseTest {
 
     @Test
     void parseConcurrentPrintTerms(){
-        final boolean saveResults = false;
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
-        p.useStemming = true;
+        p.useStemming = false;
+        final boolean saveResults = true;
         Thread parser1 = new Thread(p);
 
         SortedSet<Term> terms = new TreeSet<>();
@@ -171,7 +171,7 @@ class ParseTest {
             DateFormat dateFormat = new SimpleDateFormat("YY_MM_DD_HH_mm");
             String formattedDate=dateFormat.format(date);
 
-            String fullPath= pathToTestResultsFolder + "/allTerms " + formattedDate + ".txt";
+            String fullPath= pathToTestResultsFolder + "/allTerms " + formattedDate + " " + (p.useStemming ? "stemmed" : "unstemmed") +  ".txt";
             try (PrintWriter out = new PrintWriter(fullPath, "UTF-8")){
                 for (Term t: terms
                         ) {

@@ -6,11 +6,11 @@ import Elements.TermDocument;
 import java.util.SortedSet;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class TermAccumulator implements Runnable{
-    SortedSet<Term> terms;
+public class StringAccumulator implements Runnable{
+    SortedSet<String> terms;
     ArrayBlockingQueue<TermDocument> termDocs;
 
-    public TermAccumulator(SortedSet<Term> terms, ArrayBlockingQueue<TermDocument> termDocs) {
+    public StringAccumulator(SortedSet<String> terms, ArrayBlockingQueue<TermDocument> termDocs) {
         this.terms = terms;
         this.termDocs = termDocs;
     }
@@ -25,8 +25,14 @@ public class TermAccumulator implements Runnable{
                     done = true;
                 }
                 else{
-                    terms.addAll(termDoc.getText());
-                    terms.addAll(termDoc.getTitle());
+                    for (Term t: termDoc.getText()
+                         ) {
+                        terms.add(t.toString());
+                    }
+                    for (Term t: termDoc.getTitle()
+                         ) {
+                        terms.add(t.toString());
+                    }
                 }
             }
 
@@ -35,4 +41,3 @@ public class TermAccumulator implements Runnable{
         }
     }
 }
-

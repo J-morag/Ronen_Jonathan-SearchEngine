@@ -36,16 +36,4 @@ public class Indexer implements Runnable {
         index();
     }
 
-    private class indexEntry{
-        int numOfDocs = 0;
-        String term;
-        String postingsFileName;
-        int[] newPostings; //TODO change from int to some data structure
-
-        public indexEntry(String term, String postingsFileName) {
-            this.term = term;
-            this.postingsFileName = postingsFileName;
-            this.newPostings = new int[partialGroupSize];
-        }
-    }
 }
