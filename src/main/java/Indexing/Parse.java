@@ -137,6 +137,7 @@ public class Parse implements Runnable{
                 from = to;
                 to++;
                 //add the delimiter
+                //TODO only keep delimiters that have semantic value.
                 lTokens.add(string.substring(from, to));
                 from = to;
             }
@@ -167,14 +168,12 @@ public class Parse implements Runnable{
         for (String string: textAsTokens
              ) {
             //clean up empty strings and strings that only contain a delimiter
-            if( string.length() == 1 && isProtectedChar(string.charAt(0)) )
+            if( string.length() == 1 && isProtectedChar(string.charAt(0)) ) //TODO incorporate into tokenize (avoid creating delimiter tokens that will be thrown away)
                 listOfTokens.add(string);
             else if(string.length() > 1){
                 //removes  ' in words.
-                if(string.contains("\'") )
-                    listOfTokens.add(string.replace("\'", "")); //
-                else
-                    listOfTokens.add(string);
+                //TODO possible small performance hotspot. can maybe avoid this? incorporate into tokenize?
+                listOfTokens.add(string.replace("\'", ""));
             }
         }
 

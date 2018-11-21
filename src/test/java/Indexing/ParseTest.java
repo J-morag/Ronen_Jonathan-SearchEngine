@@ -5,10 +5,17 @@ import Elements.Term;
 import Elements.TermDocument;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.Parent;
+import javafx.util.Pair;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -18,7 +25,8 @@ class ParseTest {
     ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
     ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
     private static final String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
-    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\corpus";
+    private static final String pathToTestResultsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval/test results";
+    private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval/corpus";
     private static final Stemmer stemmer = new Stemmer();
 
     @Test
@@ -125,33 +133,16 @@ class ParseTest {
 
     @Test
     void parseConcurrentPrintTerms(){
+        final boolean saveResults = false;
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
         p.useStemming = true;
         Thread parser1 = new Thread(p);
 
-//        Set<Term> terms = new HashSet<>();
         SortedSet<Term> terms = new TreeSet<>();
 
-        Thread termAccumulator = new Thread(() -> {
-            try {
-                boolean done = false;
-                while( !done){
-                    TermDocument termDoc = termDocs.take();
-                    if(termDoc.getText() == null){
-                        done = true;
-                    }
-                    else{
-                        terms.addAll(termDoc.getText());
-                        terms.addAll(termDoc.getTitle());
-                    }
-                }
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        Thread termAccumulator = new Thread(new TermAccumulator(terms, termDocs));
 
 
         ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
@@ -173,6 +164,25 @@ class ParseTest {
             System.out.println(t);
         }
         System.out.println("total number of terms: " + terms.size());
+
+        if(saveResults){
+            Calendar cal = Calendar.getInstance();
+            Date date=cal.getTime();
+            DateFormat dateFormat = new SimpleDateFormat("YY_MM_DD_HH_mm");
+            String formattedDate=dateFormat.format(date);
+
+            String fullPath= pathToTestResultsFolder + "/allTerms " + formattedDate + ".txt";
+            try (PrintWriter out = new PrintWriter(fullPath, "UTF-8")){
+                for (Term t: terms
+                        ) {
+                    out.println(t);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Test
@@ -302,6 +312,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
+        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDate("AUGUST 2");
         doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance\n" +
