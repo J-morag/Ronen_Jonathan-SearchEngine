@@ -298,12 +298,12 @@ class IndexerTest {
         long startingHeapSize = Runtime.getRuntime().totalMemory();
         long startingFreeMemory = Runtime.getRuntime().freeMemory();
         long startingUsedMemory = startingHeapSize-startingFreeMemory;
-        System.out.println("Test with IndexEntry(with array). size: " + sizeOfPointerLists);
+        System.out.println("        Test with IndexEntry(with array of size: " + sizeOfPointerLists + ")");
         System.out.println("Max heap size (MBytes): " + toMB(Runtime.getRuntime().maxMemory()));
         System.out.println("Heap size before start (MBytes): " + toMB(startingHeapSize));
         System.out.println("Available memory in heap (MBytes): " + toMB(startingFreeMemory));
         System.out.println("Memory in use before starting (MByte): " + toMB(startingUsedMemory));
-        System.out.println("Starting test of max dictionary size...");
+        System.out.println("    Starting test of max dictionary size...");
 
         termAccumulator.start();
         reader.start();
@@ -315,15 +315,21 @@ class IndexerTest {
             e.printStackTrace();
         }
 
+
         System.out.println("");
-        System.out.println("Dictionary is in memory.");
+        System.out.println("    Dictionary is in memory.");
         System.out.println("total number of terms: " + terms.size());
         System.out.println("Current heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
         System.out.println("Available memory in heap (MBytes): " + toMB(Runtime.getRuntime().freeMemory()));
+        System.out.println("");
         long endingUsedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         System.out.println("Estimated Total memory consumed by dictionary (MBytes): " + toMB(endingUsedMemory - startingUsedMemory ) );
-
-
+        long timeBeforeGC = System.currentTimeMillis();
+        System.gc();
+        long timeAfterGC = System.currentTimeMillis();
+        endingUsedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        System.out.println("Estimated Total memory consumed by dictionary after garbage collection (more accurate) (MBytes): " + toMB(endingUsedMemory - startingUsedMemory ) );
+        System.out.println("GC time (ms) = " + (timeAfterGC-timeBeforeGC));
     }
 
     private double toMB(long bytes){

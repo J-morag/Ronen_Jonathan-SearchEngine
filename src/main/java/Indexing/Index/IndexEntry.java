@@ -4,7 +4,8 @@ public class IndexEntry {
     int idf = 0;
     String term;
     int postingsFileSerial;
-    int[] postingPointers; //TODO change from int to some data structure
+    int[] postingPointers;
+
 
     public IndexEntry(String term, int postingsFileName, int numTempFiles) {
         this.term = term;

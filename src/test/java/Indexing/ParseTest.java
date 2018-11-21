@@ -18,6 +18,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 
 class ParseTest {
@@ -136,7 +138,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
-        p.useStemming = false;
+        p.useStemming = true;
         final boolean saveResults = true;
         Thread parser1 = new Thread(p);
 
@@ -186,6 +188,63 @@ class ParseTest {
     }
 
     @Test
+    void countTermsNonUnique() throws Exception {
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = false;
+        p.useStemming = true;
+        Thread parser1 = new Thread(p);
+
+        SortedSet<Term> terms = new TreeSet<>();
+
+        Callable<Long> termAccumulator = () -> {
+            try {
+                Long totalTermsNonUnique = 0L;
+                boolean done = false;
+                while (!done) {
+                    TermDocument termDoc = termDocs.take();
+                    if (termDoc.getText() == null) {
+                        done = true;
+                    } else {
+                        for (Term t : termDoc.getText()
+                                ) {
+                            terms.add(t);
+                            totalTermsNonUnique++;
+                        }
+                        for (Term t : termDoc.getTitle()
+                                ) {
+                            terms.add(t);
+                            totalTermsNonUnique++;
+                        }
+                    }
+                }
+                return totalTermsNonUnique;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+        FutureTask<Long> totalNonUniqueTerms = new FutureTask<>(termAccumulator);
+        Thread t_termAccumulator = new Thread(totalNonUniqueTerms);
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        t_termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("total number of unique terms: " + terms.size());
+        System.out.println("Total number of non unique terms: " + totalNonUniqueTerms.get());
+    }
+
+    @Test
     void parseConcurrentPrintTermsOneFile(){
         String fileName = "/FB396001";
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
@@ -194,28 +253,9 @@ class ParseTest {
         p.useStemming = true;
         Thread parser1 = new Thread(p);
 
-//        Set<Term> terms = new HashSet<>();
         SortedSet<Term> terms = new TreeSet<>();
 
-        Thread termAccumulator = new Thread(() -> {
-            try {
-                boolean done = false;
-                while( !done){
-                    TermDocument termDoc = termDocs.take();
-                    if(termDoc.getText() == null){
-                        done = true;
-                    }
-                    else{
-                        terms.addAll(termDoc.getText());
-                        terms.addAll(termDoc.getTitle());
-                    }
-                }
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
+        Thread termAccumulator = new Thread(new TermAccumulator(terms, termDocs));
 
         ReadFile rf = new ReadFile(pathToDocumentsFolder+fileName, docs);
         Thread reader = new Thread(rf);
