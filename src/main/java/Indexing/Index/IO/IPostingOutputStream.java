@@ -11,20 +11,23 @@ public interface IPostingOutputStream{
     /**
      * writes a single posting.
      * @param p - a Posting to write.
+     * @return - the index where the first byte posting was written.
      */
-    void write(@NotNull Posting p);
+    int write(@NotNull Posting p);
 
     /**
      * writes a single posting and ends the line of postings.
      * if {@param p} is null, will end the line without writing any posting.
      * @param p - a Posting to write.
+     *  @return - the index where the first byte of the posting was written.
      */
-    void writeln(Posting p);
+    int writeln(Posting p);
 
     /**
      * writes all the postings in {@param postings} and then ends the line.
-     * @param postings - an array of postings to write.
+     * @param postings  - an array of postings to write.
+     * @return - the index where the first byte of the first posting was written.
      * @throws NullPointerException - if {@param postings} contains a null pointer
      */
-    void write(@NotNull Posting[] postings) throws NullPointerException;
+    int write(@NotNull Posting[] postings) throws NullPointerException;
 }

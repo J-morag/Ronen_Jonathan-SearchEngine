@@ -366,6 +366,8 @@ class ParseTest {
         System.out.println("Elapsed time(ms): " + (time));
         System.out.println("Terms parsed: " + (numTerms1) + "/" + numTermsExpected1);
         List<Term> terms = td.getText();
+
+        //check that the output is equal in pairs
         for (int i = 0; i < terms.size() ;) {
             assertEquals(terms.get(i++), terms.get(i++));
         }
@@ -393,8 +395,8 @@ class ParseTest {
         System.out.println("Elapsed time(ms): " + (time));
         List<Term> terms = td.getText();
         //check that all are equal
-        for (int i = 0; i < terms.size() ;) {
-            assertEquals(terms.get(i++), terms.get(i));
+        for (int i = 0; i < terms.size()-1 ;) {
+            assertEquals(terms.get(i++).toString().toUpperCase(), terms.get(i).toString().toUpperCase());
         }
     }
 
@@ -545,11 +547,12 @@ class ParseTest {
                     "May 1994, MAY 1994";
 
     static final String acronymTestCase = "" +
-            "USA" +
-            "U.S.A." +
-            "U.S.A" +
-            "u.s.a" +
-            "U.S.a" +
+            "USA\n" +
+            "U.S.A. " +
+            "U.S.A. " +
+            "U.S.A " +
+            "u.s.a\n" +
+            "U.S.a\n" +
             "U.S"
             ;
 }

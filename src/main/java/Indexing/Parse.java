@@ -247,7 +247,6 @@ public class Parse implements Runnable{
                     }
                 }
             }
-            //TODO add something original?
 
             else //if completely failed to identify a token (unlikely)
                 safeIterateAndCheckType(iterator);
@@ -609,7 +608,6 @@ public class Parse implements Runnable{
     }
 
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
-        //TODO add acronym support
         // MONTH -> MM-DD
         if (months.containsKey(word)){
             String month = months.get(word);
