@@ -664,8 +664,11 @@ public class Parse implements Runnable{
                 }
             }
             // acronym
-            else if(firstToken.length() == 1 && TokenType.SYMBOL == currType && currString.equals(".")){
+            else if(firstToken.length() == 1 && currString.equals(".")){
                 tryParseAcronym(iterator, result);
+            }
+            else if(firstToken.equals("www") && currString.equals(".")){
+                tryParseURL(iterator, result);
             }
         }
 
@@ -743,6 +746,13 @@ public class Parse implements Runnable{
         return false;
     }
 
+    /**
+     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * leaves iterator on the next string after this term if successfully parsed.
+     * @param iterator
+     * @param result
+     * @return true if successfully parsed, else returns false.
+     */
     private boolean tryParseAcronym(ListIterator<String> iterator, StringBuilder result) {
         boolean isAcronym = false;
         // assumes the previously encountered string was ".".
@@ -755,6 +765,48 @@ public class Parse implements Runnable{
             }
         }
         return isAcronym;
+    }
+
+    /**
+     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * rewinds iterator if unsuccessful. leaves iterator on the next string after this term if successfully parsed.
+     * @param iterator
+     * @param result
+     * @return true if successfully parsed, else returns false.
+     */
+    private boolean tryParseURL(ListIterator<String> iterator, StringBuilder result) {
+        short numFields = 1;
+        short numTokensPopped = 0;
+        StringBuilder URL_fields = new StringBuilder();
+        // assumes the previously encountered string was ".".
+        while(currString.equals(".")){
+            safeIterateAndCheckType(iterator);
+            numTokensPopped++;
+            if(TokenType.WORD == currType){
+                URL_fields.append(".");
+                URL_fields.append(currString);
+                safeIterateAndCheckType(iterator);
+                numFields++;
+                numTokensPopped++;
+            }
+        }
+        //is URL
+        if(numFields>=3){
+            while(currString.equals("/")){
+                safeIterateAndCheckType(iterator);
+                if(TokenType.WORD == currType){
+                    URL_fields.append("/");
+                    URL_fields.append(currString);
+                    safeIterateAndCheckType(iterator);
+                }
+            }
+            //write parsed URL to result
+            result.append(URL_fields);
+        }
+        //not a URL, rewind
+        else rewindIterator(iterator, numTokensPopped);
+
+        return numFields>=3;
     }
 
     private void commitTermToList(String term, List<Term> lTerms){

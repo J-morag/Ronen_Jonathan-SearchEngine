@@ -401,6 +401,34 @@ class ParseTest {
     }
 
     @Test
+    void urlTest(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = true;
+        p.useStemming = true;
+        Document doc1 = new Document();
+        doc1.setDocId("01");
+        doc1.setCity("new york");
+        doc1.setDate("AUGUST 2");
+        doc1.setTitle("url");
+        doc1.setDocId("url test case");
+        doc1.setText(urlTestCase);
+
+        int numExpectedTerms = 8;
+
+
+        long startTime = System.currentTimeMillis();
+        TermDocument td = p.parseOneDocument(doc1);
+        long time = System.currentTimeMillis() - startTime;
+
+        System.out.println("----- RESULTS -----");
+        System.out.println("Elapsed time(ms): " + (time));
+        List<Term> terms = td.getText();
+        //check that all are equal
+        assertEquals(numExpectedTerms, terms.size());
+    }
+
+    @Test
     void parseSerialExampleDoc(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
@@ -554,5 +582,16 @@ class ParseTest {
             "u.s.a\n" +
             "U.S.a\n" +
             "U.S"
+            ;
+
+    static final String urlTestCase = "" +
+            "www.bgu.com\n" +
+            "www.bgu.ac.il " +
+            "www.bgu.com/one\n" +
+            "www.bgu.com/one/\n" +
+            "www.bgu.com/one/two\n" +
+            "www.bgu.com/one/two/.\n" +
+            "www.bgu.com/one/two/." +
+            "www.bgu.ac.il/one/two/\n"
             ;
 }
