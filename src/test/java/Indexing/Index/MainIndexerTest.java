@@ -23,6 +23,7 @@ public class MainIndexerTest {
 
     @Test
     void testMainIndex() throws InterruptedException {
+        long start=System.currentTimeMillis();
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
         BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
@@ -38,6 +39,7 @@ public class MainIndexerTest {
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
         tParser.start();
         tParser.join();
+
         MainIndexMaker mainIndexMaker = new MainIndexMaker();
         for (TermDocument doc : termDocumentsBuffer) {
             if(doc!=null){
@@ -51,6 +53,7 @@ public class MainIndexerTest {
         Map<Term,TempIndexEntry> map = mainIndexMaker.getTempDictionary();
 
         String path = "C:\\Users\\ronen\\Desktop\\test.txt";
+
         try {
             File file = new File(path);
             OutputStream fo = new FileOutputStream(file);
@@ -68,7 +71,8 @@ public class MainIndexerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        System.out.println(((double) System.currentTimeMillis()-start)/1000);
+        
     }
+
 }
