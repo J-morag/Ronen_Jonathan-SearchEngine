@@ -127,6 +127,6 @@ public class Posting {
 
     @Override
     public String toString(){
-        return docID+","+tf+","+","+maxTf+","+uniqueWord+","+city+","+specialInfo[0]+","+specialInfo[1];
+        return docID+","+tf+","+maxTf+","+uniqueWord+","+city+","+isInTitle+","+isInBeginning;
     }
 }

@@ -49,8 +49,8 @@ public class MainIndexerTest {
         }
 
         Map<Term,TempIndexEntry> map = mainIndexMaker.getTempDictionary();
-        /*
-        String path = "C:\\Users\\ronen\\Desktop\\a.txt";
+
+        String path = "C:\\Users\\ronen\\Desktop\\test.txt";
         try {
             File file = new File(path);
             OutputStream fo = new FileOutputStream(file);
@@ -68,7 +68,7 @@ public class MainIndexerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-*/
+
 
     }
 }

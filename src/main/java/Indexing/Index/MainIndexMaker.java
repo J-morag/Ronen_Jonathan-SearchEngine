@@ -41,13 +41,17 @@ public class MainIndexMaker extends AIndexMaker {
 
                 Posting posting = new Posting(docId,tf ,(short) maxTf,(short)numOfUniqueWords,city,"");
                 if(special.get(term)==0){
-                    posting.setSpecialInfo(false,false);
+                    posting.setInTitle(false);
+                    posting.setInBeginning(false);
                 }else if(special.get(term)==1){
-                    posting.setSpecialInfo(true,false);
+                    posting.setInTitle(true);
+                    posting.setInBeginning(false);
                 }else if(special.get(term)==2){
-                    posting.setSpecialInfo(false,true);
+                    posting.setInTitle(false);
+                    posting.setInBeginning(true);
                 }else {
-                    posting.setSpecialInfo(true,true);
+                    posting.setInTitle(true);
+                    posting.setInBeginning(true);
                 }
 
                 if(!tempDictionary.containsKey(term)) {
