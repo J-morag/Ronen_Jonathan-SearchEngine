@@ -3,17 +3,12 @@ package Indexing;
 import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
-import javafx.collections.transformation.SortedList;
-import javafx.scene.Parent;
-import javafx.util.Pair;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -348,7 +343,7 @@ class ParseTest {
     }
 
     @Test
-    void parseSerialTestCases(){
+    void parseSerialNumberTestCases(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = true;
@@ -357,8 +352,8 @@ class ParseTest {
         doc1.setDate("AUGUST 2");
         doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance\n" +
                 "politicians Politicians POLITICIANS POLITICIANs");
-        doc1.setDocId("testCases");
-        doc1.setText(testCases);
+        doc1.setDocId("numberTestCases");
+        doc1.setText(numberTestCases);
         int numTerms1 = 0;
         int numTermsExpected1 = 48;
 
@@ -373,6 +368,33 @@ class ParseTest {
         List<Term> terms = td.getText();
         for (int i = 0; i < terms.size() ;) {
             assertEquals(terms.get(i++), terms.get(i++));
+        }
+    }
+
+    @Test
+    void acronymTest(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs);
+        Parse.debug = true;
+        p.useStemming = true;
+        Document doc1 = new Document();
+        doc1.setDocId("01");
+        doc1.setCity("new york");
+        doc1.setDate("AUGUST 2");
+        doc1.setTitle("acronym");
+        doc1.setDocId("acronym test case");
+        doc1.setText(acronymTestCase);
+
+        long startTime = System.currentTimeMillis();
+        TermDocument td = p.parseOneDocument(doc1);
+        long time = System.currentTimeMillis() - startTime;
+
+        System.out.println("----- RESULTS -----");
+        System.out.println("Elapsed time(ms): " + (time));
+        List<Term> terms = td.getText();
+        //check that all are equal
+        for (int i = 0; i < terms.size() ;) {
+            assertEquals(terms.get(i++), terms.get(i));
         }
     }
 
@@ -486,7 +508,7 @@ class ParseTest {
             "  The congress session ended with the solemn playing of the \n" +
             "national anthem. \n";
 
-    static final String testCases =
+    static final String numberTestCases =
             "1,000,000 Dollars 1 M Dollars\n" +
                     "$450,000,000\n" +
                     "450 M Dollars\n" +
@@ -522,4 +544,12 @@ class ParseTest {
                     "June 4, JUNE 4 " +
                     "May 1994, MAY 1994";
 
+    static final String acronymTestCase = "" +
+            "USA" +
+            "U.S.A." +
+            "U.S.A" +
+            "u.s.a" +
+            "U.S.a" +
+            "U.S"
+            ;
 }
