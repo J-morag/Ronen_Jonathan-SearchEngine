@@ -81,4 +81,10 @@ public class Posting {
         specialInfo[0]=isInTitel;
         specialInfo[1]=isInBeginning;
     }
+
+
+    @Override
+    public String toString(){
+        return docID+","+tf+","+","+maxTf+","+uniqueWord+","+city+","+specialInfo[0]+","+specialInfo[1];
+    }
 }

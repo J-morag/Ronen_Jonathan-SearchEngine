@@ -203,7 +203,12 @@ public class ReadFile implements Runnable {
         public void characters(char ch[], int start, int length) throws SAXException {
 
             if (docId) {
-                doc.setDocId(new String(ch, start, length));
+                StringBuilder sb = new StringBuilder();
+                for (int i = start; i <length ; i++) {
+                    if(ch[i]!=' ' && ch[i]!='\n')
+                        sb.append(ch[i]);
+                }
+                doc.setDocId(sb.toString());
                 docId = false;
             } else if (date) {
                 doc.setDate(new String(ch, start, length));
@@ -221,6 +226,7 @@ public class ReadFile implements Runnable {
                             }
                             else {
                                 s.append(ch[i]);
+                                i++;
                             }
                         }
                         break;

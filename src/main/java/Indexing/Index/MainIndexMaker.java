@@ -1,14 +1,14 @@
 package Indexing.Index;
 
-import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
-import com.sun.xml.internal.bind.v2.TODO;
 
 import java.util.*;
 
+import static javafx.application.Platform.exit;
+
 public class MainIndexMaker extends AIndexMaker {
-    private Map<Term,tempIndexEntry> tempDictionary;
+    private Map<Term, TempIndexEntry> tempDictionary;
     private int numOfDocs;
 
     public MainIndexMaker (){
@@ -20,25 +20,54 @@ public class MainIndexMaker extends AIndexMaker {
 
     @Override
     public void addToIndex(TermDocument doc) {
-        if(doc != null){
-
+        if(doc.getSerialID() != -1){
+            numOfDocs++;
             Set<Term> uniqueWords=new HashSet<>();
             Map<Term,Integer> tfMap=new HashMap<>();
             Map<Term , Byte> special = new HashMap<Term ,Byte>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
-            int maxTf = getMaxTf(uniqueWords,tfMap,title,text);
+            int maxTf = getMaxTf(uniqueWords,tfMap,special,title,text);
             int numOfUniqueWords = uniqueWords.size();
+            String city ="";
+            if(doc.getCity()!=null) {
+                city = doc.getCity().toString();
+            }
 
 
+            String docId = doc.getDocId();
+            for(Term term : uniqueWords){
+                short tf =  tfMap.get(term).shortValue();
+
+                Posting posting = new Posting(docId,tf ,(short) maxTf,(short)numOfUniqueWords,city,"");
+                if(special.get(term)==0){
+                    posting.setSpecialInfo(false,false);
+                }else if(special.get(term)==1){
+                    posting.setSpecialInfo(true,false);
+                }else if(special.get(term)==2){
+                    posting.setSpecialInfo(false,true);
+                }else {
+                    posting.setSpecialInfo(true,true);
+                }
+
+                if(!tempDictionary.containsKey(term)) {
+                    TempIndexEntry tmp = new TempIndexEntry();
+                    tmp.addPosting(posting);
+                    tempDictionary.put(term,tmp);
+                }else {
+                    TempIndexEntry tmp = tempDictionary.get(term);
+                    tmp.addPosting(posting);
+                }
 
 
-
-
+            }
 
 
         }
+
+
     }
+
 
     /**
      * this function go over every term in a list and calculate the maxTF for the doc
@@ -53,7 +82,15 @@ public class MainIndexMaker extends AIndexMaker {
      */
     private int getMaxTf( Set<Term> uniqueWords , Map<Term,Integer> tfMap , Map<Term,Byte> special, List<Term> title , List<Term> text){
         int maxTf=0;
-        int beginning = (int)(text.size()*0.1);
+        int beginning=0;
+        try {
+            beginning = (int)(text.size()*0.1);
+        }catch (NullPointerException e ){
+            System.out.println(numOfDocs);
+            exit();
+
+        }
+
 
         for(Term t : title){
             uniqueWords.add(t);
@@ -74,9 +111,9 @@ public class MainIndexMaker extends AIndexMaker {
 
 
         }
-
+        int count =0;
         for(Term t : text){
-            int count =0;
+
             uniqueWords.add(t);
             if(tfMap.containsKey(t)){
                 tfMap.put(t, tfMap.get(t)+1);
@@ -93,12 +130,23 @@ public class MainIndexMaker extends AIndexMaker {
                 special.put(t , new Byte((byte)2));
             }
             else if(count<= beginning && special.containsKey(t)){
-                special.put(t,(byte)(special.get(t)+1));
+                if(special.get(t) == 1){
+                    special.put(t, new Byte((byte)3));
+                }
+            } else if(count>beginning && !special.containsKey(t)){
+                special.put(t,new Byte((byte)0));
             }
-            beginning++;
+            count++;
         }
         return maxTf;
     }
+
+
+
+    public Map<Term , TempIndexEntry> getTempDictionary(){
+        return tempDictionary;
+    }
+
 
 
    //TODO
