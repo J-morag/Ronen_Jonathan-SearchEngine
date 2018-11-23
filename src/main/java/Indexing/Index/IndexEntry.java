@@ -1,7 +1,7 @@
 package Indexing.Index;
 
 public class IndexEntry {
-    int idf = 0;
+    int df = 0;
     String term;
     int postingsFileSerial;
     int[] postingPointers;

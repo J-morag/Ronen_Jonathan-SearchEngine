@@ -21,7 +21,6 @@ public class MainIndexMaker extends AIndexMaker {
     @Override
     public void addToIndex(TermDocument doc) {
         if(doc.getSerialID() != -1){
-            numOfDocs++;
             Set<Term> uniqueWords=new HashSet<>();
             Map<Term,Integer> tfMap=new HashMap<>();
             Map<Term , Byte> special = new HashMap<Term ,Byte>();
@@ -62,9 +61,8 @@ public class MainIndexMaker extends AIndexMaker {
                     TempIndexEntry tmp = tempDictionary.get(term);
                     tmp.addPosting(posting);
                 }
-
-
             }
+            numOfDocs++;
 
 
         }
