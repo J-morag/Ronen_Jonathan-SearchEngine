@@ -221,6 +221,7 @@ public class ReadFile implements Runnable {
                             }
                             else {
                                 s.append(ch[i]);
+                                i++;
                             }
                         }
                         break;
