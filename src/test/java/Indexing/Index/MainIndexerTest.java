@@ -23,20 +23,20 @@ public class MainIndexerTest {
 
     @Test
     void testMainIndex() throws InterruptedException {
-        long start=System.currentTimeMillis();
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
         BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
 
 
+        long start=System.currentTimeMillis();
         //  Worker Threads:
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
-        tReader.start();
 
         HashSet<String> stopwords = Parse.getStopWords("");
-
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
+
+        tReader.start();
         tParser.start();
         tParser.join();
 
@@ -72,7 +72,7 @@ public class MainIndexerTest {
             e.printStackTrace();
         }
         System.out.println(((double) System.currentTimeMillis()-start)/1000);
-        
+
     }
 
 }
