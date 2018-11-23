@@ -3,6 +3,9 @@ package Indexing;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 
 
@@ -293,110 +296,27 @@ public class ReadTest {
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-    public class ReadFileTest_2 implements Runnable {
-        private String pathToDocumentsFolder;
+@Test
+void toUpperCaseTest()
+{
+    char a='h';
+
+    System.out.println((char)(a-32));
+
+}
+
+    @Test
+    void setTest()
+    {
 
 
-        public ReadFileTest_2(String pathToDocumentsFolder, HashMap documentBuffer) {
-            this.pathToDocumentsFolder = pathToDocumentsFolder;
-            documentBuffer = documentBuffer;
-        }
-
-        public void run() {
-            read();
-        }
-
-        private void read() {
-            File f = new File(pathToDocumentsFolder);
-            Elements docs;
-            File[] allSubFiles = f.listFiles();
-            for (File file : allSubFiles) {
-                if (file.isDirectory()) {
-                    File[] documentsFiles = file.listFiles();
-                    for (File fileToGenerate : documentsFiles) {
-                        docs = separateDocs(fileToGenerate);
-                        if (docs != null) {
-                            generateDocs(docs);
-                        }
-                    }
-
-                }
-
-            }
-
-        }
-
-
-        private Elements separateDocs(File fileToGenerate) {
-            FileInputStream fi = null;
-            Elements toReturn = null;
-
-            try {
-                fi = new FileInputStream(fileToGenerate);
-                BufferedReader br = new BufferedReader(new InputStreamReader(fi));
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-                line = br.readLine();
-                while (line != null) {
-                    sb.append(line);
-                    line = br.readLine();
-                }
-                org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());
-                toReturn = doc.select("DOC");
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return toReturn;
-        }
-
-
-        private void generateDocs(Elements elems) {
-            Document doc = new Document();
-            for (Element elm : elems) {
-                XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-                try {
-                    String st = elems.toString();
-                    XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new ByteArrayInputStream(st.getBytes()));
-                    while (xmlEventReader.hasNext()) {
-                        XMLEvent xmlEvent = xmlEventReader.nextEvent();
-                        if (xmlEvent.isStartElement()) {
-                            StartElement startElement = xmlEvent.asStartElement();
-                            if (startElement.getName().toString().equalsIgnoreCase("DOCNO")) {
-                                doc.setDocId(xmlEvent.toString());
-                            }
-                            //set the other varibles from xml elements
-                            else if (startElement.getName().toString().equalsIgnoreCase("TI")) {
-                                xmlEvent = xmlEventReader.nextEvent();
-                                doc.setTitle(xmlEvent.toString());
-                            } else if (startElement.getName().toString().equalsIgnoreCase("DATE") || startElement.getName().getLocalPart().equals("DATE1")) {
-                                xmlEvent = xmlEventReader.nextEvent();
-                                doc.setDate(xmlEvent.toString());
-                            } else if (startElement.getName().toString().equalsIgnoreCase("TEXT")) {
-                                xmlEvent = xmlEventReader.nextEvent();
-                                doc.setText(xmlEvent.toString());
-                            }
-                        }
-                        //if Employee end element is reached, add employee object to list
-                        if (xmlEvent.isEndElement()) {
-                            EndElement endElement = xmlEvent.asEndElement();
-                            if (endElement.getName().getLocalPart().equalsIgnoreCase("DOC")) {
-                                //documentBuffer.put(doc , doc.getDocId());
-                            }
-                        }
-                    }
-
-                } catch (XMLStreamException e) {
-                    e.printStackTrace();
-                }
-            }
-            }
-
+        Set<String> s =new HashSet<>();
+        s.add("a");
+        s.add("a");
+        System.out.println(s.size());
 
 
     }
-
-
 
 
 }

@@ -215,8 +215,13 @@ public class ReadFile implements Runnable {
                 for(int i=start ; i<length-1 ; i++ ){
                     if(ch[i]!=' ' && ch[i]!='\n'){
                         while(ch[i]!=' '){
-                            s.append(ch[i]);
-                            i++;
+                            if(ch[i]>='a'&& ch[i]<='z') {
+                                s.append((char)(ch[i]-32));
+                                i++;
+                            }
+                            else {
+                                s.append(ch[i]);
+                            }
                         }
                         break;
                     }

@@ -25,9 +25,10 @@ public class StringAccumulator implements Runnable{
                     done = true;
                 }
                 else{
-                    for (Term t: termDoc.getText()
-                         ) {
+                    for (Term t: termDoc.getText())
+                    {
                         terms.add(t.toString());
+
                     }
                     for (Term t: termDoc.getTitle()
                          ) {
