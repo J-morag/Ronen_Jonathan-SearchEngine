@@ -1,4 +1,6 @@
-package Indexing.Index;
+package Indexing.Index.IO;
+
+import Indexing.Index.Posting;
 
 public interface IPostingInputStream {
 

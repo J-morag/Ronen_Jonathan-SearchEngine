@@ -34,10 +34,11 @@ public class Document {
         this.title = header;
     }
     public String[] getAllParsableFields(){
-        String[] fields = new String[3];
+        String[] fields = new String[4];
         fields[0] = title;
         fields[1] = text;
         fields[2] = date;
+        fields[3] = city;
         return fields;
     }
 
