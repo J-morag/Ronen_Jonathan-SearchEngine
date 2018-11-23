@@ -26,6 +26,7 @@ public class TermDocument {
         this.title = fields[0];
         this.text = fields[1];
         this.date = fields[2];
+        if(!fields[3].isEmpty()) this.city = fields[3].get(0);
     }
 
     public int getSerialID() {
