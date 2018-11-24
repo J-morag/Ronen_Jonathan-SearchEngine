@@ -2,6 +2,7 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public abstract class APostingOutputStream implements IPostingOutputStream {
@@ -10,6 +11,11 @@ public abstract class APostingOutputStream implements IPostingOutputStream {
 
     public APostingOutputStream(RandomAccessFile postingsFile) {
         this.postingsFile = postingsFile;
+    }
+
+    @Override
+    public void setCursor(long pos) throws IOException {
+        this.postingsFile.seek(pos);
     }
 
     protected short[] extractShortFields(Posting posting){
@@ -22,4 +28,8 @@ public abstract class APostingOutputStream implements IPostingOutputStream {
         return posting.getBooleanFields();
     }
 
+    @Override
+    public void close() throws IOException {
+        postingsFile.close();
+    }
 }

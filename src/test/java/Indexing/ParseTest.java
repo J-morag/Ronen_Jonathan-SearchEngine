@@ -10,11 +10,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 class ParseTest {
@@ -134,7 +137,7 @@ class ParseTest {
                 docs, termDocs);
         Parse.debug = false;
         p.useStemming = true;
-        final boolean saveResults = true;
+        final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 
         SortedSet<Term> terms = new TreeSet<>();
@@ -160,9 +163,10 @@ class ParseTest {
                 terms) {
             System.out.println(t);
         }
-        System.out.println("total number of terms: " + terms.size());
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        System.out.println("total number of terms: " + formatter.format(terms.size()));
 
-        if(saveResults){
+        if(saveToDisk){
             Calendar cal = Calendar.getInstance();
             Date date=cal.getTime();
             DateFormat dateFormat = new SimpleDateFormat("YY_MM_DD_HH_mm");

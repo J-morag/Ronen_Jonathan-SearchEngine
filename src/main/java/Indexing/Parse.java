@@ -8,6 +8,8 @@ import com.sun.istack.internal.NotNull;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * takes Documents, tokenizes and parses them. does not perform stemming.
@@ -534,24 +536,24 @@ public class Parse implements Runnable{
                 unformattedNumber.append('.');
                 unformattedNumber.append(decimals);
             }
-            double number = Double.parseDouble(unformattedNumber.toString());
+            float number = Float.parseFloat(unformattedNumber.toString());
             number *= kmbtMultiplier;
 
             if(isPrice){
+                String MKB = "";
                 if (number<1000){ // too small to matter
-                    appendWhileTrimmingDecimals(result, number);
                 }
                 else if (number>=1000 && number<1000000){ //thousands
                     number /= 1000;
-                    appendWhileTrimmingDecimals(result, number);
-                    result.append(" K");
+                    MKB = " K";
                 }
                 else { //millions or larger
                     number /= 1000000;
-                    appendWhileTrimmingDecimals(result, number);
-                    result.append(" M");
+                    MKB= " M";
                 }
 
+                appendWhileTrimmingDecimals(result, number);
+                result.append(MKB);
                 result.append(stringDollars);
 
             }
@@ -573,24 +575,24 @@ public class Parse implements Runnable{
                 }
             }
             else{ //regular number
+                String MKB = "";
                 if (number<1000){ // too small to matter
-                    appendWhileTrimmingDecimals(result, number);
                 }
                 else if (number>=1000 && number<1000000){ //thousands
                     number /= 1000;
-                    appendWhileTrimmingDecimals(result, number);
-                    result.append("K");
+                    MKB ="K";
                 }
                 else if (number>=1000000 && number<1000000000){ //millions
                     number /= 1000000;
-                    appendWhileTrimmingDecimals(result, number);
-                    result.append("M");
+                    MKB = "M";
                 }
                 else { //billions or larger
                     number /= 1000000000;
-                    appendWhileTrimmingDecimals(result, number);
-                    result.append("B");
+                    MKB = "B";
                 }
+
+                appendWhileTrimmingDecimals(result, number);
+                result.append(MKB);
 
                 if(isPercent){
                     result.append('%');
@@ -599,7 +601,8 @@ public class Parse implements Runnable{
         }
     }
 
-    private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, double number){
+    private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, float number){
+//        number -= number%0.00001; //remove anything beyond the five digits past the decimal point
         if( number % 1 == 0 ){
             long numberWithoutDecimals = ((long)number);
             result.append(numberWithoutDecimals);
