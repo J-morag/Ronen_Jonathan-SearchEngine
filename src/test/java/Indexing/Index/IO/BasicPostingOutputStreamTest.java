@@ -50,7 +50,7 @@ class BasicPostingOutputStreamTest {
 
     @Test
     void writeln() throws IOException {
-        Posting p  = new Posting("dco01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
+        Posting p  = new Posting("doc01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
 
         clean();
 
@@ -58,13 +58,12 @@ class BasicPostingOutputStreamTest {
         out.writeln(p);
         out.writeln(p);
 
-
-        Scanner scanner = new Scanner(new File(outputPath));
-
-        while (scanner.hasNext()){
-            String line = scanner.nextLine();
+        raf.seek(0);
+        String line = raf.readLine();
+        while (null != line){
             System.out.println(line);
             System.out.println("length: " + line.length());
+            line = raf.readLine();
         }
 
         out.close();
