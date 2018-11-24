@@ -3,8 +3,6 @@ package Indexing.Index.IO;
 import Indexing.Index.Posting;
 import com.sun.istack.internal.NotNull;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -26,16 +24,25 @@ public class BasicPostingOutputStream extends APostingOutputStream {
 
     //OUTPUT
 
+    protected String postingToStringTuple(Posting posting){
+        return posting.toString()+";";
+    }
+
+    protected void postingToStringTuple(Posting posting, StringBuilder result){
+        result.append(posting.toString());
+        result.append(';');
+    }
+
     @Override
     public long write(@NotNull Posting p) throws IOException {
         // ';' denotes the end of a single posting
-        postingsFile.writeBytes(p.toString() + ";");
+        postingsFile.writeBytes(postingToStringTuple(p));
         return postingsFile.getFilePointer();
     }
 
     @Override
     public long writeln(Posting p) throws IOException {
-        String output = p!=null? (p+";\n") : "\n";
+        String output = p!=null? (postingToStringTuple(p)+"\n") : "\n";
         postingsFile.writeBytes(output);
         return postingsFile.getFilePointer();
     }
@@ -45,8 +52,7 @@ public class BasicPostingOutputStream extends APostingOutputStream {
         StringBuilder output = new StringBuilder();
         for (Posting p : postings
              ) {
-            output.append(p.toString());
-            output.append(';');
+            postingToStringTuple(p, output);
         }
         output.append('\n');
         postingsFile.writeBytes(output.toString());
