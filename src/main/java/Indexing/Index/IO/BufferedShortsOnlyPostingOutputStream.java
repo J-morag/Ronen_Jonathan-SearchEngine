@@ -49,4 +49,14 @@ public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutp
 
         buffer.clear();
     }
+
+    @Override
+    public long write(Posting p) throws IOException {
+        return super.write(p);
+    }
+
+    @Override
+    public long writeln(Posting p) throws IOException {
+        return super.writeln(p);
+    }
 }
