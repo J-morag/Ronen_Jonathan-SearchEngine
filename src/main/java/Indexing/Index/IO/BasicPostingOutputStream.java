@@ -16,7 +16,7 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
 
     //ADMINISTRATIVE
 
-    public BasicPostingOutputStream(String pathToFile) throws FileNotFoundException {
+    public BasicPostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
     }
 

@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 public class ShortsOnlyPostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
 
-    public ShortsOnlyPostingOutputStream(String pathToFile) throws FileNotFoundException {
+    public ShortsOnlyPostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
     }
 //
@@ -73,4 +73,6 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream implemen
     public void close() throws IOException {
         postingsFile.close();
     }
+
+
 }
