@@ -2,28 +2,38 @@ package Indexing.Index;
 
 import Elements.Term;
 import Elements.TermDocument;
+import Indexing.Index.IO.APostingOutputStream;
+import Indexing.Index.IO.BasicPostingOutputStream;
 
+import javax.print.DocFlavor;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.*;
 
 import static javafx.application.Platform.exit;
 
 public class MainIndexMaker extends AIndexMaker {
-    private Map<Term, TempIndexEntry> tempDictionary;
+    private Map<String, TempIndexEntry> tempDictionary;
+    private Map <String, TempIndexEntry> mainDictionary;
     private int numOfDocs;
+    private byte tempFileNumber;
 
     public MainIndexMaker (){
         super();
         this.tempDictionary=new LinkedHashMap<>();
         numOfDocs=0;
+        tempFileNumber=0;
 
     }
 
     @Override
     public void addToIndex(TermDocument doc) {
         if(doc.getSerialID() != -1){
-            Set<Term> uniqueWords=new HashSet<>();
-            Map<Term,Integer> tfMap=new HashMap<>();
-            Map<Term , Byte> special = new HashMap<Term ,Byte>();
+            Set<String> uniqueWords=new HashSet<>();
+            Map<String,Integer> tfMap=new HashMap<>();
+            Map<String , Byte> special = new HashMap<String, Byte>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
             int maxTf = getMaxTf(uniqueWords,tfMap,special,title,text);
@@ -35,7 +45,7 @@ public class MainIndexMaker extends AIndexMaker {
 
 
             String docId = doc.getDocId();
-            for(Term term : uniqueWords){
+            for(String term : uniqueWords){
                 short tf =  tfMap.get(term).shortValue();
 
                 Posting posting = new Posting(docId,tf ,(short) maxTf,(short)numOfUniqueWords,city,"");
@@ -63,8 +73,11 @@ public class MainIndexMaker extends AIndexMaker {
                 }
             }
             numOfDocs++;
-
-
+            if(numOfDocs==5000){
+                dumpToDisk();
+            }
+        }else {
+            dumpToDisk();
         }
 
 
@@ -82,7 +95,7 @@ public class MainIndexMaker extends AIndexMaker {
      *                if the value is
      * @return the maxTF of a term in the Document
      */
-    private int getMaxTf( Set<Term> uniqueWords , Map<Term,Integer> tfMap , Map<Term,Byte> special, List<Term> title , List<Term> text){
+    private int getMaxTf( Set<String> uniqueWords , Map<String,Integer> tfMap , Map<String,Byte> special, List<Term> title , List<Term> text){
         int maxTf=0;
         int beginning=0;
         try {
@@ -93,8 +106,8 @@ public class MainIndexMaker extends AIndexMaker {
 
         }
 
-
-        for(Term t : title){
+        for(Term term : title){
+            String t = term.toString();
             uniqueWords.add(t);
             if(tfMap.containsKey(t)){
                 tfMap.put(t, tfMap.get(t)+1);
@@ -114,8 +127,8 @@ public class MainIndexMaker extends AIndexMaker {
 
         }
         int count =0;
-        for(Term t : text){
-
+        for(Term term : text){
+            String t = term.toString();
             uniqueWords.add(t);
             if(tfMap.containsKey(t)){
                 tfMap.put(t, tfMap.get(t)+1);
@@ -145,14 +158,48 @@ public class MainIndexMaker extends AIndexMaker {
 
 
 
-    public Map<Term , TempIndexEntry> getTempDictionary(){
+    public Map<String , TempIndexEntry> getTempDictionary(){
         return tempDictionary;
     }
 
 
 
-   //TODO
-    private void mergeIndex(){
+    public void  dumpToDisk()
+    {
+
+        BasicPostingOutputStream outputStream = null;
+        try {
+            outputStream = new BasicPostingOutputStream("C:\\Users\\ronen\\Desktop\\test\\temp"+tempFileNumber+".txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        TempIndexEntry tmp =null;
+        numOfDocs=0;
+        for (String term : tempDictionary.keySet()) {
+            tmp = tempDictionary.get(term);
+            if (tmp.getPostingSize() > 0) {
+                tmp.sortPosting();
+                long pointer = 0;
+                try {
+                    pointer = outputStream.write(tmp.getPosting());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                tmp.addPointer(tempFileNumber, pointer);
+                tmp.deletePostingList();
+
+            }
+        }
+        tempFileNumber++;
+    }
+
+
+
+   //@TODO
+    public void mergeIndex(Set<String> uniqueWords){
+        String[] allTerms = uniqueWords.stream().toArray(String[]::new);
+
+        Arrays.parallelSort(allTerms);
 
     }
 

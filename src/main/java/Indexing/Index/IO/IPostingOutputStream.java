@@ -6,6 +6,7 @@ import com.sun.istack.internal.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.List;
 
 public interface IPostingOutputStream{
 
@@ -44,7 +45,7 @@ public interface IPostingOutputStream{
      * @return - the index where the first byte of the first posting was written.
      * @throws NullPointerException - if {@param postings} contains a null pointer
      */
-    long write(@NotNull Posting[] postings) throws NullPointerException, IOException;
+    long write(@NotNull List<Posting> postings) throws NullPointerException, IOException;
 
     void close() throws IOException;
 }

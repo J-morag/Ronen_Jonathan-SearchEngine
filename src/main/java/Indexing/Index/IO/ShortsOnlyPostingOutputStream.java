@@ -26,9 +26,7 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream implemen
     @Override
     public long write(Posting[] postings) throws NullPointerException, IOException {
         long startIdx = postingsFile.getFilePointer();
-
         postingsFile.write(postingsArrayToByteArray(postings));
-
         return startIdx;
     }
 
