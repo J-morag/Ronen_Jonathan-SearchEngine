@@ -4,10 +4,11 @@ import Indexing.Index.Posting;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutputStream{
+public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutputStream implements IBufferedPostingOutputStream{
 
     List<byte[]> buffer = new ArrayList<>();
 
@@ -19,25 +20,11 @@ public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutp
     public long write(Posting[] postings) throws NullPointerException, IOException {
         long startIdx = postingsFile.getFilePointer();
 
-        short numPostings = (short)postings.length;
-        int numFields = extractShortFields(postings[0]).length;
-        byte[] data = new byte[((numPostings * numFields) + 1) *2];
-        data[0] = short8MSB(numPostings);
-        data[1] = short8LSB(numPostings);
-        for (int i = 0; i <numPostings ; i++) {
-            short[] fieldsFori = extractShortFields(postings[i]);
-            for (int j = 0; j <numFields ; j++) {
-                int idxInShortStream = 1+ (i*j) +j ; //skip first (indicates length) + jump to start of this posting + jump to field in this posting
-                data[ idxInShortStream * 2 ] //put MSBs
-                        = short8MSB(fieldsFori[j]);
-                data[ idxInShortStream * 2  + 1]  //put LSBs
-                        = short8LSB(fieldsFori[j]);
-            }
-        }
-        buffer.add(data);
+        buffer.add(postingsArrayToByteArray(postings));
 
         return startIdx;
     }
+
 
     @Override
     public void flush() throws IOException {

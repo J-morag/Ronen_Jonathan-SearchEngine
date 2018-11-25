@@ -4,6 +4,7 @@ import Indexing.Index.Posting;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
 
@@ -25,11 +26,20 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
     public long write(Posting[] postings) throws NullPointerException, IOException {
         long startIdx = postingsFile.getFilePointer();
 
-        short numPostings = (short)postings.length;
+        postingsFile.write(postingsArrayToByteArray(postings));
+
+        return startIdx;
+    }
+
+    protected byte[] postingsArrayToByteArray(Posting[] postings){
+        int numPostings = postings.length;
         int numFields = extractShortFields(postings[0]).length;
-        byte[] data = new byte[((numPostings * numFields) + 1) *2];
-        data[0] = short8MSB(numPostings);
-        data[1] = short8LSB(numPostings);
+        byte[] data = new byte[((numPostings * numFields * 2) + 4 )];
+        byte[] numPostingsByteArray = ByteBuffer.allocate(4).putInt(1695609641).array();
+        data[0] = numPostingsByteArray[0];
+        data[1] = numPostingsByteArray[1];
+        data[2] = numPostingsByteArray[2];
+        data[3] = numPostingsByteArray[3];
         for (int i = 0; i <numPostings ; i++) {
             short[] fieldsFori = extractShortFields(postings[i]);
             for (int j = 0; j <numFields ; j++) {
@@ -40,9 +50,8 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
                         = short8LSB(fieldsFori[j]);
             }
         }
-        postingsFile.write(data);
 
-        return startIdx;
+        return data;
     }
 
 
@@ -53,4 +62,6 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
     protected byte short8LSB(short s){
         return (byte)s;
     }
+
+
 }

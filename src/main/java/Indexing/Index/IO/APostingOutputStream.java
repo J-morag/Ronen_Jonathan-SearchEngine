@@ -33,8 +33,4 @@ public abstract class APostingOutputStream implements IPostingOutputStream {
         postingsFile.close();
     }
 
-    @Override
-    public void flush() throws IOException {
-
-    }
 }

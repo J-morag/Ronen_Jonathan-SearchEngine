@@ -136,7 +136,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
-        p.useStemming = true;
+        p.useStemming = false;
         final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 
@@ -239,8 +239,9 @@ class ParseTest {
             e.printStackTrace();
         }
 
-        System.out.println("total number of unique terms: " + terms.size());
-        System.out.println("Total number of non unique terms: " + totalNonUniqueTerms.get());
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        System.out.println("total number of terms: " + formatter.format(terms.size()));
+        System.out.println("Total number of non unique terms: " + formatter.format(totalNonUniqueTerms.get()));
     }
 
     @Test

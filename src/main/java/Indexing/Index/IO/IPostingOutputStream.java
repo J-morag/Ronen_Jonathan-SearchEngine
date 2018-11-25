@@ -47,6 +47,4 @@ public interface IPostingOutputStream{
     long write(@NotNull Posting[] postings) throws NullPointerException, IOException;
 
     void close() throws IOException;
-
-    void flush() throws IOException;
 }
