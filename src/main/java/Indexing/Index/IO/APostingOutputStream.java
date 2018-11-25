@@ -12,9 +12,16 @@ public abstract class APostingOutputStream{
     RandomAccessFile postingsFile;
 //    MappedByteBuffer postingsFile;
 
-    public APostingOutputStream(String pathToFile) throws FileNotFoundException {
+    /**
+     * if the file doesn't exist, creates it.
+     * if the file exists, clears it!
+     * @param pathToFile
+     * @throws IOException
+     */
+    public APostingOutputStream(String pathToFile) throws IOException {
 
         this.postingsFile = new RandomAccessFile(pathToFile, "rw");
+        postingsFile.setLength(0);
 
     }
 
