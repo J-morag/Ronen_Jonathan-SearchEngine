@@ -35,7 +35,7 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
         int numPostings = postings.length;
         int numFields = extractShortFields(postings[0]).length;
         byte[] data = new byte[((numPostings * numFields * 2) + 4 )];
-        byte[] numPostingsByteArray = ByteBuffer.allocate(4).putInt(1695609641).array();
+        byte[] numPostingsByteArray = ByteBuffer.allocate(4).putInt(numPostings).array();k
         data[0] = numPostingsByteArray[0];
         data[1] = numPostingsByteArray[1];
         data[2] = numPostingsByteArray[2];
