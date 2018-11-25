@@ -22,21 +22,21 @@ public interface IPostingOutputStream{
      * @throws IOException - if pos is less than 0 or if an I/O error occurs.
      */
     void setCursor(long pos) throws IOException;
-
-    /**
-     * writes a single posting.
-     * @param p - a Posting to write.
-     * @return - the index where the first byte posting was written.
-     */
-    long write(@NotNull Posting p) throws IOException;
-
-    /**
-     * writes a single posting and ends the line of postings.
-     * if {@param p} is null, will end the line without writing any posting.
-     * @param p - a Posting to write.
-     *  @return - the index where the first byte of the posting was written.
-     */
-    long writeln(Posting p) throws IOException;
+//
+//    /**
+//     * writes a single posting.
+//     * @param p - a Posting to write.
+//     * @return - the index where the first byte posting was written.
+//     */
+//    long write(@NotNull Posting p) throws IOException;
+//
+//    /**
+//     * writes a single posting and ends the line of postings.
+//     * if {@param p} is null, will end the line without writing any posting.
+//     * @param p - a Posting to write.
+//     *  @return - the index where the first byte of the posting was written.
+//     */
+//    long writeln(Posting p) throws IOException;
 
     /**
      * writes all the postings in {@param postings} and then ends the line.

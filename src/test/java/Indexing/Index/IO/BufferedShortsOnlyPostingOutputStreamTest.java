@@ -11,22 +11,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BufferedShortsOnlyPostingOutputStreamTest {
 
-    private static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\ShortsOnlyPostingOutputStreamTest";
-    private static RandomAccessFile raf;
+    static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\BasicPostingOutputStreamTest";
+    static RandomAccessFile raf;
+    IBufferedPostingOutputStream out;
 
-    static {
+
+    public BufferedShortsOnlyPostingOutputStreamTest() throws IOException {
+
         try {
             raf = new RandomAccessFile(outputPath, "rw");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
 
-    IPostingOutputStream out = new BufferedShortsOnlyPostingOutputStream(raf);
-
-    void clean() throws IOException {
         raf.setLength(0);
+        raf.close();
+
+        try {
+            out = new BufferedShortsOnlyPostingOutputStream(outputPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
+
 
     @Test
     void testTime() throws IOException {
@@ -39,8 +46,6 @@ class BufferedShortsOnlyPostingOutputStreamTest {
         for (int i = 50; i <postingsForOneTerm.length ; i++) {
             postingsForOneTerm[i] = p2;
         }
-
-        clean();
 
         long startTime = System.currentTimeMillis();
 

@@ -13,21 +13,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BasicPostingOutputStreamTest {
 
-    private static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\BasicPostingOutputStreamTest";
-    private static RandomAccessFile raf;
+    static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\BasicPostingOutputStreamTest";
+    static RandomAccessFile raf;
+    IPostingOutputStream out;
 
-    static {
+
+    public BasicPostingOutputStreamTest() throws IOException {
+
         try {
             raf = new RandomAccessFile(outputPath, "rw");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
 
-    IPostingOutputStream out = new BasicPostingOutputStream(raf);
-
-    void clean() throws IOException {
         raf.setLength(0);
+        raf.close();
+
+        try {
+            out = new BasicPostingOutputStream(outputPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -48,47 +54,47 @@ class BasicPostingOutputStreamTest {
         out.close();
     }
 
-    @Test
-    void writeln() throws IOException {
-        Posting p  = new Posting("doc01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
-
-        clean();
-
-        out.writeln(p);
-        out.writeln(p);
-        out.writeln(p);
-
-        raf.seek(0);
-        String line = raf.readLine();
-        while (null != line){
-            System.out.println(line);
-            System.out.println("length: " + line.length());
-            line = raf.readLine();
-        }
-
-        out.close();
-    }
-
-    @Test
-    void write() throws IOException {
-        Posting p  = new Posting("dco01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
-
-        clean();
-
-        out.write(p);
-        out.write(p);
-        out.writeln(p);
-
-        Scanner scanner = new Scanner(new File(outputPath));
-
-        while (scanner.hasNext()){
-            String line = scanner.nextLine();
-            System.out.println(line);
-            System.out.println("length: " + line.length());
-        }
-
-        out.close();
-    }
+//    @Test
+//    void writeln() throws IOException {
+//        Posting p  = new Posting("doc01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
+//
+//        clean();
+//
+//        out.writeln(p);
+//        out.writeln(p);
+//        out.writeln(p);
+//
+//        raf.seek(0);
+//        String line = raf.readLine();
+//        while (null != line){
+//            System.out.println(line);
+//            System.out.println("length: " + line.length());
+//            line = raf.readLine();
+//        }
+//
+//        out.close();
+//    }
+//
+//    @Test
+//    void write() throws IOException {
+//        Posting p  = new Posting("dco01", (short)13, (short)78, (short)1900, "Beer Sheva", "hebrew", true, false);
+//
+//        clean();
+//
+//        out.write(p);
+//        out.write(p);
+//        out.writeln(p);
+//
+//        Scanner scanner = new Scanner(new File(outputPath));
+//
+//        while (scanner.hasNext()){
+//            String line = scanner.nextLine();
+//            System.out.println(line);
+//            System.out.println("length: " + line.length());
+//        }
+//
+//        out.close();
+//    }
 
 
     @Test
@@ -102,8 +108,6 @@ class BasicPostingOutputStreamTest {
         for (int i = 50; i <postingsForOneTerm.length ; i++) {
             postingsForOneTerm[i] = p2;
         }
-
-        clean();
 
         long startTime = System.currentTimeMillis();
 

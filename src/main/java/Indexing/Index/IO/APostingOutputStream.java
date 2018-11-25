@@ -2,21 +2,22 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 
-public abstract class APostingOutputStream implements IPostingOutputStream {
+public abstract class APostingOutputStream{
 
     RandomAccessFile postingsFile;
+//    MappedByteBuffer postingsFile;
 
-    public APostingOutputStream(RandomAccessFile postingsFile) {
-        this.postingsFile = postingsFile;
+    public APostingOutputStream(String pathToFile) throws FileNotFoundException {
+
+        this.postingsFile = new RandomAccessFile(pathToFile, "rw");
+
     }
 
-    @Override
-    public void setCursor(long pos) throws IOException {
-        this.postingsFile.seek(pos);
-    }
 
     protected short[] extractShortFields(Posting posting){
         return posting.getShortFields();
@@ -28,9 +29,5 @@ public abstract class APostingOutputStream implements IPostingOutputStream {
         return posting.getBooleanFields();
     }
 
-    @Override
-    public void close() throws IOException {
-        postingsFile.close();
-    }
 
 }

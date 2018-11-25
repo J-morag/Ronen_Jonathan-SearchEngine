@@ -2,6 +2,7 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -12,8 +13,8 @@ public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutp
 
     List<byte[]> buffer = new ArrayList<>();
 
-    public BufferedShortsOnlyPostingOutputStream(RandomAccessFile postingsFile) {
-        super(postingsFile);
+    public BufferedShortsOnlyPostingOutputStream(String pathToFile) throws FileNotFoundException {
+        super(pathToFile);
     }
 
     @Override
@@ -50,13 +51,4 @@ public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutp
         buffer.clear();
     }
 
-    @Override
-    public long write(Posting p) throws IOException {
-        return super.write(p);
-    }
-
-    @Override
-    public long writeln(Posting p) throws IOException {
-        return super.writeln(p);
-    }
 }

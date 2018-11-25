@@ -2,25 +2,26 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
-public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
+public class ShortsOnlyPostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
 
-    public ShortsOnlyPostingOutputStream(RandomAccessFile postingsFile) {
-        super(postingsFile);
+    public ShortsOnlyPostingOutputStream(String pathToFile) throws FileNotFoundException {
+        super(pathToFile);
     }
-
-    @Override
-    public long write(Posting p) throws IOException {
-        return 0;
-    }
-
-    @Override
-    public long writeln(Posting p) throws IOException {
-        return 0;
-    }
+//
+//    @Override
+//    public long write(Posting p) throws IOException {
+//        return 0;
+//    }
+//
+//    @Override
+//    public long writeln(Posting p) throws IOException {
+//        return 0;
+//    }
 
     @Override
     public long write(Posting[] postings) throws NullPointerException, IOException {
@@ -63,5 +64,13 @@ public class ShortsOnlyPostingOutputStream extends APostingOutputStream {
         return (byte)s;
     }
 
+    @Override
+    public void setCursor(long pos) throws IOException {
+        postingsFile.seek(pos);
+    }
 
+    @Override
+    public void close() throws IOException {
+        postingsFile.close();
+    }
 }

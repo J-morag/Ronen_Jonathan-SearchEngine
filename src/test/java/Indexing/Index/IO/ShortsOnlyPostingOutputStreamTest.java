@@ -9,23 +9,15 @@ import java.io.RandomAccessFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ShortsOnlyPostingOutputStreamTest {
+class ShortsOnlyPostingOutputStreamTest extends BasicPostingOutputStreamTest {
 
-    private static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\ShortsOnlyPostingOutputStreamTest";
-    private static RandomAccessFile raf;
-
-    static {
+    public ShortsOnlyPostingOutputStreamTest() throws IOException {
+        super();
         try {
-            raf = new RandomAccessFile(outputPath, "rw");
+            out = new BasicPostingOutputStream(outputPath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    IPostingOutputStream out = new ShortsOnlyPostingOutputStream(raf);
-
-    void clean() throws IOException {
-        raf.setLength(0);
     }
 
     @Test
@@ -40,7 +32,6 @@ class ShortsOnlyPostingOutputStreamTest {
             postingsForOneTerm[i] = p2;
         }
 
-        clean();
 
         long startTime = System.currentTimeMillis();
 
