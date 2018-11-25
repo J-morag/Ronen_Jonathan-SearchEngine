@@ -89,4 +89,32 @@ class BasicPostingOutputStreamTest {
 
         out.close();
     }
+
+
+    @Test
+    void testTime() throws IOException {
+        Posting[] postings = new Posting[50];
+        Posting p1 = new Posting("dco01", (short)13, (short)78, (short)1900, "beer sheva", "hebrew", true, false);
+        Posting p2 = new Posting("dco22", (short)2349, (short)0, (short)1910, "York", "English", false, false);
+        for (int i = 0; i <25 ; i++) {
+            postings[i] = p1;
+        }
+        for (int i = 25; i <50 ; i++) {
+            postings[i] = p2;
+        }
+
+        clean();
+
+        long startTime = System.currentTimeMillis();
+
+        for (int j = 0; j <100000 ; j++) {
+            out.write(postings);
+        }
+
+        long time = (System.currentTimeMillis() - startTime);
+
+        System.out.println("time for 100,000 terms with 50 postings each (S): " + (time)/1000);
+        System.out.println("time for 100,000 terms with 50 postings each, fifty times (m): " + (time)*50/1000/60);
+
+    }
 }

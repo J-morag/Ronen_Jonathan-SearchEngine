@@ -13,9 +13,6 @@ import java.io.RandomAccessFile;
  */
 public class BasicPostingOutputStream extends APostingOutputStream {
 
-    //TESTING
-    int dummyCounter = 0;
-
     //ADMINISTRATIVE
 
     public BasicPostingOutputStream(RandomAccessFile postingsFile) {
@@ -49,6 +46,7 @@ public class BasicPostingOutputStream extends APostingOutputStream {
 
     @Override
     public long write(@NotNull Posting[] postings) throws NullPointerException, IOException {
+        long startIdx = postingsFile.getFilePointer();
         StringBuilder output = new StringBuilder();
         for (Posting p : postings
              ) {
@@ -56,6 +54,8 @@ public class BasicPostingOutputStream extends APostingOutputStream {
         }
         output.append('\n');
         postingsFile.writeBytes(output.toString());
-        return postingsFile.getFilePointer();
+        return startIdx;
     }
+
+
 }
