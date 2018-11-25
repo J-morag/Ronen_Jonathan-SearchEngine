@@ -32,4 +32,9 @@ public abstract class APostingOutputStream implements IPostingOutputStream {
     public void close() throws IOException {
         postingsFile.close();
     }
+
+    @Override
+    public void flush() throws IOException {
+
+    }
 }
