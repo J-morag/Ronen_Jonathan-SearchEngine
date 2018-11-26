@@ -15,9 +15,9 @@ import java.util.concurrent.BlockingQueue;
 
 public class MainIndexerTest {
 
-    private static final int documentBufferSize = 500;
-    private static final int termBufferSize = 500;
-    private static final int stemmedTermBufferSize = 500;
+    private static final int documentBufferSize = 30;
+    private static final int termBufferSize = 30;
+    private static final int stemmedTermBufferSize = 30;
 
     //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
@@ -36,7 +36,7 @@ public class MainIndexerTest {
 
         HashSet<String> stopwords = Parse.getStopWords("");
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
-        Indexer indexer =new Indexer("//",termDocumentsBuffer);
+        Indexer indexer =new Indexer("C:\\Users\\ronen\\Desktop\\test",termDocumentsBuffer,true);
         Thread tIndexer = new Thread(indexer);
 
         long start=System.currentTimeMillis();

@@ -9,6 +9,7 @@ public class TermDocument {
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
+    private String language="";
 
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
@@ -42,6 +43,8 @@ public class TermDocument {
 
     public  Term getCity(){return this.city;}
 
+    public String getLanguage(){return language;}
+
     public void setCity(Term city){this.city=city; }
 
     public void setDocId(String docId) {
@@ -55,4 +58,5 @@ public class TermDocument {
     public void setText(List<Term> text) {
         this.text = text;
     }
+    public void setLanguage(String language){this.language=language;}
 }

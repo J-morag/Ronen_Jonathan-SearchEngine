@@ -43,7 +43,7 @@ public class Main {
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
         tParser.start();
 
-        Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermDocumentsBuffer));
+        Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermDocumentsBuffer,true));
         tIndexer.start();
     }
 

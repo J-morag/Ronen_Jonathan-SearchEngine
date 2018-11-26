@@ -61,7 +61,7 @@ public class ReadTest {
         tReader.join();
         for (Document doc : documentBuffer){
             if (doc != null){
-                System.out.println(doc.getCity()+"\n");
+                System.out.println(doc.getLanguage()+"\n");
             }
         }
         System.out.println((System.currentTimeMillis()-start)/1000);
@@ -159,7 +159,7 @@ public class ReadTest {
                 SAXParser saxParser = null;
                 try {
                     saxParser = factory.newSAXParser();
-                    UserHandler1 userhandler = new UserHandler1();
+                    UserHandler userhandler = new UserHandler();
                     String st = elm.toString();
                     InputStream is = new ByteArrayInputStream(st.getBytes());
                     saxParser.parse(is,userhandler);
@@ -188,7 +188,7 @@ public class ReadTest {
         /**
          * handler class that determines what to do with each tag in the document
          */
-        class UserHandler1 extends DefaultHandler {
+        class UserHandler extends DefaultHandler {
             //boolean startDoc = false;
             boolean docId = false;
             boolean title = false;
@@ -196,6 +196,7 @@ public class ReadTest {
             boolean others =false;
             boolean date = false;
             boolean city = false;
+            boolean language=false;
             Document doc = null;
             StringBuilder textString;
 
@@ -218,6 +219,10 @@ public class ReadTest {
                 {
                     city=true;
 
+                }else if (qName.equalsIgnoreCase("F") && (attributes.getValue("p").equalsIgnoreCase("105")))
+                {
+                    language=true;
+
                 }
                 else if (qName.equalsIgnoreCase("TEXT")) {
                     text = true;
@@ -239,10 +244,11 @@ public class ReadTest {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
                 } else if (qName.equalsIgnoreCase("TEXT")){
-                        text = false;
-                        doc.setText(textString.toString());
-                        textString=null;
+                    text = false;
+                    doc.setText(textString.toString());
+                    textString=null;
                 }
             }
 
@@ -251,26 +257,52 @@ public class ReadTest {
             public void characters(char ch[], int start, int length) throws SAXException {
 
                 if (docId) {
-                    doc.setDocId(new String(ch, start, length));
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = start; i <length ; i++) {
+                        if(ch[i]!=' ' && ch[i]!='\n')
+                            sb.append(ch[i]);
+                    }
+                    doc.setDocId(sb.toString());
+                    sb=null;
                     docId = false;
                 } else if (date) {
                     doc.setDate(new String(ch, start, length));
                     date = false;
 
-                }
-                if(city){
+
+                }else if(city){
                     StringBuilder s =new StringBuilder();
                     for(int i=start ; i<length-1 ; i++ ){
                         if(ch[i]!=' ' && ch[i]!='\n'){
                             while(ch[i]!=' '){
-                                s.append(ch[i]);
-                                i++;
+                                if(ch[i]>='a'&& ch[i]<='z') {
+                                    s.append((char)(ch[i]-32));
+                                    i++;
+                                }
+                                else {
+                                    s.append(ch[i]);
+                                    i++;
+                                }
                             }
                             break;
                         }
                     }
                     doc.setCity(s.toString().replace(" ",""));
+                    s=null;
                     city=false;
+                }
+                else if (language) {
+                    StringBuilder s = new StringBuilder();
+                    for (int i = start; i < length - 1; i++) {
+                        if (ch[i] != ' ' && ch[i] != '\n') {
+                            s.append(ch[i]);
+                        }else {
+                            continue;
+                        }
+                    }
+                    doc.setLanguage(s.toString());
+                    s=null;
+                    language=false;
                 }
                 else if(title){
                     doc.setTitle(new String(ch, start, length));

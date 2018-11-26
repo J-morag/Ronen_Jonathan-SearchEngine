@@ -147,6 +147,7 @@ public class ReadFile implements Runnable {
         boolean others =false;
         boolean date = false;
         boolean city = false;
+        boolean language=false;
         Document doc = null;
         StringBuilder textString;
 
@@ -168,6 +169,10 @@ public class ReadFile implements Runnable {
             }else if (qName.equalsIgnoreCase("F") && (attributes.getValue("p").equalsIgnoreCase("104")))
             {
                 city=true;
+
+            }else if (qName.equalsIgnoreCase("F") && (attributes.getValue("p").equalsIgnoreCase("105")))
+            {
+                language=true;
 
             }
             else if (qName.equalsIgnoreCase("TEXT")) {
@@ -209,13 +214,14 @@ public class ReadFile implements Runnable {
                         sb.append(ch[i]);
                 }
                 doc.setDocId(sb.toString());
+                sb=null;
                 docId = false;
             } else if (date) {
                 doc.setDate(new String(ch, start, length));
                 date = false;
 
-            }
-            if(city){
+
+            }else if(city){
                 StringBuilder s =new StringBuilder();
                 for(int i=start ; i<length-1 ; i++ ){
                     if(ch[i]!=' ' && ch[i]!='\n'){
@@ -233,7 +239,21 @@ public class ReadFile implements Runnable {
                     }
                 }
                 doc.setCity(s.toString().replace(" ",""));
+                s=null;
                 city=false;
+            }
+            else if (language) {
+                StringBuilder s = new StringBuilder();
+                for (int i = start; i < length - 1; i++) {
+                    if (ch[i] != ' ' && ch[i] != '\n') {
+                        s.append(ch[i]);
+                    }else {
+                        continue;
+                    }
+                }
+                doc.setLanguage(s.toString());
+                s=null;
+                language=false;
             }
             else if(title){
                 doc.setTitle(new String(ch, start, length));

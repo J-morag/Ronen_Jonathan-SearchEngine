@@ -1,30 +1,35 @@
 package Elements;
 
+import com.sun.scenario.effect.impl.prism.PrImage;
+
 public class Document {
     private  String docId;
     private String title = "";
     private String text = "";
     private  String date = "";
     private String city="";
+    private String language ="";
 
 
     public Document(/*int serialID*/){
         //this.serialID = serialID;
     }
 
-    public Document(String docId, String title, String text, String date) {
+    public Document(String docId, String title, String text, String date ) {
         this.docId = docId;
         this.title = title;
         this.text = text;
         this.date = date;
+
     }
 
-    public Document(String docId, String title, String text, String date , String city) {
+    public Document(String docId, String title, String text, String date , String city , String language) {
         this.docId = docId;
         this.title = title;
         this.text = text;
         this.date = date;
         this.city=city;
+        this.language=language;
     }
 
     public void setTitle(String header) {
@@ -47,6 +52,7 @@ public class Document {
         this.date = date;
     }
     public void setCity(String city){this.city=city;}
+    public void setLanguage(String language){this.language=language;}
 
     public void setDocId(String id){
         docId=id;
@@ -68,6 +74,7 @@ public class Document {
     public String getDate(){
         return date;
     }
+    public String getLanguage(){return language;}
 
 
     @Override

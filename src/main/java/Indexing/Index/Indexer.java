@@ -4,6 +4,7 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -15,18 +16,25 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Indexer implements Runnable {
 
-    //the size of the group of documents that will be indexed every time.
-    private static final int partialGroupSize = 10;
+
+
 
     private String pathToOutputFolder;
     private BlockingQueue<TermDocument> stemmedTermDocumentsBuffer;
     private AIndexMaker mainIndex;
-    //private boolean withSteming=false; @TODO seport this
+    //private boolean withSteming=false;
 
-    public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer) {
+    public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer,boolean withSteming) {
         this.pathToOutputFolder = pathToOutputFolder;
         this.stemmedTermDocumentsBuffer = stemmedTermDocumentsBuffer;
-        mainIndex = new MainIndexMaker();
+        if(withSteming) {
+            new File(pathToOutputFolder +"\\postingWithStemming").mkdir();
+            mainIndex = new MainIndexMaker(pathToOutputFolder + "\\postingWithStemming");
+        }
+        else {
+            new File(pathToOutputFolder +"\\postingWithOutStemming").mkdir();
+            mainIndex = new MainIndexMaker(pathToOutputFolder + "\\postingWithOutStemming");
+        }
 }
 
     /**

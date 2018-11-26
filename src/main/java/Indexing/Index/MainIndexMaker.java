@@ -15,36 +15,57 @@ import java.util.*;
 import static javafx.application.Platform.exit;
 
 public class MainIndexMaker extends AIndexMaker {
+
+    //the size of the group of documents that will be indexed every time.
+    private static final short partialGroupSize = 5000;
+
+
     private Map<String, TempIndexEntry> tempDictionary;
     private Map <String, TempIndexEntry> mainDictionary;
+    private Map <Integer,DocIndexEntery> docsDictionary;
     private int numOfDocs;
     private byte tempFileNumber;
+    private String path="";
 
-    public MainIndexMaker (){
+    public MainIndexMaker (String path ){
         super();
         this.tempDictionary=new LinkedHashMap<>();
+        this.mainDictionary = new LinkedHashMap<>();
+        this.docsDictionary = new LinkedHashMap<>();
         numOfDocs=0;
         tempFileNumber=0;
+        this.path=path;
 
     }
 
     @Override
     public void addToIndex(TermDocument doc) {
         if(doc.getSerialID() != -1){
-            Set<String> uniqueWords=new HashSet<>();
-            Map<String,Integer> tfMap=new HashMap<>();
-            Map<String , Byte> special = new HashMap<String, Byte>();
+
+            Set<String> uniqueWords=new HashSet<>();// set of all unique words in a doc
+            Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
+            Map<String , Byte> special = new HashMap<String, Byte>(); // map that indicates if a term is in the tile to in a beginning of the text or none
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
             int maxTf = getMaxTf(uniqueWords,tfMap,special,title,text);
             int numOfUniqueWords = uniqueWords.size();
+            String docId = doc.getDocId();
             String city ="";
+            String language = "";
             if(doc.getCity()!=null) {
                 city = doc.getCity().toString();
             }
+            if(doc.getLanguage()!=null) {
+                language = doc.getLanguage();
+            }
+
+// add a document to the DocIndex
+            DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language);
+            docsDictionary.put(doc.getSerialID(),docIndexEntery);
+            docIndexEntery=null;
 
 
-            String docId = doc.getDocId();
+// create the posting to the doc and add is to the index entery or creat a new index entery if not exist
             for(String term : uniqueWords){
                 short tf =  tfMap.get(term).shortValue();
                 Posting posting = new Posting(doc.getSerialID(), tf);
@@ -65,16 +86,20 @@ public class MainIndexMaker extends AIndexMaker {
                 if(!tempDictionary.containsKey(term)) {
                     TempIndexEntry tmp = new TempIndexEntry();
                     tmp.addPosting(posting);
+                    posting=null;
                     tempDictionary.put(term,tmp);
                 }else {
                     TempIndexEntry tmp = tempDictionary.get(term);
                     tmp.addPosting(posting);
+                    posting=null;
                 }
             }
             numOfDocs++;
-            if(numOfDocs==5000){
+            if(numOfDocs==partialGroupSize){
                 dumpToDisk();
             }
+            tfMap=null;
+            special = null;
         }else {
             dumpToDisk();
         }
@@ -168,7 +193,7 @@ public class MainIndexMaker extends AIndexMaker {
 
         BasicPostingOutputStream outputStream = null;
         try {
-            outputStream = new BasicPostingOutputStream("C:\\Users\\ronen\\Desktop\\test\\temp"+tempFileNumber+".txt");
+            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
