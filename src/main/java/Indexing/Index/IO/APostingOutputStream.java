@@ -19,8 +19,6 @@ public abstract class APostingOutputStream implements IPostingOutputStream{
      */
     public APostingOutputStream(String pathToFile) throws IOException {
 
-        this.postingsFile = new FileOutputStream(pathToFile);
-
     }
 
     @Override

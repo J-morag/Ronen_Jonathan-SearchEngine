@@ -2,7 +2,9 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 import javafx.geometry.Pos;
+import sun.awt.Mutex;
 
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -12,12 +14,18 @@ import java.util.List;
 
 public class PostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
 
-    //TODO booleans!
-    //TODO add ints!
-    protected List<byte[]> buffer = new ArrayList<>();
+//    protected List<byte[]> buffer = new ArrayList<>();
+    private Mutex m_postingsFile = new Mutex();
 
+    /**
+     * if the file doesn't exist, creates it.
+     * if the file exists, clears it!
+     * @param pathToFile
+     * @throws IOException
+     */
     public PostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
+        postingsFile = new BufferedOutputStream(postingsFile);
     }
 
     @Override
@@ -25,7 +33,8 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
         long startIdx = getCursor();
 
         byte[] outBytes = postingsArrayToByteArray(postings);
-        buffer.add(outBytes);
+//        buffer.add(outBytes);
+        postingsFile.write(outBytes);
 
         filePointer += outBytes.length;
 
@@ -35,49 +44,45 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
 
     @Override
     public void flush() throws IOException {
-        int totalByte = 0;
-        for (byte[] arr: buffer
-                ) {
-            totalByte += arr.length;
-        }
-        byte[] data = new byte[totalByte];
-
-        int idx = 0;
-        for (byte[] arr: buffer
-                ) {
-            for (byte b: arr
-                    ) {
-                data[idx] = b;
-                idx++;
-            }
-        }
-
-        writeOut(data);
-
-        buffer.clear();
+        postingsFile.flush();
+//        int totalByte = 0;
+//        for (byte[] arr: buffer
+//                ) {
+//            totalByte += arr.length;
+//        }
+//        byte[] data = new byte[totalByte];
+//
+//        int idx = 0;
+//        for (byte[] arr: buffer
+//                ) {
+//            for (byte b: arr
+//                    ) {
+//                data[idx] = b;
+//                idx++;
+//            }
+//        }
+//        writeOut(data);
+//        buffer.clear();
     }
 
-    protected void writeOut(byte[] bytes) throws IOException {
-
-        Thread t = new Thread(() -> {
+//    protected void writeOut(byte[] bytes) throws IOException {
+//        Thread t = new Thread(() -> {
 //            m_postingsFile.lock();
-            synchronized (postingsFile){
-                try {
-                    postingsFile.write(bytes);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+//            try {
+//                postingsFile.write(bytes);
+//                postingsFile.flush();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 //            m_postingsFile.unlock();
-        });
-        t.run();
-
-    }
+//        });
+//        t.run();
+//    }
 
     protected byte[] postingsArrayToByteArray(List<Posting> postings){
         int numPostings = postings.size();
         byte[] data = new byte[4 + numPostings *
-                (Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 + Posting.getNumberOfBooleanFields()/8 /* rounded down*/ )];
+                (Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 + 1 /*holds 8 bools*/  )];
 
         intToBytes(numPostings, data, 0);
 
@@ -134,11 +139,9 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
     }
 
     protected static byte extractBoolsAsByte(Posting p){
-        int idx = 0;
-        byte isInTitle = p.isInTitle() ? (byte)1 : 0;
-        isInTitle = (byte)(isInTitle << idx++);
-        byte isInBeggining = p.isInBeginning() ? (byte)1 : 0;
-        isInBeggining = (byte)(isInBeggining << idx++);
+        byte isInTitle = p.isInTitle() ? Byte.MIN_VALUE+1 : Byte.MIN_VALUE;
+        byte isInBeggining = p.isInBeginning() ? Byte.MIN_VALUE+2 : Byte.MIN_VALUE;
+        // next will have +4
 
         return (byte)(isInTitle | isInBeggining);
     }
