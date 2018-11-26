@@ -2,10 +2,7 @@ package Indexing;
 
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 
@@ -306,14 +303,14 @@ void toUpperCaseTest()
 }
 
     @Test
-    void setTest()
+    void generalTest()
     {
 
 
-        Set<String> s =new HashSet<>();
-        s.add("a");
-        s.add("a");
-        System.out.println(s.size());
+        List<Integer> a = new ArrayList<>();
+
+        a.add(0,new Integer(4));
+        System.out.println(a);
 
 
     }

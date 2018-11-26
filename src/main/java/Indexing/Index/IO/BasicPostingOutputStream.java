@@ -6,6 +6,7 @@ import com.sun.istack.internal.NotNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.List;
 
 
 /**
@@ -47,7 +48,7 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
 //    }
 
     @Override
-    public long write(@NotNull Posting[] postings) throws NullPointerException, IOException {
+    public long write(@NotNull List<Posting> postings) throws NullPointerException, IOException {
         long startIdx = postingsFile.getFilePointer();
         StringBuilder output = new StringBuilder();
         for (Posting p : postings
