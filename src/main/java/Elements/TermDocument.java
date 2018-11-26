@@ -3,9 +3,9 @@ package Elements;
 import java.util.List;
 
 public class TermDocument {
-    private int serialID;
-    private String docId;
-    private String language;
+    final private int serialID;
+    final private String docId;
+    final private String language;
     private Term city;
     private List<Term> title;
     private List<Term> text;
@@ -16,6 +16,10 @@ public class TermDocument {
         if (null != doc){
             this.docId = doc.getDocId();
             this.language = doc.getLanguage();
+        }
+        else{
+            docId = null;
+            language = null;
         }
     }
 
@@ -49,18 +53,4 @@ public class TermDocument {
 
     public String getLanguage(){return language;}
 
-    public void setCity(Term city){this.city=city; }
-
-    public void setDocId(String docId) {
-        this.docId = docId;
-    }
-
-    public void setTitle(List<Term> title) {
-        this.title = title;
-    }
-
-    public void setText(List<Term> text) {
-        this.text = text;
-    }
-    public void setLanguage(String language){this.language=language;}
 }

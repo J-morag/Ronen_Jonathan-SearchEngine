@@ -2,7 +2,7 @@ package Indexing.Index;
 
 public class Posting {
 
-    private int docSerialID;
+    final private int docSerialID;
     private short tf;
     private boolean isInTitle = false;
     private boolean isInBeginning = false;
