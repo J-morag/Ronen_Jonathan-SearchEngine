@@ -1,7 +1,6 @@
 package Elements;
 
 public class Document {
-    private int serialID;
     private  String docId;
     private String title = "";
     private String text = "";
@@ -13,16 +12,14 @@ public class Document {
         //this.serialID = serialID;
     }
 
-    public Document(int serialID, String docId, String title, String text, String date) {
-        this.serialID = serialID;
+    public Document(String docId, String title, String text, String date) {
         this.docId = docId;
         this.title = title;
         this.text = text;
         this.date = date;
     }
 
-    public Document(int serialID, String docId, String title, String text, String date , String city) {
-        this.serialID = serialID;
+    public Document(String docId, String title, String text, String date , String city) {
         this.docId = docId;
         this.title = title;
         this.text = text;
@@ -53,10 +50,6 @@ public class Document {
 
     public void setDocId(String id){
         docId=id;
-    }
-
-    public int getSerialID() {
-        return serialID;
     }
 
     public String getDocId() {

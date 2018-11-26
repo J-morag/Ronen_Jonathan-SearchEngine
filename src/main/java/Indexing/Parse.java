@@ -8,6 +8,7 @@ import com.sun.istack.internal.NotNull;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,11 +22,12 @@ public class Parse implements Runnable{
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
-//    private static final String keepDelimiters = "((?<=%1$s)|(?=%1$s))";
     private String currString = "";
     private HashMap<String, String> months;
     private TokenType currType;
     private boolean bIteratorHasNext = true;
+
+    private static AtomicInteger docSerialId = new AtomicInteger(0);
 
     //          Administrative
 
@@ -93,7 +95,7 @@ public class Parse implements Runnable{
             parsedFields[i] = parseWorker(tokenize(originalFields[i]));
         }
 
-        return new TermDocument(doc, parsedFields);
+        return new TermDocument(docSerialId.getAndIncrement(), doc, parsedFields);
     }
 
     //          Tokenizing
