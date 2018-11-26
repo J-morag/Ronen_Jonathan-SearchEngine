@@ -112,7 +112,7 @@ public class ReadTest {
             }
             try {
                 // when done, insert poison element
-                documentBuffer.put(new Document(-1,null,null,null,null));
+                documentBuffer.put(new Document(null,null,null,null));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
