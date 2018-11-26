@@ -83,4 +83,26 @@ public class Posting {
     public String toString(){
         return docSerialID+","+tf+","+isInTitle+","+isInBeginning;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Posting posting = (Posting) o;
+
+        if (docSerialID != posting.docSerialID) return false;
+        if (tf != posting.tf) return false;
+        if (isInTitle != posting.isInTitle) return false;
+        return isInBeginning == posting.isInBeginning;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = docSerialID;
+        result = 31 * result + (int) tf;
+        result = 31 * result + (isInTitle ? 1 : 0);
+        result = 31 * result + (isInBeginning ? 1 : 0);
+        return result;
+    }
 }
