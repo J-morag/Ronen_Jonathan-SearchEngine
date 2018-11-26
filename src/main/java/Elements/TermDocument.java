@@ -10,18 +10,13 @@ public class TermDocument {
     private List<Term> text;
     private List<Term> date;
 
-    public TermDocument(int serialID, String docId) {
+    public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
-        this.docId = docId;
+        if (null != doc) this.docId = doc.getDocId();
     }
 
-    public TermDocument(Document doc) {
-        this.serialID = doc.getSerialID();
-        this.docId = doc.getDocId();
-    }
-
-    public TermDocument(Document doc, List<Term>[] fields) {
-        this.serialID = doc.getSerialID();
+    public TermDocument(int serialID, Document doc, List<Term>[] fields) {
+        this.serialID = serialID;
         this.docId = doc.getDocId();
         this.title = fields[0];
         this.text = fields[1];
