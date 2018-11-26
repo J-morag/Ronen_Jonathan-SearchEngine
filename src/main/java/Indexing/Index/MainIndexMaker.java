@@ -47,8 +47,7 @@ public class MainIndexMaker extends AIndexMaker {
             String docId = doc.getDocId();
             for(String term : uniqueWords){
                 short tf =  tfMap.get(term).shortValue();
-
-                Posting posting = new Posting(-1,tf,false,false);
+                Posting posting = new Posting(doc.getSerialID(), tf);
                 if(special.get(term)==0){
                     posting.setInTitle(false);
                     posting.setInBeginning(false);
