@@ -5,7 +5,6 @@ import java.util.List;
 public class TermDocument {
     private int serialID;
     private String docId;
-    private String language;
     private Term city;
     private List<Term> title;
     private List<Term> text;
