@@ -7,18 +7,31 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import static org.junit.jupiter.api.Assertions.*;
+class BufferedNumericPostingOutputStreamTest {
 
-class ShortsOnlyPostingOutputStreamTest extends BasicPostingOutputStreamTest {
+    static final String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\BasicPostingOutputStreamTest";
+    static RandomAccessFile raf;
+    IBufferedPostingOutputStream out;
 
-    public ShortsOnlyPostingOutputStreamTest() throws IOException {
-        super();
+
+    public BufferedNumericPostingOutputStreamTest() throws IOException {
+
         try {
-            out = new BasicPostingOutputStream(outputPath);
+            raf = new RandomAccessFile(outputPath, "rw");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        raf.setLength(0);
+        raf.close();
+
+        try {
+            out = new BufferedNumericPostingOutputStream(outputPath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
+
 
     @Test
     void testTime() throws IOException {
@@ -32,12 +45,12 @@ class ShortsOnlyPostingOutputStreamTest extends BasicPostingOutputStreamTest {
             postingsForOneTerm[i] = p2;
         }
 
-
         long startTime = System.currentTimeMillis();
 
         for (int j = 0; j <100000 ; j++) {
-                out.write(postingsForOneTerm);
+            out.write(postingsForOneTerm);
         }
+        out.flush();
 
         long time = (System.currentTimeMillis() - startTime);
 
@@ -45,7 +58,5 @@ class ShortsOnlyPostingOutputStreamTest extends BasicPostingOutputStreamTest {
         System.out.println("time for 100,000 terms with 100 postings each, fifty times (m): " + ((time)*50/1000)/60);
 
     }
-
-
 
 }

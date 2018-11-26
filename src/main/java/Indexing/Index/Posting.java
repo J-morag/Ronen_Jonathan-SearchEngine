@@ -10,36 +10,40 @@ public class Posting {
     private short tf;
     private short maxTf;
     private short uniqueWord;
+    private int docSerial;
     private String docID;
     private String city;
     private String language;
     private boolean isInTitle = false;
     private boolean isInBeginning = false;
 
-    public Posting(String docID , short tf , short maxTf , short uniqueWord, String city ,  String language){
+    public Posting(String docID , short tf , short maxTf , short uniqueWord, int docSerial, String city ,  String language){
         this.docID = docID;
         this.tf = tf;
         this.maxTf = maxTf;
         this.uniqueWord= uniqueWord;
+        this.docSerial = docSerial;
         this.city=city;
         this.language=language;
     }
 
-    public Posting(String docID , short tf , short maxTf , short uniqueWord, String city ,  String language, boolean isInTitle, boolean isInBeginning){
+    public Posting(String docID , short tf , short maxTf , short uniqueWord, int docSerial, String city ,  String language, boolean isInTitle, boolean isInBeginning){
         this.docID = docID;
         this.tf = tf;
         this.maxTf = maxTf;
         this.uniqueWord= uniqueWord;
+        this.docSerial = docSerial;
         this.city=city;
         this.language=language;
         this.isInTitle = isInTitle;
         this.isInBeginning = isInBeginning;
     }
 
-    public Posting(short[] shorts, String[] strings, boolean[] bools){
+    public Posting(short[] shorts, int[] ints, String[] strings, boolean[] bools){
         tf = shorts[0];
         maxTf = shorts[1];
         uniqueWord = shorts[2];
+        docSerial = ints[0];
         docID = strings[0];
         city = strings[1];
         language = strings[2];
@@ -90,6 +94,10 @@ public class Posting {
     public boolean[] getBooleanFields(){
         return new boolean[]{isInTitle, isInBeginning};
     }
+
+    public int[] getIntegerFields(){ return new int[]{docSerial} ; }
+
+    public int getNumberOfNumericFields(){return 4;}
 
     //SETTERS
     public void setDocID(String docID) {

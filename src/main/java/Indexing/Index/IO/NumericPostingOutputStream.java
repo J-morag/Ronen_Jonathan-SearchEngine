@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
-public class ShortsOnlyPostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
+public class NumericPostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
 
-    public ShortsOnlyPostingOutputStream(String pathToFile) throws IOException {
+    public NumericPostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
     }
 //

@@ -29,6 +29,10 @@ public abstract class APostingOutputStream{
     protected short[] extractShortFields(Posting posting){
         return posting.getShortFields();
     }
+
+    protected int[] extractIntFields(Posting posting){
+        return posting.getIntegerFields();
+    }
     protected String[] extractStringFields(Posting posting){
         return posting.getStringFields();
     }

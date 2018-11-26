@@ -1,21 +1,19 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
-import sun.awt.Mutex;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferedShortsOnlyPostingOutputStream extends ShortsOnlyPostingOutputStream implements IBufferedPostingOutputStream{
+public class BufferedNumericPostingOutputStream extends NumericPostingOutputStream implements IBufferedPostingOutputStream{
 
+    //TODO booleans!
+    //TODO simplify classe hierarchy!
     List<byte[]> buffer = new ArrayList<>();
 //    Mutex m_postingsFile = new Mutex();
 
-    public BufferedShortsOnlyPostingOutputStream(String pathToFile) throws IOException {
+    public BufferedNumericPostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
     }
 

@@ -177,16 +177,6 @@ public class Parse implements Runnable{
             }
         }
 
-//        //TESTING
-//        if(debug){
-//            System.out.println("-----------start tokenize output-------------");
-//            for (String t:
-//                    listOfTokens) {
-//                System.out.println(t);
-//            }
-//            System.out.println("-----------end tokenize output-------------");
-//        }
-//        //TESTING
 
         return listOfTokens;
     }
@@ -903,6 +893,7 @@ public class Parse implements Runnable{
                 stopWords.add(line);
                 line = buffer.readLine();
             }
+            buffer.close();
         } catch (FileNotFoundException e) {
             System.out.println("stopwords file not found in the specified path. running without stopwords");
         } catch (IOException e){
