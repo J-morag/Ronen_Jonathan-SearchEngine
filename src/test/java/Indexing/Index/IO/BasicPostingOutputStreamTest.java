@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,9 +40,9 @@ class BasicPostingOutputStreamTest {
 
     @Test
     void writePostings() throws IOException {
-        Posting[] postings = new Posting[2];
-        postings[0] = new Posting("dco01", (short)13, (short)78, (short)1900, "beer sheva", "hebrew", true, false);
-        postings[1] = new Posting("dco22", (short)2349, (short)0, (short)1910, "York", "English", false, false);
+        List<Posting> postings = new ArrayList<>(2);
+        Posting p1 = new Posting(66, (short)13, true, false);
+        Posting p2 = new Posting(129, (short)28, false, false);
 
         out.write(postings);
         out.write(postings);
@@ -99,14 +101,15 @@ class BasicPostingOutputStreamTest {
 
     @Test
     void testTime() throws IOException {
-        Posting[] postingsForOneTerm = new Posting[100];
-        Posting p1 = new Posting("dco01", (short)13, (short)78, (short)1900, "beer sheva", "hebrew", true, false);
-        Posting p2 = new Posting("dco22", (short)2349, (short)0, (short)1910, "York", "English", false, false);
+        int numPostings = 100;
+        ArrayList<Posting> postingsForOneTerm = new ArrayList<>(numPostings);
+        Posting p1 = new Posting(66, (short)13, true, false);
+        Posting p2 = new Posting(129, (short)28, false, false);
         for (int i = 0; i <50 ; i++) {
-            postingsForOneTerm[i] = p1;
+            postingsForOneTerm.add(i, p1);
         }
-        for (int i = 50; i <postingsForOneTerm.length ; i++) {
-            postingsForOneTerm[i] = p2;
+        for (int i = 50; i <numPostings ; i++) {
+            postingsForOneTerm.add(i, p2);
         }
 
         long startTime = System.currentTimeMillis();
