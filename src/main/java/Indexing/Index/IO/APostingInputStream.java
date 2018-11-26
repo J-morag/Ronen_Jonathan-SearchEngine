@@ -14,8 +14,8 @@ public abstract class APostingInputStream implements IPostingInputStream {
         this.postingsFile = new RandomAccessFile(pathToFile, "rw");
     }
 
-    protected Posting fieldsToPosting(short[] shortFields, String[] stringFields, boolean[] booleanFields){
-        return new Posting(shortFields, stringFields, booleanFields);
+    protected Posting fieldsToPosting(short[] shortFields, int[] ints , String[] stringFields, boolean[] booleanFields){
+        return new Posting(ints, shortFields, booleanFields);
     }
 
 

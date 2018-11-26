@@ -9,16 +9,16 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TempIndexEntry {
+    private int tfTotal;
     private int df;
     private List<Posting> posting;
     private List<Long> pointerList;
 
     public TempIndexEntry(){
+        tfTotal = 0;
         df=0;
         posting=new ArrayList<>();
         pointerList = new ArrayList<>();
-
-
     }
 
     public int getDf(){

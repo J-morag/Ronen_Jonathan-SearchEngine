@@ -1,52 +1,32 @@
 package Indexing.Index;
 
-import sun.util.locale.provider.SPILocaleProviderAdapter;
-
-import java.util.Arrays;
-import java.util.List;
-
 public class Posting {
 
+    private int docSerialID;
     private short tf;
-    private short maxTf;
-    private short uniqueWord;
-    private int docSerial;
-    private String docID;
-    private String city;
-    private String language;
     private boolean isInTitle = false;
     private boolean isInBeginning = false;
+    //    private String language;
+    //    private String city;
+    //    private String docID;
+    //    private short maxTf;
+    //    private short uniqueWord;
 
-    public Posting(String docID , short tf , short maxTf , short uniqueWord, int docSerial, String city ,  String language){
-        this.docID = docID;
+    public Posting(int docSerialID, short tf, boolean isInTitle, boolean isInBeginning) {
+        this.docSerialID = docSerialID;
         this.tf = tf;
-        this.maxTf = maxTf;
-        this.uniqueWord= uniqueWord;
-        this.docSerial = docSerial;
-        this.city=city;
-        this.language=language;
-    }
-
-    public Posting(String docID , short tf , short maxTf , short uniqueWord, int docSerial, String city ,  String language, boolean isInTitle, boolean isInBeginning){
-        this.docID = docID;
-        this.tf = tf;
-        this.maxTf = maxTf;
-        this.uniqueWord= uniqueWord;
-        this.docSerial = docSerial;
-        this.city=city;
-        this.language=language;
         this.isInTitle = isInTitle;
         this.isInBeginning = isInBeginning;
     }
 
-    public Posting(short[] shorts, int[] ints, String[] strings, boolean[] bools){
+    public Posting(int docSerialID, short tf) {
+        this.docSerialID = docSerialID;
+        this.tf = tf;
+    }
+
+    public Posting(int[] ints, short[] shorts, boolean[] bools){
+        docSerialID = ints[0];
         tf = shorts[0];
-        maxTf = shorts[1];
-        uniqueWord = shorts[2];
-        docSerial = ints[0];
-        docID = strings[0];
-        city = strings[1];
-        language = strings[2];
         isInTitle = bools[0];
         isInBeginning = bools[1];
     }
@@ -54,26 +34,6 @@ public class Posting {
 //GETTERS
     public short getTf() {
         return tf;
-    }
-
-    public short getMaxTf() {
-        return maxTf;
-    }
-
-    public short getUniqueWord() {
-        return uniqueWord;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public String getDocID() {
-        return docID;
     }
 
     public boolean isInTitle(){
@@ -85,44 +45,30 @@ public class Posting {
     }
 
     public short[] getShortFields(){
-        return new short[]{this.tf, this.maxTf, this.uniqueWord};
+        return new short[]{this.tf};
     }
 
-    public String[] getStringFields(){
-        return new String[]{docID, city, language};
-    }
     public boolean[] getBooleanFields(){
         return new boolean[]{isInTitle, isInBeginning};
     }
 
-    public int[] getIntegerFields(){ return new int[]{docSerial} ; }
+    public int[] getIntegerFields(){ return new int[]{docSerialID} ; }
 
-    public int getNumberOfNumericFields(){return 4;}
+    public int getNumberOfIntFields(){return 1;}
+
+    public int getNumberOfShortFields(){return 1;}
+
+    public int getNumberOfBooleanFields(){return 2;}
 
     //SETTERS
-    public void setDocID(String docID) {
-        this.docID = docID;
-    }
 
     public void setTf(short tf) {
         this.tf = tf;
     }
 
-    public void setMaxTf(short maxTf) {
-        this.maxTf = maxTf;
-    }
 
-    public void setUniqueWord(short uniqueWord) {
-        this.uniqueWord = uniqueWord;
-    }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
 
     public void setInTitle(boolean isInTitle){
         this.isInTitle = isInTitle;
@@ -135,6 +81,6 @@ public class Posting {
 
     @Override
     public String toString(){
-        return docID+","+tf+","+maxTf+","+uniqueWord+","+city+","+isInTitle+","+isInBeginning;
+        return docSerialID+","+tf+","+isInTitle+","+isInBeginning;
     }
 }

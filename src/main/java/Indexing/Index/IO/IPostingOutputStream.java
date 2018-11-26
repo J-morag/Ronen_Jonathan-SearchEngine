@@ -10,34 +10,11 @@ import java.util.List;
 
 public interface IPostingOutputStream{
 
-//    /**
-//     * sets the file to write to.
-//     * writes to wherever the file's cursor is set to.
-//     * @param randomAccessFile
-//     */
-//    void setFile(@NotNull RandomAccessFile randomAccessFile);
-
     /**
-     * sets the cursor to {@param pos}.
-     * @param pos - a pointer to the location to write to in thr file.
-     * @throws IOException - if pos is less than 0 or if an I/O error occurs.
+     *
+     * @return a pointer to the index of the next byte to be written.
      */
-    void setCursor(long pos) throws IOException;
-//
-//    /**
-//     * writes a single posting.
-//     * @param p - a Posting to write.
-//     * @return - the index where the first byte posting was written.
-//     */
-//    long write(@NotNull Posting p) throws IOException;
-//
-//    /**
-//     * writes a single posting and ends the line of postings.
-//     * if {@param p} is null, will end the line without writing any posting.
-//     * @param p - a Posting to write.
-//     *  @return - the index where the first byte of the posting was written.
-//     */
-//    long writeln(Posting p) throws IOException;
+    long getCursor();
 
     /**
      * writes all the postings in {@param postings} and then ends the line.
@@ -46,6 +23,12 @@ public interface IPostingOutputStream{
      * @throws NullPointerException - if {@param postings} contains a null pointer
      */
     long write(@NotNull List<Posting> postings) throws NullPointerException, IOException;
+
+    /**
+     * flushes the buffer
+     * @throws IOException
+     */
+    void flush() throws IOException;
 
     void close() throws IOException;
 }

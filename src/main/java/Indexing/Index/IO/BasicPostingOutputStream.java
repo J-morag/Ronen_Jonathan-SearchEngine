@@ -47,9 +47,10 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
 //        return postingsFile.getFilePointer();
 //    }
 
+
     @Override
     public long write(@NotNull List<Posting> postings) throws NullPointerException, IOException {
-        long startIdx = postingsFile.getFilePointer();
+        long startIdx = getCursor();
         StringBuilder output = new StringBuilder();
         for (Posting p : postings
              ) {
@@ -57,12 +58,15 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
         }
         output.append('\n');
         postingsFile.writeBytes(output.toString());
+
+        filePointer += output.length();
+
         return startIdx;
     }
 
     @Override
-    public void setCursor(long pos) throws IOException {
-        this.postingsFile.seek(pos);
+    public void flush() throws IOException {
+
     }
 
     @Override

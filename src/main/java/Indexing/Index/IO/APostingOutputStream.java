@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 
-public abstract class APostingOutputStream{
+public abstract class APostingOutputStream implements IPostingOutputStream{
 
+    long filePointer = 0;
     RandomAccessFile postingsFile;
 //    MappedByteBuffer postingsFile;
 
@@ -25,6 +26,12 @@ public abstract class APostingOutputStream{
 
     }
 
+    @Override
+    public long getCursor() {
+        return filePointer;
+    }
+
+
 
     protected short[] extractShortFields(Posting posting){
         return posting.getShortFields();
@@ -33,8 +40,8 @@ public abstract class APostingOutputStream{
     protected int[] extractIntFields(Posting posting){
         return posting.getIntegerFields();
     }
-    protected String[] extractStringFields(Posting posting){
-        return posting.getStringFields();
+    protected int[] extractIntegerFields(Posting posting){
+        return posting.getIntegerFields();
     }
     protected boolean[] extractBooleanFields(Posting posting){
         return posting.getBooleanFields();
