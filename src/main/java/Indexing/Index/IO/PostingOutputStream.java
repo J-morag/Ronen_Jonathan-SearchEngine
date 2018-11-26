@@ -4,10 +4,7 @@ import Indexing.Index.Posting;
 import javafx.geometry.Pos;
 import sun.awt.Mutex;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
      */
     public PostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
-        postingsFile = new BufferedOutputStream(postingsFile);
+        postingsFile = new BufferedOutputStream(new FileOutputStream(pathToFile));
     }
 
     @Override

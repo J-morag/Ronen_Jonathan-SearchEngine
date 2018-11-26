@@ -10,18 +10,18 @@ public class TermDocument {
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
-    private String language="";
 
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
         if (null != doc){
             this.docId = doc.getDocId();
-//            this.language = doc.
+            this.language = doc.getLanguage();
         }
     }
 
     public TermDocument(int serialID, Document doc, List<Term>[] fields) {
         this.serialID = serialID;
+        this.language = doc.getLanguage();
         this.docId = doc.getDocId();
         this.title = fields[0];
         this.text = fields[1];
