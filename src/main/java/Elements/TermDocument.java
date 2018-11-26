@@ -5,6 +5,7 @@ import java.util.List;
 public class TermDocument {
     private int serialID;
     private String docId;
+    private String language;
     private Term city;
     private List<Term> title;
     private List<Term> text;
@@ -12,7 +13,10 @@ public class TermDocument {
 
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
-        if (null != doc) this.docId = doc.getDocId();
+        if (null != doc){
+            this.docId = doc.getDocId();
+//            this.language = doc.
+        }
     }
 
     public TermDocument(int serialID, Document doc, List<Term>[] fields) {
