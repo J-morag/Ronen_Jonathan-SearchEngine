@@ -1,6 +1,7 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
+import javafx.geometry.Pos;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,7 +14,7 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
 
     //TODO booleans!
     //TODO add ints!
-    List<byte[]> buffer = new ArrayList<>();
+    protected List<byte[]> buffer = new ArrayList<>();
 
     public PostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
@@ -75,22 +76,36 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
 
     protected byte[] postingsArrayToByteArray(List<Posting> postings){
         int numPostings = postings.size();
-        int numFields = extractShortFields(postings.get(0)).length;
-        byte[] data = new byte[((numPostings * numFields * 2) + 4 )];
-        byte[] numPostingsByteArray = ByteBuffer.allocate(4).putInt(numPostings).array();
-        data[0] = numPostingsByteArray[0];
-        data[1] = numPostingsByteArray[1];
-        data[2] = numPostingsByteArray[2];
-        data[3] = numPostingsByteArray[3];
-        for (int i = 0; i <numPostings ; i++) {
-            short[] fieldsFori = extractShortFields(postings.get(i));
-            for (int j = 0; j <numFields ; j++) {
-                int idxInShortStream = 1+ (i*j) +j ; //skip first (indicates length) + jump to start of this posting + jump to field in this posting
-                data[ idxInShortStream * 2 ] //put MSBs
-                        = short8MSB(fieldsFori[j]);
-                data[ idxInShortStream * 2  + 1]  //put LSBs
-                        = short8LSB(fieldsFori[j]);
+        byte[] data = new byte[4 + numPostings *
+                (Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 + Posting.getNumberOfBooleanFields()/8 /* rounded down*/ )];
+
+        intToBytes(numPostings, data, 0);
+
+        int dataIdx = 4;
+
+        for (Posting p :postings
+             ) {
+            int[] intFieldsFori = extractIntegerFields(p);
+            for (int integer: intFieldsFori
+                    ) {
+                intToBytes(integer, data, dataIdx);
+                dataIdx += 4;
             }
+
+            short[] shortFieldsFori = extractShortFields(p);
+            for (short s: shortFieldsFori
+                    ) {
+                data[dataIdx] = short8MSB(s);
+                dataIdx++;
+                data[dataIdx] = short8LSB(s);
+                dataIdx++;
+            }
+
+//            boolean[] booleanFieldsFori = extractBooleanFields(postings.get(i));
+            // THIS HAS TO CHANGE IF POSTING CHANGES //
+            data[dataIdx] = extractBoolsAsByte(p);
+            dataIdx++;
+            // THIS HAS TO CHANGE IF POSTING CHANGES //
         }
 
         return data;
@@ -105,10 +120,27 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
         return (byte)s;
     }
 
+    protected void intToBytes(int i, byte[] bytes, int startIdx) throws IndexOutOfBoundsException{
+        bytes[startIdx] = (byte)(i >> 24);
+        bytes[startIdx] = (byte)(i >> 16);
+        bytes[startIdx] = (byte)(i >> 8);
+        bytes[startIdx] = (byte)(i);
+    }
+
 
     @Override
     public void close() throws IOException {
         postingsFile.close();
+    }
+
+    protected static byte extractBoolsAsByte(Posting p){
+        int idx = 0;
+        byte isInTitle = p.isInTitle() ? (byte)1 : 0;
+        isInTitle = (byte)(isInTitle << idx++);
+        byte isInBeggining = p.isInBeginning() ? (byte)1 : 0;
+        isInBeggining = (byte)(isInBeggining << idx++);
+
+        return (byte)(isInTitle | isInBeggining);
     }
 
 

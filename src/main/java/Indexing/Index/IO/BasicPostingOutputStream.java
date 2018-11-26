@@ -4,6 +4,7 @@ import Indexing.Index.Posting;
 import com.sun.istack.internal.NotNull;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
@@ -57,9 +58,11 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
             postingToStringTuple(p, output);
         }
         output.append('\n');
-        postingsFile.writeBytes(output.toString());
 
-        filePointer += output.length();
+        byte[] outBytes = output.toString().getBytes();
+        postingsFile.write(outBytes);
+
+        filePointer += outBytes.length;
 
         return startIdx;
     }

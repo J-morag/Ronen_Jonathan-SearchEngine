@@ -2,15 +2,13 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.MappedByteBuffer;
 
 public abstract class APostingOutputStream implements IPostingOutputStream{
 
     long filePointer = 0;
-    RandomAccessFile postingsFile;
+    OutputStream postingsFile;
 //    MappedByteBuffer postingsFile;
 
     /**
@@ -21,8 +19,7 @@ public abstract class APostingOutputStream implements IPostingOutputStream{
      */
     public APostingOutputStream(String pathToFile) throws IOException {
 
-        this.postingsFile = new RandomAccessFile(pathToFile, "rw");
-        postingsFile.setLength(0);
+        this.postingsFile = new FileOutputStream(pathToFile);
 
     }
 

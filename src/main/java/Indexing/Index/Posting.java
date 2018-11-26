@@ -54,11 +54,11 @@ public class Posting {
 
     public int[] getIntegerFields(){ return new int[]{docSerialID} ; }
 
-    public int getNumberOfIntFields(){return 1;}
+    public static int getNumberOfIntFields(){return 1;}
 
-    public int getNumberOfShortFields(){return 1;}
+    public static int getNumberOfShortFields(){return 1;}
 
-    public int getNumberOfBooleanFields(){return 2;}
+    public static int getNumberOfBooleanFields(){return 2;}
 
     //SETTERS
 
