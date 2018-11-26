@@ -86,6 +86,7 @@ public class Posting {
 
     @Override
     public boolean equals(Object o) {
+        //TODO shorten this to just use docSerialID later! more efficient!
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -99,6 +100,7 @@ public class Posting {
 
     @Override
     public int hashCode() {
+        //TODO shorten this to just use docSerialID later! more efficient!
         int result = docSerialID;
         result = 31 * result + (int) tf;
         result = 31 * result + (isInTitle ? 1 : 0);
