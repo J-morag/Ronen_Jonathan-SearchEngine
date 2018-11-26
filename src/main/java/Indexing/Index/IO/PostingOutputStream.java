@@ -17,6 +17,12 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
 //    protected List<byte[]> buffer = new ArrayList<>();
     private Mutex m_postingsFile = new Mutex();
 
+    /**
+     * if the file doesn't exist, creates it.
+     * if the file exists, clears it!
+     * @param pathToFile
+     * @throws IOException
+     */
     public PostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
         postingsFile = new BufferedOutputStream(postingsFile);

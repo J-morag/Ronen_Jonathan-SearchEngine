@@ -18,6 +18,12 @@ public class BasicPostingOutputStream extends APostingOutputStream implements IP
 
     //ADMINISTRATIVE
 
+    /**
+     * if the file doesn't exist, creates it.
+     * if the file exists, clears it!
+     * @param pathToFile
+     * @throws IOException
+     */
     public BasicPostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
     }
