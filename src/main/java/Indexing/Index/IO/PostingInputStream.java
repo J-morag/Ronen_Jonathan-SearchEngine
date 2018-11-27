@@ -78,8 +78,8 @@ public class PostingInputStream implements IPostingInputStream {
         // THIS HAS TO CHANGE IF POSTING CHANGES //
         byte boolsAsByte = postingsFile.readByte();
         boolean[] boolFields = new boolean[2];
-        boolFields[0] = (boolsAsByte & (Byte.MIN_VALUE+1)) > Byte.MIN_VALUE;
-        boolFields[1] = (boolsAsByte & (Byte.MIN_VALUE+2)) > Byte.MIN_VALUE;
+        boolFields[0] = (boolsAsByte & (0b00000001)) > 0b00000000;
+        boolFields[1] = (boolsAsByte & (0b00000010)) > 0b00000000;
         // THIS HAS TO CHANGE IF POSTING CHANGES //
 
         return new Posting(intFields, shortFields, boolFields);
