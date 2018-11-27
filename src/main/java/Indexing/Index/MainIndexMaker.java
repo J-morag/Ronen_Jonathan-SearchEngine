@@ -253,10 +253,9 @@ public class MainIndexMaker extends AIndexMaker {
         }
         else { // index >= array.length
             int[] newArray = Arrays.copyOf(array, Math.max(array.length*2, index+1)); // double the capacity
+            newArray[index] = intToInsert;
             return newArray;
         }
     }
-
-
 
 }
