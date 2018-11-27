@@ -16,7 +16,7 @@ import static javafx.application.Platform.exit;
 public class MainIndexMaker extends AIndexMaker {
 
     //the size of the group of documents that will be indexed every time.
-    private static final short partialGroupSize = 5000;
+    private static final short partialGroupSize = 30000;
 
 
     private Map<String, TempIndexEntry> tempDictionary;
