@@ -1,12 +1,14 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
+import javafx.geometry.Pos;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,4 +52,41 @@ class PostingInputStreamTest {
 
     }
 
+
+    @Test
+    void multiTerm() throws IOException {
+        Random random = new Random();
+        int numTerms = 4;
+        ArrayList<ArrayList<Posting>> termsOut = new ArrayList<>(4);
+        for (int i = 0; i <  numTerms ; i++) {
+            int numPostings = random.nextInt(100);
+            termsOut.add(new ArrayList<>());
+            for (int j = 0; j < numPostings ; j++) {
+                termsOut.get(i).add(new Posting((short)random.nextInt(Integer.MAX_VALUE), (short)random.nextInt(Short.MAX_VALUE), random.nextBoolean(), random.nextBoolean()));
+            }
+        }
+
+        long[] pointers = new long[numTerms];
+
+        for (int i = 0; i < numTerms ; i++) {
+            pointers[i] = out.write(termsOut.get(i));
+        }
+
+        out.flush();
+        out.close();
+
+        List<Posting>[] termsIn = new List[numTerms];
+        for (int i = 0; i < numTerms ; i++) {
+            termsIn[i] = in.readTermPostings(pointers[i]);
+        }
+
+        for (int i = 0; i < numTerms ; i++) {
+            List<Posting> postingsIn = termsIn[i];
+            System.out.println(termsOut.get(i));
+            System.out.println(termsIn[i]);
+            assertArrayEquals(postingsIn.toArray(), termsOut.get(i).toArray());
+        }
+
+
+    }
 }

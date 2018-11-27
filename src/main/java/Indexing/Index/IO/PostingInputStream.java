@@ -47,18 +47,20 @@ public class PostingInputStream implements IPostingInputStream {
     }
 
     private int readFourBytesAsInt() throws IOException {
-        //TODO? can improve efficiency
         byte[] bytes = new byte[4];
         postingsFile.read(bytes, 0, 4);
-        ByteBuffer bf = ByteBuffer.wrap(bytes);
-        return bf.getInt();
+        return  (bytes[0]<<24) & 0xff000000|
+                (bytes[1]<<16) & 0x00ff0000|
+                (bytes[2]<< 8) & 0x0000ff00|
+                (bytes[3]<< 0) & 0x000000ff;
     }
 
     private short readTwoBytesAsShort() throws IOException {
         byte[] bytes = new byte[2];
         postingsFile.read(bytes, 0 ,2);
-        int res = ((int)bytes[0]) << 8; //add MSBs
-        res = res | bytes[1]; // add LSBs
+        int res = (((int)bytes[0]) << 8) & 0x0000ff00; //add MSBs
+        int LSBs = ((int)bytes[1] & 0x000000ff); //this makes sure that after casting to int, all bits except those in 8 LSBs are off.
+        res = res | LSBs ; // add LSBs
         return (short)res;
     }
 
