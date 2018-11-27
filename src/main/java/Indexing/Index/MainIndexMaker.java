@@ -246,7 +246,7 @@ public class MainIndexMaker extends AIndexMaker {
      * @param intToInsert - int to insert.
      * @return the original array if it was large enough to be inserted into, else a new array with double the size.
      */
-    private int[] insertDynamic(int[] array, int index, int intToInsert){
+    private static int[] insertDynamic(int[] array, int index, int intToInsert){
         if(index < array.length){
             array[index] = intToInsert;
             return array;
@@ -257,5 +257,6 @@ public class MainIndexMaker extends AIndexMaker {
             return newArray;
         }
     }
+
 
 }
