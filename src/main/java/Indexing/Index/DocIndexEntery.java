@@ -59,7 +59,5 @@ public class DocIndexEntery {
         this.language = language;
     }
 
-    public void increaseTfByN(int n){
-        maxTF+=n;
-    }
+
 }

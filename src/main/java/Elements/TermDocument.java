@@ -5,7 +5,7 @@ import java.util.List;
 public class TermDocument {
     final private int serialID;
     final private String docId;
-    final private Term city;
+    private Term city;
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
@@ -55,9 +55,7 @@ public class TermDocument {
 
     public void setCity(Term city){this.city=city; }
 
-    public void setDocId(String docId) {
-        this.docId = docId;
-    }
+
 
     public void setTitle(List<Term> title) {
         this.title = title;
@@ -66,5 +64,4 @@ public class TermDocument {
     public void setText(List<Term> text) {
         this.text = text;
     }
-    public void setLanguage(String language){this.language=language;}
 }
