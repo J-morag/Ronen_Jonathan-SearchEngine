@@ -79,8 +79,7 @@ public class TempIndexEntry {
     }
 
     public void deletePostingList(){
-        posting=null;
-        posting= new ArrayList<>();
+        posting.clear();
     }
     public int getPostingSize(){
         return posting.size();

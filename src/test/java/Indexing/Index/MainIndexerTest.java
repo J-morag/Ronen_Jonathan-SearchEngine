@@ -58,6 +58,8 @@ public class MainIndexerTest {
 
         indexer.mergeMainIndex();
 
+        System.out.println("Current heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+
         Map<String,TempIndexEntry> map = indexer.getMainMap();
         indexer=null;
 /*
@@ -130,7 +132,9 @@ public class MainIndexerTest {
         System.out.println(((double) System.currentTimeMillis()-start)/1000);
 
 
-//        indexer.mergeMainIndex();
+        indexer.mergeMainIndex();
+
+        System.out.println("Current heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
 //
 //        Map<String,TempIndexEntry> map = indexer.getMainMap();
 ///*
@@ -161,6 +165,13 @@ public class MainIndexerTest {
 //            e.printStackTrace();
 //        }
 
+    }
+
+
+
+
+    public static double toMB(long bytes){
+        return bytes/(Math.pow(2, 20));
     }
 
 
