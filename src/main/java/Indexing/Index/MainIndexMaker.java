@@ -200,7 +200,7 @@ public class MainIndexMaker extends AIndexMaker {
     public void  dumpToDisk()
     {
 
-        BasicPostingOutputStream outputStream = null;
+        APostingOutputStream outputStream = null;
         try {
             outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to other postingOutPutStream
         } catch (IOException e) {
@@ -212,9 +212,9 @@ public class MainIndexMaker extends AIndexMaker {
             tmp = tempDictionary.get(term);
             if (tmp.getPostingSize() > 0) {
                 tmp.sortPosting();
-                long pointer = 0;
+                int pointer = 0;
                 try {
-                    pointer = outputStream.write(tmp.getPosting());
+                    pointer = (int)outputStream.write(tmp.getPosting());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -236,27 +236,7 @@ public class MainIndexMaker extends AIndexMaker {
 
     }
 
-    /**
-     * simulates a dynamic array of int that only grows.
-     * inserts into the given array and returns it if it is large enough.
-     * if it isn't large enough to be inserted to ( {@param index} >= {@param array.length}, will copy arrary contents
-     * into a new array with double the size, insert, and return the new array.
-     * @param array - original array.
-     * @param index index to insert on.
-     * @param intToInsert - int to insert.
-     * @return the original array if it was large enough to be inserted into, else a new array with double the size.
-     */
-    private static int[] insertDynamic(int[] array, int index, int intToInsert){
-        if(index < array.length){
-            array[index] = intToInsert;
-            return array;
-        }
-        else { // index >= array.length
-            int[] newArray = Arrays.copyOf(array, Math.max(array.length*2, index+1)); // double the capacity
-            newArray[index] = intToInsert;
-            return newArray;
-        }
-    }
+
 
 
 }

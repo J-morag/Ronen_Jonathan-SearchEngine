@@ -12,13 +12,13 @@ public class TempIndexEntry {
     private int tfTotal;
     private int df;
     private List<Posting> posting;
-    private List<Long> pointerList;
+    private int [] pointerList;
 
     public TempIndexEntry(){
         tfTotal = 0;
         df=0;
         posting=new ArrayList<>();
-        pointerList = new ArrayList<>();
+        pointerList = new int[1]; // initial size
     }
 
     public int getDf(){
@@ -56,24 +56,25 @@ public class TempIndexEntry {
             }
         });
     }
+//
+//    public void addPointer(byte fileIndex, long pointer){
+//        int size = pointerList.size();
+//        int i=size;
+//        if(size>fileIndex){
+//            pointerList.add(fileIndex,pointer);
+//        }
+//        else {
+//            while (i<fileIndex){
+//                pointerList.add(i,new Long(-1));
+//                i++;
+//            }
+//            pointerList.add(i,pointer);
+//        }
+//
+//    }
 
-    public void addPointer(byte fileIndex, long pointer){
-        int size = pointerList.size();
-        int i=size;
-        if(size>fileIndex){
-            pointerList.add(fileIndex,pointer);
-        }
-        else {
-            while (i<fileIndex){
-                pointerList.add(i,new Long(-1));
-                i++;
-            }
-            pointerList.add(i,pointer);
-        }
 
-    }
-
-    public List<Long> getPointerList(){
+    public int[] getPointerList(){
         return pointerList;
     }
 
@@ -83,6 +84,41 @@ public class TempIndexEntry {
     }
     public int getPostingSize(){
         return posting.size();
+    }
+
+    /**
+     * simulates a dynamic array of int that only grows.
+     * inserts into the given array and returns it if it is large enough.
+     * if it isn't large enough to be inserted to ( {@param index} >= {@param array.length}, will copy arrary contents
+     * into a new array with double the size, insert, and return the new array.
+     * @param index index to insert on.
+     * @param intToInsert - int to insert.
+     */
+    public void addPointer(int index, int intToInsert){
+        int [] array = this.pointerList;
+        int length = array.length;
+        if(index <length){
+            array[index] = intToInsert;
+            return;
+        }
+        else { // index >= array.length
+            int size = index+1;
+            int [] newArray = new int[size];
+            int i;
+            for (i = 0; i <array.length ; i++) {
+                newArray[i]=array[i];
+            }
+            for (;i<size;i++){
+                if(i!=index){
+                    newArray[i]=-1;
+                }else {
+                    newArray[i]=intToInsert;
+                }
+            }
+            this.pointerList=null;
+            this.pointerList=newArray;
+            return;
+        }
     }
 
 

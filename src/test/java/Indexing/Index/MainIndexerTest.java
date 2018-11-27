@@ -19,8 +19,8 @@ public class MainIndexerTest {
     private static final int termBufferSize = 30;
     private static final int stemmedTermBufferSize = 30;
 
-    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
 
     private static final String pathToDocumentsFolderAtJM = "C:/Users/John/Downloads/infoRetrieval/corpus";
     private static final String patToStopwordsFileAtJM = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
@@ -75,7 +75,16 @@ public class MainIndexerTest {
 
         for (String term : map.keySet()) {
              //(term+"->"+map.get(term).getPosting()+"\n");
-            fo.write((term+"->"+map.get(term).getPointerList()+"\n").getBytes());//term+"->"+map.get(term).getPosting()+"\n").getBytes());
+            int [] pointer=map.get(term).getPointerList();
+            fo.write((term+"->[").getBytes());
+            for (int i = 0; i <pointer.length ; i++) {
+                if(i+1<pointer.length)
+                    fo.write((pointer[i]+",").getBytes());
+                else
+                    fo.write((pointer[i]+"").getBytes());
+            }
+            fo.write(("]\n").getBytes());
+            //fo.write((term+"->"+map.get(term).getPointerList()[0]+"\n").getBytes());//term+"->"+map.get(term).getPosting()+"\n").getBytes());
             //System.out.println(map.get(term).getPointerList()+"\n");
         }
         fo.flush();
