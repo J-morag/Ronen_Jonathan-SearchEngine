@@ -215,8 +215,8 @@ public class MainIndexMaker extends AIndexMaker {
    //@TODO
     public void mergeIndex(Set<String> uniqueWords){
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
-
         Arrays.parallelSort(allTerms);
+
 
     }
 

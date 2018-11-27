@@ -21,6 +21,7 @@ public class MainIndexerTest {
 
     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    private static final String pathToStopWordRONEN ="C:\\Users\\ronen\\Desktop\\stopWords.txt";
 
     private static final String pathToDocumentsFolderAtJM = "C:/Users/John/Downloads/infoRetrieval/corpus";
     private static final String patToStopwordsFileAtJM = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
@@ -39,7 +40,7 @@ public class MainIndexerTest {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
 
-        HashSet<String> stopwords = Parse.getStopWords("");
+        HashSet<String> stopwords = Parse.getStopWords(pathToStopWordRONEN);
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
         Indexer indexer =new Indexer("C:\\Users\\ronen\\Desktop\\test",termDocumentsBuffer,true);
         Thread tIndexer = new Thread(indexer);
