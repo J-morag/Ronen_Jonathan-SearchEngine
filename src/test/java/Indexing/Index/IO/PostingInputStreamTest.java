@@ -62,7 +62,7 @@ class PostingInputStreamTest {
             int numPostings = random.nextInt(100);
             termsOut.add(new ArrayList<>());
             for (int j = 0; j < numPostings ; j++) {
-                termsOut.get(i).add(new Posting((short)random.nextInt(Integer.MAX_VALUE), (short)random.nextInt(Short.MAX_VALUE), random.nextBoolean(), random.nextBoolean()));
+                termsOut.get(i).add(getRandomPosting(random));
             }
         }
 
@@ -94,7 +94,7 @@ class PostingInputStreamTest {
             int numPostings = random.nextInt(100);
             termsOut.add(new ArrayList<>());
             for (int j = 0; j < numPostings ; j++) {
-                termsOut.get(i).add(new Posting((short)random.nextInt(Integer.MAX_VALUE), (short)random.nextInt(Short.MAX_VALUE), random.nextBoolean(), random.nextBoolean()));
+                termsOut.get(i).add(getRandomPosting(random));
             }
         }
 
@@ -123,11 +123,53 @@ class PostingInputStreamTest {
 
     }
 
+    private Posting getRandomPosting(Random random) {
+        return new Posting((short)random.nextInt(Integer.MAX_VALUE), (short)random.nextInt(Short.MAX_VALUE), random.nextBoolean(), random.nextBoolean());
+    }
+
     private void assertEqualsOnTermPostings(ArrayList<Posting> x, List<Posting> postingsIn1) {
         List<Posting> postingsIn = postingsIn1;
         System.out.println(x);
         System.out.println(postingsIn1);
         assertArrayEquals(postingsIn.toArray(), x.toArray());
+    }
+
+    @Test
+    void testTime() throws IOException {
+        int numPostings = 100;
+        ArrayList<Posting> postingsForOneTerm = new ArrayList<>(numPostings);
+        for (int i = 0; i <numPostings ; i++) {
+            postingsForOneTerm.add(getRandomPosting(new Random()));
+        }
+
+        int numTerms = 100000;
+
+        long[] pointers = new long[numTerms];
+
+        long startTime = System.currentTimeMillis();
+
+        for (int j = 0; j < numTerms ; j++) {
+            pointers[j] = out.write(postingsForOneTerm);
+        }
+
+        out.flush();
+
+        long time = (System.currentTimeMillis() - startTime);
+
+        System.out.println("time to write 100,000 terms with 100 postings each (ms): " + (time));
+        System.out.println("time to write 100,000 terms with 100 postings each, fifty times (m): " + ((time)*50/1000)/60);
+
+        startTime = System.currentTimeMillis();
+
+        for (int i = 0; i < numPostings ; i++) {
+            in.readTermPostings(pointers[i]);
+        }
+
+        time = (System.currentTimeMillis() - startTime);
+
+        System.out.println("time to read 100,000 terms with 100 postings each (ms): " + (time));
+        System.out.println("time to read 100,000 terms with 100 postings each, fifty times (m): " + ((time)*50/1000)/60);
+
     }
 
 }
