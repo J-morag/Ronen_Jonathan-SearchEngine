@@ -16,7 +16,7 @@ import static javafx.application.Platform.exit;
 public class MainIndexMaker extends AIndexMaker {
 
     //the size of the group of documents that will be indexed every time.
-    private static final short partialGroupSize = 5000;
+    private static final short partialGroupSize = 10000;
 
 
     private Map<String, TempIndexEntry> tempDictionary;
@@ -43,10 +43,9 @@ public class MainIndexMaker extends AIndexMaker {
 
             Set<String> uniqueWords=new HashSet<>();// set of all unique words in a doc
             Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
-            Map<String , Byte> special = new HashMap<String, Byte>(); // map that indicates if a term is in the tile to in a beginning of the text or none
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
-            int maxTf = getMaxTf(uniqueWords,tfMap,special,title,text);
+            int maxTf = getMaxTf(uniqueWords,tfMap,title,text);
             int numOfUniqueWords = uniqueWords.size();
             String docId = doc.getDocId();
             String city ="";
@@ -68,19 +67,27 @@ public class MainIndexMaker extends AIndexMaker {
             for(String term : uniqueWords){
                 short tf =  tfMap.get(term).shortValue();
                 Posting posting = new Posting(doc.getSerialID(), tf);
-                if(special.get(term)==0){
-                    posting.setInTitle(false);
-                    posting.setInBeginning(false);
-                }else if(special.get(term)==1){
-                    posting.setInTitle(true);
-                    posting.setInBeginning(false);
-                }else if(special.get(term)==2){
-                    posting.setInTitle(false);
-                    posting.setInBeginning(true);
-                }else {
-                    posting.setInTitle(true);
-                    posting.setInBeginning(true);
+
+                int beginning=0;
+                try {
+                    beginning = (int)(text.size()*0.1);
+                }catch (NullPointerException e ){
+                    System.out.println(numOfDocs);
+                    exit();
+
                 }
+
+                if (title.contains(term)){
+                    posting.setInTitle(true);
+                }
+
+                boolean isInBeginning=false;
+                for (int i = 0; i <beginning && !isInBeginning ; i++) {
+                    if(term.equals(text.get(i)))
+                        isInBeginning=true;
+                }
+
+                posting.setInBeginning(isInBeginning);
 
                 if(!tempDictionary.containsKey(term)) {
                     TempIndexEntry tmp = new TempIndexEntry();
@@ -100,7 +107,6 @@ public class MainIndexMaker extends AIndexMaker {
                 dumpToDisk();
             }
             tfMap=null;
-            special = null;
         }else {
             dumpToDisk();
         }
@@ -116,11 +122,9 @@ public class MainIndexMaker extends AIndexMaker {
      * and fiinaly check if a term is in the title or in the first 20% of a document and update the spacial map
      * @param uniqueWords - an empty Set that will contain every unique term in the doc
      * @param tfMap - an empty Hash map that counts , for each Term it's tf in the doc
-     * @param special - an empty Hash map that indicate if a term is in the title or in the first 10% of the document
-     *                if the value is
      * @return the maxTF of a term in the Document
      */
-    private int getMaxTf( Set<String> uniqueWords , Map<String,Integer> tfMap , Map<String,Byte> special, List<Term> title , List<Term> text){
+    private int getMaxTf( Set<String> uniqueWords , Map<String,Integer> tfMap, List<Term> title , List<Term> text){
         int maxTf=0;
         int beginning=0;
         try {
@@ -145,10 +149,6 @@ public class MainIndexMaker extends AIndexMaker {
             if(value > maxTf){
                 maxTf = value;
             }
-            if(!special.containsKey(t)){
-                special.put(t,new Byte((byte)1));
-            }
-
 
         }
         int count =0;
@@ -165,16 +165,6 @@ public class MainIndexMaker extends AIndexMaker {
             int value = tfMap.get(t);
             if(value > maxTf){
                 maxTf = value;
-            }
-            if((count<=beginning) && (!special.containsKey(t))){
-                special.put(t , new Byte((byte)2));
-            }
-            else if(count<= beginning && special.containsKey(t)){
-                if(special.get(t) == 1){
-                    special.put(t, new Byte((byte)3));
-                }
-            } else if(count>beginning && !special.containsKey(t)){
-                special.put(t,new Byte((byte)0));
             }
             count++;
         }

@@ -59,6 +59,7 @@ public class MainIndexerTest {
         indexer.mergeMainIndex();
 
         Map<String,TempIndexEntry> map = indexer.getMainMap();
+        indexer=null;
 /*
         for (Term term : map.keySet())
         {
