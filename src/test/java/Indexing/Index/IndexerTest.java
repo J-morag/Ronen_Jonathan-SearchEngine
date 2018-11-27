@@ -332,7 +332,7 @@ class IndexerTest {
         System.out.println("GC time (ms) = " + (timeAfterGC-timeBeforeGC));
     }
 
-    private double toMB(long bytes){
+    public static double toMB(long bytes){
         return bytes/(Math.pow(2, 20));
     }
 }
