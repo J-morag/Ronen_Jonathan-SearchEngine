@@ -5,17 +5,18 @@ import java.util.List;
 public class TermDocument {
     final private int serialID;
     final private String docId;
-    final private String language;
     private Term city;
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
+    private String language="";
 
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
         if (null != doc){
             this.docId = doc.getDocId();
             this.language = doc.getLanguage();
+
         }
         else{
             docId = null;
@@ -25,7 +26,6 @@ public class TermDocument {
 
     public TermDocument(int serialID, Document doc, List<Term>[] fields) {
         this.serialID = serialID;
-        this.language = doc.getLanguage();
         this.docId = doc.getDocId();
         this.title = fields[0];
         this.text = fields[1];
@@ -53,4 +53,15 @@ public class TermDocument {
 
     public String getLanguage(){return language;}
 
+    public void setCity(Term city){this.city=city; }
+
+
+
+    public void setTitle(List<Term> title) {
+        this.title = title;
+    }
+
+    public void setText(List<Term> text) {
+        this.text = text;
+    }
 }

@@ -86,10 +86,12 @@ public class MainIndexMaker extends AIndexMaker {
                 if(!tempDictionary.containsKey(term)) {
                     TempIndexEntry tmp = new TempIndexEntry();
                     tmp.addPosting(posting);
+                    tmp.increaseTfByN(tfMap.get(term).shortValue());
                     posting=null;
                     tempDictionary.put(term,tmp);
                 }else {
                     TempIndexEntry tmp = tempDictionary.get(term);
+                    tmp.increaseTfByN(tfMap.get(term).shortValue());
                     tmp.addPosting(posting);
                     posting=null;
                 }
@@ -187,13 +189,18 @@ public class MainIndexMaker extends AIndexMaker {
     }
 
 
+    public Map<Integer , DocIndexEntery> getDocsDictionary(){
+        return docsDictionary;
+    }
+
+
 
     public void  dumpToDisk()
     {
 
         BasicPostingOutputStream outputStream = null;
         try {
-            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");
+            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to postingOutPutStream
         } catch (IOException e) {
             e.printStackTrace();
         }

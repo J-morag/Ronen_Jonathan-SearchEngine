@@ -29,6 +29,11 @@ public class TempIndexEntry {
         df++;
     }
 
+    public void increaseTfByN(int n){
+
+        tfTotal+=n;
+    }
+
     public void addPosting(Posting pos){
         posting.add(pos);
         df++;
