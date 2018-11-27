@@ -21,6 +21,11 @@ public class MainIndexerTest {
 
     //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+
+    private static final String pathToDocumentsFolderAtJM = "C:/Users/John/Downloads/infoRetrieval/corpus";
+    private static final String patToStopwordsFileAtJM = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
+    private static final String pathToOutputFolderAtJM = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
+
     @Test
     void testMainIndex() throws InterruptedException {
 
@@ -85,4 +90,66 @@ public class MainIndexerTest {
 
     }
 
+    @Test
+    void testMainIndexClone() throws InterruptedException {
+
+        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
+        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
+        BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
+
+
+
+        //  Worker Threads:
+
+        Thread tReader = new Thread(new ReadFile(pathToDocumentsFolderAtJM, documentBuffer));
+
+        HashSet<String> stopwords = Parse.getStopWords(patToStopwordsFileAtJM);
+        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
+        Indexer indexer =new Indexer(pathToOutputFolderAtJM,termDocumentsBuffer,true);
+        Thread tIndexer = new Thread(indexer);
+
+        long start=System.currentTimeMillis();
+
+
+        tReader.start();
+
+        tParser.start();
+
+        tIndexer.start();
+        tIndexer.join();
+        System.out.println(((double) System.currentTimeMillis()-start)/1000);
+
+
+//        indexer.mergeMainIndex();
+//
+//        Map<String,TempIndexEntry> map = indexer.getMainMap();
+///*
+//        for (Term term : map.keySet())
+//        {
+//            System.out.println(map.get(term).getPointerList()+"\n");
+//        }
+//   */
+//
+//        String path = "C:\\Users\\ronen\\Desktop\\a.txt";
+//
+//        try {
+//            File file = new File(path);
+//            OutputStream fo = new FileOutputStream(file);
+//
+//
+//            for (String term : map.keySet()) {
+//                //(term+"->"+map.get(term).getPosting()+"\n");
+//                fo.write((term+"->"+map.get(term).getPointerList()+"\n").getBytes());//term+"->"+map.get(term).getPosting()+"\n").getBytes());
+//                //System.out.println(map.get(term).getPointerList()+"\n");
+//            }
+//            fo.flush();
+//            fo.close();
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+    }
 }

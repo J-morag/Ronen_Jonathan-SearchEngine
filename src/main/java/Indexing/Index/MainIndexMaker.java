@@ -4,6 +4,7 @@ import Elements.Term;
 import Elements.TermDocument;
 import Indexing.Index.IO.APostingOutputStream;
 import Indexing.Index.IO.BasicPostingOutputStream;
+import Indexing.Index.IO.PostingOutputStream;
 
 import javax.print.DocFlavor;
 import java.io.File;
@@ -233,6 +234,27 @@ public class MainIndexMaker extends AIndexMaker {
 
         Arrays.parallelSort(allTerms);
 
+    }
+
+    /**
+     * simulates a dynamic array of int that only grows.
+     * inserts into the given array and returns it if it is large enough.
+     * if it isn't large enough to be inserted to ( {@param index} >= {@param array.length}, will copy arrary contents
+     * into a new array with double the size, insert, and return the new array.
+     * @param array - original array.
+     * @param index index to insert on.
+     * @param intToInsert - int to insert.
+     * @return the original array if it was large enough to be inserted into, else a new array with double the size.
+     */
+    private int[] insertDynamic(int[] array, int index, int intToInsert){
+        if(index < array.length){
+            array[index] = intToInsert;
+            return array;
+        }
+        else { // index >= array.length
+            int[] newArray = Arrays.copyOf(array, array.length*2); // double the capacity
+            return newArray;
+        }
     }
 
 
