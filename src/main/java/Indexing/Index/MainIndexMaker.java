@@ -2,9 +2,7 @@ package Indexing.Index;
 
 import Elements.Term;
 import Elements.TermDocument;
-import Indexing.Index.IO.APostingOutputStream;
-import Indexing.Index.IO.BasicPostingOutputStream;
-import Indexing.Index.IO.PostingOutputStream;
+import Indexing.Index.IO.*;
 
 import javax.print.DocFlavor;
 import java.io.File;
@@ -200,30 +198,26 @@ public class MainIndexMaker extends AIndexMaker {
     public void  dumpToDisk()
     {
 
-        APostingOutputStream outputStream = null;
         try {
-            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to other postingOutPutStream
+            IPostingOutputStream outputStream = new PostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to other postingOutPutStream
+            TempIndexEntry tmp =null;
+            numOfDocs=0;
+            for (String term : tempDictionary.keySet()) {
+                tmp = tempDictionary.get(term);
+                if (tmp.getPostingSize() > 0) {
+                    tmp.sortPosting();
+                    int pointer = (int)outputStream.write(tmp.getPosting());
+                    tmp.addPointer(tempFileNumber, pointer);
+                    tmp.deletePostingList();
+                }
+            }
+            outputStream.flush();
+            outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        TempIndexEntry tmp =null;
-        numOfDocs=0;
-        for (String term : tempDictionary.keySet()) {
-            tmp = tempDictionary.get(term);
-            if (tmp.getPostingSize() > 0) {
-                tmp.sortPosting();
-                int pointer = 0;
-                try {
-                    pointer = (int)outputStream.write(tmp.getPosting());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                tmp.addPointer(tempFileNumber, pointer);
-                tmp.deletePostingList();
-
-            }
-        }
         tempFileNumber++;
+
     }
 
 

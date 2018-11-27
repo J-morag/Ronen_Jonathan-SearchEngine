@@ -99,10 +99,9 @@ public class TempIndexEntry {
         int length = array.length;
         if(index <length){
             array[index] = intToInsert;
-            return;
         }
         else { // index >= array.length
-            int size = index+1;
+            int size = length+10;
             int [] newArray = new int[size];
             int i;
             for (i = 0; i <array.length ; i++) {
@@ -115,9 +114,7 @@ public class TempIndexEntry {
                     newArray[i]=intToInsert;
                 }
             }
-            this.pointerList=null;
             this.pointerList=newArray;
-            return;
         }
     }
 
