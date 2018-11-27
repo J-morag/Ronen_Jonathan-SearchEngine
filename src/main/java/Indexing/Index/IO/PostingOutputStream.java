@@ -4,10 +4,7 @@ import Indexing.Index.Posting;
 import javafx.geometry.Pos;
 import sun.awt.Mutex;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
      */
     public PostingOutputStream(String pathToFile) throws IOException {
         super(pathToFile);
-        postingsFile = new BufferedOutputStream(postingsFile);
+        postingsFile = new BufferedOutputStream(new FileOutputStream(pathToFile));
     }
 
     @Override
@@ -125,10 +122,20 @@ public class PostingOutputStream extends APostingOutputStream implements IPostin
         return (byte)s;
     }
 
+    /**
+     * big endian:  In this order, the bytes of a multibyte value are ordered from most significant to least significant.
+     * @param i
+     * @param bytes
+     * @param startIdx
+     * @throws IndexOutOfBoundsException
+     */
     protected void intToBytes(int i, byte[] bytes, int startIdx) throws IndexOutOfBoundsException{
         bytes[startIdx] = (byte)(i >> 24);
+        startIdx++;
         bytes[startIdx] = (byte)(i >> 16);
+        startIdx++;
         bytes[startIdx] = (byte)(i >> 8);
+        startIdx++;
         bytes[startIdx] = (byte)(i);
     }
 

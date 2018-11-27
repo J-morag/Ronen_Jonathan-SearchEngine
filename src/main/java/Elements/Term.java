@@ -3,7 +3,7 @@ package Elements;
 import java.util.List;
 
 public class Term implements Comparable {
-    String string;
+    final String string;
 //    boolean isInHeader = false;
 //    boolean isInTitle = false;
 //    boolean isInBold = false;

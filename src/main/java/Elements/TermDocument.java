@@ -3,9 +3,9 @@ package Elements;
 import java.util.List;
 
 public class TermDocument {
-    private int serialID;
-    private String docId;
-    private Term city;
+    final private int serialID;
+    final private String docId;
+    final private Term city;
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
@@ -15,7 +15,12 @@ public class TermDocument {
         this.serialID = serialID;
         if (null != doc){
             this.docId = doc.getDocId();
-//            this.language = doc.
+            this.language = doc.getLanguage();
+
+        }
+        else{
+            docId = null;
+            language = null;
         }
     }
 
