@@ -51,7 +51,7 @@ public class MainIndexerTest {
         System.out.println(((double) System.currentTimeMillis()-start)/1000);
 
 
-        indexer.merge();
+        indexer.mergeMainIndex();
 
         Map<String,TempIndexEntry> map = indexer.getMainMap();
 /*

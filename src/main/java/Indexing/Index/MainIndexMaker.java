@@ -185,6 +185,7 @@ public class MainIndexMaker extends AIndexMaker {
 
 
     public Map<String , TempIndexEntry> getTempDictionary(){
+
         return tempDictionary;
     }
 
@@ -200,7 +201,7 @@ public class MainIndexMaker extends AIndexMaker {
 
         BasicPostingOutputStream outputStream = null;
         try {
-            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to postingOutPutStream
+            outputStream = new BasicPostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to other postingOutPutStream
         } catch (IOException e) {
             e.printStackTrace();
         }

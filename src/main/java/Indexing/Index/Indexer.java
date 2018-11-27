@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * takes fully parsed and stemmed documents and indexes them.
  * Calculates tf, tags terms to indicate their importance...
- * will index {@value #partialGroupSize} documents at a time.
+ * will index {@value # partialGroupSize} documents at a time.
  */
 public class Indexer implements Runnable {
 
@@ -40,7 +40,7 @@ public class Indexer implements Runnable {
     /**
      * takes fully parsed and stemmed documents and indexes them.
      * Calculates tf, tags terms to indicate their importance...
-     * will index {@value #partialGroupSize} documents at a time.
+     * will index {@value # partialGroupSize} documents at a time.
      */
     private void index(){
         Boolean done = false;
@@ -56,20 +56,34 @@ public class Indexer implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        stemmedTermDocumentsBuffer=null;
     }
 
     public void run() {
         index();
     }
 
-
+    /**
+     * get the index dictionary from MainIndexMaker
+     * @return - Main index
+     */
     //@TODO change it to getMainDictionary
     public Map<String , TempIndexEntry> getMainMap(){
 
         return ((MainIndexMaker)mainIndex).getTempDictionary();
     }
 
-    public void merge(){
+    /**
+     * get the Document dictionary from MainIndexMaker
+     * @return - Doc dictionary
+     */
+    public Map<Integer , DocIndexEntery> getDocsMap(){
+        return ((MainIndexMaker)mainIndex).getDocsDictionary();
+    }
+
+
+
+    public void mergeMainIndex(){
         ((MainIndexMaker)mainIndex).mergeIndex(getMainMap().keySet());
     }
 
