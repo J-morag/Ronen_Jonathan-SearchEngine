@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.GUI">
    <top>
       <Label text="!GOOGLE" textAlignment="CENTER" BorderPane.alignment="CENTER">
          <font>
@@ -40,11 +40,11 @@
          <children>
             <Label text="Corpus Location" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             <Label text="Stop Words File" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <CheckBox mnemonicParsing="false" text="Use Stemming" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-            <TextField GridPane.columnIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-            <Button mnemonicParsing="false" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <CheckBox fx:id="chkbox_use_stemming" mnemonicParsing="false" selected="true" text="Use Stemming" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <TextField fx:id="txtfld_corpus_location" GridPane.columnIndex="1" />
+            <TextField fx:id="txtfld_stopwords_location" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Button fx:id="btn_corpus_browse" mnemonicParsing="false" onAction="#browseCorpusLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+            <Button fx:id="btn_stopwords_browse" mnemonicParsing="false" onAction="#browseStopwordsLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <children>
                   <Label alignment="CENTER" text="Language" />
@@ -57,22 +57,22 @@
    <bottom>
       <HBox alignment="CENTER" prefHeight="33.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" text="Reset">
+            <Button fx:id="btn_reset" mnemonicParsing="false" onAction="#reset" text="Reset">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Generate Index">
+            <Button fx:id="btn_genereate_index" mnemonicParsing="false" onAction="#generateIndex" text="Generate Index">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Display Dictionary">
+            <Button fx:id="btn_display_dictionary" mnemonicParsing="false" onAction="#displayDictionary" text="Display Dictionary">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Load Dictionary">
+            <Button fx:id="btn_load_dictionary" mnemonicParsing="false" onAction="#loadDictionary" text="Load Dictionary">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>

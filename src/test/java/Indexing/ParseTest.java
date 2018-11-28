@@ -97,7 +97,7 @@ class ParseTest {
     }
 
     @Test
-    void parseConcurrentWithReadFileOneThreadTestTime(){
+    void testTime(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
@@ -128,15 +128,16 @@ class ParseTest {
         }
 
         System.out.println((System.currentTimeMillis() - startTime)/1000);
+        System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 
     }
 
     @Test
-    void parseConcurrentPrintTerms(){
+    void printTerms(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs);
         Parse.debug = false;
-        p.useStemming = false;
+        p.useStemming = true;
         final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 
@@ -452,6 +453,11 @@ class ParseTest {
         System.out.println("----- RESULTS -----");
 //        System.out.println("Elapsed time(ms): " + (time));
         List<Term> terms = td.getText();
+    }
+
+
+    public static double toMB(long bytes){
+        return bytes/(Math.pow(2, 20));
     }
 
 
