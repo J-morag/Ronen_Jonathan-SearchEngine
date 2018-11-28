@@ -23,7 +23,7 @@ public class MainIndexMaker extends AIndexMaker {
     private Map <String, TempIndexEntry> mainDictionary;
     private Map <Integer,DocIndexEntery> docsDictionary;
     private int numOfDocs;
-    private byte tempFileNumber;
+    private short tempFileNumber;
     private String path="";
 
     public MainIndexMaker (String path ){

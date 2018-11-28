@@ -15,9 +15,9 @@ import java.util.concurrent.BlockingQueue;
 
 public class MainIndexerTest {
 
-    private static final int documentBufferSize = 30;
-    private static final int termBufferSize = 30;
-    private static final int stemmedTermBufferSize = 30;
+    private static final int documentBufferSize = 3;
+    private static final int termBufferSize = 3;
+    private static final int stemmedTermBufferSize = 3;
 
     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
     //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
@@ -32,7 +32,6 @@ public class MainIndexerTest {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
-        BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
 
 
 
@@ -59,7 +58,8 @@ public class MainIndexerTest {
 
         indexer.mergeMainIndex();
 
-        System.out.println("Current heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+        System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+        System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 
         Map<String,TempIndexEntry> map = indexer.getMainMap();
         indexer=null;
@@ -108,8 +108,6 @@ public class MainIndexerTest {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
-        BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
-
 
 
         //  Worker Threads:
@@ -123,19 +121,34 @@ public class MainIndexerTest {
 
         long start=System.currentTimeMillis();
 
+        Thread memoryReporter = new Thread(() -> {
+            int seconds = 0;
+            final int interval = 15;
+            while (true){
+                System.out.println("Seconds: " + seconds);
+                seconds += interval;
+                System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+                System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+                try {
+                    Thread.sleep(interval*1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        memoryReporter.start();
 
         tReader.start();
-
         tParser.start();
-
         tIndexer.start();
         tIndexer.join();
-        System.out.println(((double) System.currentTimeMillis()-start)/1000);
-
 
         indexer.mergeMainIndex();
 
-        System.out.println("Current heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+        System.out.println("Total time: " + ((double) System.currentTimeMillis()-start)/1000);
+
+//        System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
+//        System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 //
 //        Map<String,TempIndexEntry> map = indexer.getMainMap();
 ///*

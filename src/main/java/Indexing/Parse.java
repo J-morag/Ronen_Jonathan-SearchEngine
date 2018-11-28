@@ -27,6 +27,8 @@ public class Parse implements Runnable{
     private TokenType currType;
     private boolean bIteratorHasNext = true;
 
+    private Map<String, Term> uniqueTerms;
+
     private static AtomicInteger docSerialId = new AtomicInteger(0);
 
     //          Administrative
@@ -55,6 +57,8 @@ public class Parse implements Runnable{
         months.put("OCTOBER", "10");months.put("October", "10");
         months.put("NOVEMBER", "11");months.put("November", "11");
         months.put("DECEMBER", "12");months.put("December", "12");
+
+        uniqueTerms = new HashMap<>();
     }
 
     /**
@@ -628,12 +632,11 @@ public class Parse implements Runnable{
                     safeIterateAndCheckType(iterator);
                 }
                 else{ // just some word
-                    result.append(currString);
-                    safeIterateAndCheckType(iterator);
+                    result.append(word);
                 }
             }
             else{ // just some word
-                result.append(currString);
+                result.append(word);
                 safeIterateAndCheckType(iterator);
             }
         }
@@ -810,9 +813,21 @@ public class Parse implements Runnable{
             stemmer.add(term.toCharArray(), term.length());
             stemmer.stem();
             term = stemmer.toString();
-            if(!stopWords.contains(term.toLowerCase())) lTerms.add(new Term(term));
+            if(!stopWords.contains(term.toLowerCase())) lTerms.add(filterThroughHashMap(term));
         }
-        else if (!stopWords.contains(term.toLowerCase())) lTerms.add(new Term(term));
+        else if (!stopWords.contains(term.toLowerCase())) lTerms.add(filterThroughHashMap(term));
+    }
+
+    private Term filterThroughHashMap(String term){
+        return new Term((term));
+//        if(uniqueTerms.containsKey(term)){
+//            return uniqueTerms.get(term);
+//        }
+//        else{
+//            Term newTerm = new Term(term);
+//            uniqueTerms.put(term, newTerm);
+//            return newTerm;
+//        }
     }
 
     /**
