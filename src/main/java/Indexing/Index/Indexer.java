@@ -7,6 +7,7 @@ import Elements.TermDocument;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -67,8 +68,13 @@ public class Indexer implements Runnable {
      * get the index dictionary from MainIndexMaker
      * @return - GUI.Main index
      */
-    //@TODO change it to getMainDictionary
-    public Map<String , TempIndexEntry> getMainMap(){
+    public Map<String , IndexEntry> getMainMap(){
+
+        return ((MainIndexMaker)mainIndex).getMainDictionary();
+    }
+
+
+    public Map<String , TempIndexEntry> getTempMap(){
 
         return ((MainIndexMaker)mainIndex).getTempDictionary();
     }
@@ -77,14 +83,17 @@ public class Indexer implements Runnable {
      * get the Document dictionary from MainIndexMaker
      * @return - Doc dictionary
      */
-    public Map<Integer , DocIndexEntery> getDocsMap(){
+    public Map<Integer , DocIndexEntery> getDocsMap()
+    {
         return ((MainIndexMaker)mainIndex).getDocsDictionary();
     }
 
 
 
     public void mergeMainIndex(){
-        ((MainIndexMaker)mainIndex).mergeIndex(getMainMap().keySet());
+            ((MainIndexMaker) mainIndex).mergeIndex();
+
     }
+
 
 }

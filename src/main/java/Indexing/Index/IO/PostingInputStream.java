@@ -106,4 +106,12 @@ public class PostingInputStream implements IPostingInputStream {
     private int byteLengthOfSinglePosting(){
         return Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 +  1 /*holds 8 bools*/  ;
     }
+
+    public void close(){
+        try {
+            postingsFile.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -20,7 +20,7 @@ public class MainIndexMaker extends AIndexMaker {
 
 
     private Map<String, TempIndexEntry> tempDictionary;
-    private Map <String, TempIndexEntry> mainDictionary;
+    private Map <String, IndexEntry> mainDictionary;
     private Map <Integer,DocIndexEntery> docsDictionary;
     private int numOfDocs;
     private short tempFileNumber;
@@ -178,6 +178,10 @@ public class MainIndexMaker extends AIndexMaker {
         return tempDictionary;
     }
 
+    public Map<String , IndexEntry> getMainDictionary(){
+        return mainDictionary;
+    }
+
 
     public Map<Integer , DocIndexEntery> getDocsDictionary(){
         return docsDictionary;
@@ -213,13 +217,174 @@ public class MainIndexMaker extends AIndexMaker {
 
 
    //@TODO
-    public void mergeIndex(Set<String> uniqueWords){
+    public void mergeIndex()
+    {
+        Set<String> uniqueWords = tempDictionary.keySet();
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
         Arrays.parallelSort(allTerms);
+        //TESTING
+        System.out.println("num Of Terms before merge: "+ allTerms.length+"\n");
+        //\TESTING
 
+
+        try {
+            IPostingOutputStream postingOutputStream=new BasicPostingOutputStream(path+"\\Postings.txt");
+            for (String term: allTerms ) {
+                if(!tempDictionary.containsKey(term)){
+                    continue;
+                }
+                List<Posting> postingToWrite = new ArrayList<>();
+               String finalTerm = addTermToDictionary(term , postingToWrite);
+                int pointer =(int)postingOutputStream.write(postingToWrite);
+                mainDictionary.get(finalTerm).setPostingPointer(pointer);
+
+            }
+            postingOutputStream.flush();
+            postingOutputStream.close();
+
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        //TESTING
+        System.out.println("num Of Terms after merge: "+ mainDictionary.keySet().size()+"\n");
+        //\TESTING
+        tempDictionary=null;
+
+
+
+       try {
+
+           File file = new File(path);
+           for (File fi : file.listFiles()) {
+//               if (!(fi.getName().equals("Posting.txt"))) {
+//                   fi.delete();
+//               }
+               System.out.println(fi.getName()+'\n');
+           }
+       }catch (NullPointerException e){
+           e.printStackTrace();
+
+       }
 
     }
 
+
+    private String addTermToDictionary(String term , List<Posting> finalPosting) {
+        String termToWrite=term;
+
+        try {
+
+            int totalTF = tempDictionary.get(term).getTfTotal();
+            char c = term.charAt(0);
+            List<Posting> postingList = getTermPostings(term);
+            if (c >= 'a' && c <= 'z') { //if first letter is lower case
+                termToWrite = term;
+                char[] termArray = term.toCharArray();
+                termArray[0] = (char) (c - 32);
+                String newTerm = termArray.toString();
+                finalPosting.addAll(postingList);
+
+                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
+                    List<Posting> newTermPostings = getTermPostings(newTerm);
+                    totalTF += tempDictionary.get(newTerm).getTfTotal();
+                    finalPosting.addAll(mergePostings(postingList, newTermPostings));
+                    tempDictionary.remove(newTerm);
+                }
+
+
+            } else if (c >= 'A' && c <= 'Z') { // if firs letter is a upper case
+                char[] termArray = term.toCharArray();
+                termArray[0] = (char) (c + 32);
+                String newTerm = termArray.toString();
+                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
+                    List<Posting> newTermPostings = getTermPostings(newTerm);
+                    finalPosting.addAll(mergePostings(postingList, newTermPostings));
+                    tempDictionary.remove(newTerm);
+                    termToWrite = term.toLowerCase();
+                } else {
+                    termToWrite = term.toUpperCase();
+                    finalPosting.addAll(postingList);
+                }
+            } else {
+                termToWrite = term;
+                finalPosting.addAll(postingList);
+            }
+
+            tempDictionary.remove(term);
+            IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
+            mainDictionary.put(termToWrite, indexEntry);
+
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return termToWrite;
+    }
+
+
+    private List<Posting>getTermPostings(String term)
+    {
+        List<Posting> postingList = new ArrayList<>();
+        int[] pointers = tempDictionary.get(term).getPointerList();
+        int length = pointers.length;
+        for (int i = 0; i < length; i++) {
+            if (pointers[i] != -1) {
+                IPostingInputStream inputStream = null;
+                try {
+                    inputStream = new PostingInputStream(path + "\\temp" + i + ".txt");
+                    List<Posting> tempPostings = inputStream.readTermPostings((long)pointers[i]);
+                    ((PostingInputStream) inputStream).close();
+
+                    postingList.addAll(tempPostings);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return postingList;
+    }
+
+    private List<Posting> mergePostings(List<Posting>postingList , List<Posting>newTermPostings )
+    {
+
+        int maxTF;
+        List<Posting> finalList = new ArrayList<>();
+        Map<Integer,Posting> newTermPostingMap = new HashMap<>();
+
+        for (Posting post : newTermPostings) {
+            newTermPostingMap.put(post.getDocSerialID(),post);
+        }
+
+
+
+        for (Posting posting: postingList) {
+            int docID=posting.getDocSerialID();
+            int tf = posting.getTf();
+
+            if(!newTermPostingMap.containsKey(docID)){
+                finalList.add(posting);
+            }
+            else { // if there is the same doc in two different lists of the same term
+                Posting samePosting = newTermPostingMap.get(docID);
+                tf+=samePosting.getTf();
+                Posting newPosting = new Posting(posting.getDocSerialID() ,(short)tf ,posting.isInTitle()||samePosting.isInTitle() ,posting.isInBeginning() || samePosting.isInBeginning());
+                finalList.add(newPosting);
+
+                DocIndexEntery docIndexEntery = docsDictionary.get(docID);
+                maxTF = docIndexEntery.getMaxTF();
+                if(tf>maxTF){
+                    docIndexEntery.setMaxTF(tf);
+                }
+                docIndexEntery.setNumOfUniqueWords(docIndexEntery.getNumOfUniqueWords()-1);
+            }
+        }
+        return finalList;
+
+
+    }
 
 
 

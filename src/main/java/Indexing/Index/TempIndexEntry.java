@@ -19,6 +19,7 @@ public class TempIndexEntry {
         df=0;
         posting=new ArrayList<>();
         pointerList = new int[1]; // initial size
+        pointerList[0]=-1;
     }
 
     public int getDf(){
@@ -84,6 +85,7 @@ public class TempIndexEntry {
     public int getPostingSize(){
         return posting.size();
     }
+    public int getTfTotal(){return tfTotal;}
 
     /**
      * simulates a dynamic array of int that only grows.

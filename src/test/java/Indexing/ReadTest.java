@@ -339,10 +339,10 @@ void toUpperCaseTest()
     {
 
 
-        List<Integer> a = new ArrayList<>();
-
-        a.add(0,new Integer(4));
-        System.out.println(a);
+       String a = "Abcd";
+       char [] b = a.toCharArray();
+       b[0]=(char)(a.charAt(0)+32);
+        System.out.println(b);
 
 
     }
