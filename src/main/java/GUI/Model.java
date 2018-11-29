@@ -21,7 +21,6 @@ public class Model {
     // GLOBAL PARAMETERS
     private static final int documentBufferSize = 3;
     private static final int termBufferSize = 3;
-    private static final int stemmedTermBufferSize = 3;
 
     private Controller controller;
     private Map<String, IndexEntry> mainDictionaryWithStemming;
