@@ -2,8 +2,6 @@ package GUI;
 
 import Elements.Document;
 import Elements.TermDocument;
-import GUI.Controller;
-import GUI.Model;
 import Indexing.Index.Indexer;
 import Indexing.Parse;
 import Indexing.ReadFile;
@@ -11,10 +9,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -36,11 +32,11 @@ public class Main extends Application {
 
         primaryStage.setTitle("!GOOGLE");
         FXMLLoader fxmlLoader = new FXMLLoader();
-        Parent root = fxmlLoader.load(getClass().getResource("GUI.fxml").openStream());
+        Parent root = fxmlLoader.load(getClass().getResource("View.fxml").openStream());
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
 
-        GUI view = fxmlLoader.getController();
+        View view = fxmlLoader.getController();
         Controller controller = new Controller(model, view);
 
         model.setController(controller);

@@ -1,39 +1,46 @@
 package GUI;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-public class GUI {
+public class View {
 
     private Controller controller;
 
     public TextField txtfld_corpus_location;
     public TextField txtfld_stopwords_location;
+    public TextField txtfld_output_location;
 
     public Button btn_corpus_browse;
     public Button btn_stopwords_browse;
+    public Button btn_output_browse;
+    public Button btn_reset;
+    public Button btn_load_dictionary;
+    public Button btn_display_dictionary;
 
     public CheckBox chkbox_use_stemming;
+
+    public CharSequence getOutputLocation(){
+        return txtfld_output_location.getCharacters();
+    }
+
+    public CharSequence getCorpusLocation() {
+        return txtfld_corpus_location.getCharacters();
+    }
+
+    public boolean isUseStemming() {
+        return chkbox_use_stemming.isSelected();
+    }
 
     public void browseCorpusLocation(ActionEvent actionEvent) {
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -45,9 +52,19 @@ public class GUI {
         }
     }
 
+    public void browseOutputLocation(ActionEvent actionEvent) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Output Location");
+        directoryChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        File corpusDir = directoryChooser.showDialog( btn_output_browse.getScene().getWindow());
+        if(null != corpusDir){ //directory chosen
+            txtfld_output_location.textProperty().setValue(corpusDir.getAbsolutePath());
+        }
+    }
+
     public void browseStopwordsLocation(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Stopwords File Location");
+        fileChooser.setTitle("Output Location");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         File corpusDir = fileChooser.showOpenDialog( btn_stopwords_browse.getScene().getWindow());
         if(null != corpusDir){ //directory chosen
@@ -60,12 +77,18 @@ public class GUI {
     }
 
     public void generateIndex(ActionEvent actionEvent) {
-        controller.generateIndex();
+        Alert alert = controller.generateIndex();
+        if(alert.getAlertType() == Alert.AlertType.ERROR){
+            alert.showAndWait();
+        }
+        else{
+            alert.show();
+            btn_reset.setDisable(false);
+            btn_display_dictionary.setDisable(false);
+        }
     }
 
     public void displayDictionary(ActionEvent actionEvent) {
-
-
         Stage stage = new Stage();
         stage.setTitle("Dictionary");
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -84,6 +107,9 @@ public class GUI {
         stage.show();
     }
 
+    public CharSequence getStopwordsLocation() {
+        return txtfld_stopwords_location.getCharacters();
+    }
 
 
     static class ObservableTuple{
@@ -94,21 +120,12 @@ public class GUI {
             this.term = term;
             this.temInformation = temInformation;
         }
-
-//        public List<String> getFields(){
-//            ArrayList<String> fields = new ArrayList<String>();
-//            fields.add(id);
-//            fields.add(username.getValue());
-//            fields.add(password);
-//            fields.add(birthDate.getValue());
-//            fields.add(firstName.getValue());
-//            fields.add(lastName.getValue());
-//            fields.add(city.getValue());
-//            return fields;
-//        }
     }
 
     public void loadDictionary(ActionEvent actionEvent) {
+        controller.loadDictionary();
+        btn_reset.setDisable(false);
+        btn_display_dictionary.setDisable(false);
     }
 
     public void setController(Controller controller) {

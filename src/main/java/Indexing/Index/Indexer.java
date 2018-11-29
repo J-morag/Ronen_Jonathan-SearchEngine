@@ -65,7 +65,7 @@ public class Indexer implements Runnable {
 
     /**
      * get the index dictionary from MainIndexMaker
-     * @return - GUI.Main index
+     * @return - View.Main index
      */
     //@TODO change it to getMainDictionary
     public Map<String , TempIndexEntry> getMainMap(){

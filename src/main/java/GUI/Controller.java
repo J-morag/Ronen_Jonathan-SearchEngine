@@ -2,45 +2,65 @@ package GUI;
 
 import Indexing.Index.IndexEntry;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.util.Pair;
+import javafx.scene.control.Alert;
 
 import java.util.*;
 
 public class Controller {
 
     Model model;
+    View view;
 
-    public Controller(Model model, GUI view) {
+    public Controller(Model model, View view) {
         this.model = model;
+        this.view = view;
     }
 
     public void reset() {
+        model.reset(view.getOutputLocation().toString());
     }
 
-    public void generateIndex() {
+    public Alert generateIndex() {
+        String corpusLocation = view.getCorpusLocation().toString();
+        String stopwordsLocation = view.getStopwordsLocation().toString();
+        String outputLocation = view.getOutputLocation().toString();
+        if(corpusLocation.isEmpty() ) return new Alert(Alert.AlertType.ERROR, "Please specify corpus location.");
+        else if (stopwordsLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify stopwords file location.");
+        else if (outputLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify output location.");
+        else{
+            String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+            return new Alert(Alert.AlertType.INFORMATION, information);
+        }
     }
 
-    public List<GUI.ObservableTuple> getDictionary() {
-        Map<String, IndexEntry> dictionary = model.getDictionary();
-        List<GUI.ObservableTuple> res = new LinkedList<>();
-        Object[] keysAsObject = (dictionary.keySet().toArray());
-        String[] keys = new String[keysAsObject.length];
-        for (int i = 0; i < keysAsObject.length ; i++) {
-            keys[i] = (String) keysAsObject[i];
+    public List<View.ObservableTuple> getDictionary() {
+        Map<String, IndexEntry> dictionary = model.getDictionary(view.isUseStemming());
+        List<View.ObservableTuple> res = new LinkedList<>();
+        if(null == dictionary){
+           return res;
         }
-        Arrays.sort(keys);
+        else{
+            Object[] keysAsObject = (dictionary.keySet().toArray());
+            String[] keys = new String[keysAsObject.length];
+            for (int i = 0; i < keysAsObject.length ; i++) {
+                keys[i] = (String) keysAsObject[i];
+            }
 
-        Object[] values = dictionary.values().toArray();
-        String[] valuesAsStrings = new String[values.length];
-        for (int i = 0; i < values.length ; i++) {
-            valuesAsStrings[i] = values[i].toString();
+            Object[] values = dictionary.values().toArray();
+            String[] valuesAsStrings = new String[values.length];
+            for (int i = 0; i < values.length ; i++) {
+                valuesAsStrings[i] = values[i].toString();
+            }
+
+            for (int i = 0; i < keys.length ; i++) {
+                res.add(new View.ObservableTuple(new SimpleStringProperty(keys[i]), new SimpleStringProperty(valuesAsStrings[i])));
+            }
+
+            return res;
         }
-        Arrays.sort(valuesAsStrings);
+    }
 
-        for (int i = 0; i < keys.length ; i++) {
-            res.add(new GUI.ObservableTuple(new SimpleStringProperty(keys[i]), new SimpleStringProperty(valuesAsStrings[i])));
-        }
-
-        return res;
+    public void loadDictionary() {
+        model.loadDictionary(view.isUseStemming(), view.getOutputLocation().toString());
     }
 }

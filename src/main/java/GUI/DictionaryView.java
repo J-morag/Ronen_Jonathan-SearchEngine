@@ -11,11 +11,11 @@ public class DictionaryView {
 
     // DICTIONARY_VIEW
     @FXML
-    public TableColumn<GUI.ObservableTuple, String> clmn_terms;
+    public TableColumn<View.ObservableTuple, String> clmn_terms;
     @FXML
-    public TableColumn<GUI.ObservableTuple, String> clmn_term_information;
+    public TableColumn<View.ObservableTuple, String> clmn_term_information;
     @FXML
-    public TableView<GUI.ObservableTuple> tbl_dictionary;
+    public TableView<View.ObservableTuple> tbl_dictionary;
 
 
     @FXML
@@ -25,8 +25,10 @@ public class DictionaryView {
 
     }
 
-    public void setTableData(List<GUI.ObservableTuple> dictionaryAsObservableTuples){
+    public void setTableData(List<View.ObservableTuple> dictionaryAsObservableTuples){
+        clmn_terms.setSortType(TableColumn.SortType.ASCENDING);
         tbl_dictionary.setItems(FXCollections.observableArrayList(dictionaryAsObservableTuples));
+        tbl_dictionary.getSortOrder().add(clmn_terms);
         //      stage.initModality(Modality.APPLICATION_MODAL); //Lock the window until it closes
     }
 
