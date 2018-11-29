@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * takes Documents, tokenizes and parses them. does not perform stemming.
@@ -818,12 +816,12 @@ public class Parse implements Runnable{
             stemmer.add(term.toCharArray(), term.length());
             stemmer.stem();
             term = stemmer.toString();
-            if(!stopWords.contains(term.toLowerCase())) lTerms.add(filterThroughHashMap(term));
+            if((isLetter(term.charAt(0)) || isNumeral(term.charAt(0))) && !stopWords.contains(term.toLowerCase())) lTerms.add(filterTerms(term));
         }
-        else if (!stopWords.contains(term.toLowerCase())) lTerms.add(filterThroughHashMap(term));
+        else if ((isLetter(term.charAt(0)) || isNumeral(term.charAt(0))) && !stopWords.contains(term.toLowerCase())) lTerms.add(filterTerms(term));
     }
 
-    private Term filterThroughHashMap(String term){
+    private Term filterTerms(String term){
         return new Term((term));
 //        if(uniqueTerms.containsKey(term)){
 //            return uniqueTerms.get(term);
