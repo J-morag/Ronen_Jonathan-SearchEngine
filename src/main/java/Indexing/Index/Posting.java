@@ -44,6 +44,10 @@ public class Posting {
         return isInBeginning;
     }
 
+    public int getDocSerialID() {
+        return docSerialID;
+    }
+
     public short[] getShortFields(){
         return new short[]{this.tf};
     }

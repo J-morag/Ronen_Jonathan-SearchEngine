@@ -20,7 +20,7 @@ public class MainIndexMaker extends AIndexMaker {
 
 
     private Map<String, TempIndexEntry> tempDictionary;
-    private Map <String, TempIndexEntry> mainDictionary;
+    private Map <String, IndexEntry> mainDictionary;
     private Map <Integer,DocIndexEntery> docsDictionary;
     private int numOfDocs;
     private short tempFileNumber;
@@ -43,10 +43,9 @@ public class MainIndexMaker extends AIndexMaker {
 
             Set<String> uniqueWords=new HashSet<>();// set of all unique words in a doc
             Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
-            Map<String , Byte> special = new HashMap<String, Byte>(); // map that indicates if a term is in the tile to in a beginning of the text or none
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
-            int maxTf = getMaxTf(uniqueWords,tfMap,special,title,text);
+            int maxTf = getMaxTf(uniqueWords,tfMap,title,text);
             int numOfUniqueWords = uniqueWords.size();
             String docId = doc.getDocId();
             String city ="";
@@ -68,19 +67,27 @@ public class MainIndexMaker extends AIndexMaker {
             for(String term : uniqueWords){
                 short tf =  tfMap.get(term).shortValue();
                 Posting posting = new Posting(doc.getSerialID(), tf);
-                if(special.get(term)==0){
-                    posting.setInTitle(false);
-                    posting.setInBeginning(false);
-                }else if(special.get(term)==1){
-                    posting.setInTitle(true);
-                    posting.setInBeginning(false);
-                }else if(special.get(term)==2){
-                    posting.setInTitle(false);
-                    posting.setInBeginning(true);
-                }else {
-                    posting.setInTitle(true);
-                    posting.setInBeginning(true);
+
+                int beginning=0;
+                try {
+                    beginning = (int)(text.size()*0.1);
+                }catch (NullPointerException e ){
+                    System.out.println(numOfDocs);
+                    exit();
+
                 }
+
+                if (title.contains(term)){
+                    posting.setInTitle(true);
+                }
+
+                boolean isInBeginning=false;
+                for (int i = 0; i <beginning && !isInBeginning ; i++) {
+                    if(term.equals(text.get(i)))
+                        isInBeginning=true;
+                }
+
+                posting.setInBeginning(isInBeginning);
 
                 if(!tempDictionary.containsKey(term)) {
                     TempIndexEntry tmp = new TempIndexEntry();
@@ -100,7 +107,6 @@ public class MainIndexMaker extends AIndexMaker {
                 dumpToDisk();
             }
             tfMap=null;
-            special = null;
         }else {
             dumpToDisk();
         }
@@ -116,11 +122,9 @@ public class MainIndexMaker extends AIndexMaker {
      * and fiinaly check if a term is in the title or in the first 20% of a document and update the spacial map
      * @param uniqueWords - an empty Set that will contain every unique term in the doc
      * @param tfMap - an empty Hash map that counts , for each Term it's tf in the doc
-     * @param special - an empty Hash map that indicate if a term is in the title or in the first 10% of the document
-     *                if the value is
      * @return the maxTF of a term in the Document
      */
-    private int getMaxTf( Set<String> uniqueWords , Map<String,Integer> tfMap , Map<String,Byte> special, List<Term> title , List<Term> text){
+    private int getMaxTf( Set<String> uniqueWords , Map<String,Integer> tfMap, List<Term> title , List<Term> text){
         int maxTf=0;
         int beginning=0;
         try {
@@ -145,10 +149,6 @@ public class MainIndexMaker extends AIndexMaker {
             if(value > maxTf){
                 maxTf = value;
             }
-            if(!special.containsKey(t)){
-                special.put(t,new Byte((byte)1));
-            }
-
 
         }
         int count =0;
@@ -166,16 +166,6 @@ public class MainIndexMaker extends AIndexMaker {
             if(value > maxTf){
                 maxTf = value;
             }
-            if((count<=beginning) && (!special.containsKey(t))){
-                special.put(t , new Byte((byte)2));
-            }
-            else if(count<= beginning && special.containsKey(t)){
-                if(special.get(t) == 1){
-                    special.put(t, new Byte((byte)3));
-                }
-            } else if(count>beginning && !special.containsKey(t)){
-                special.put(t,new Byte((byte)0));
-            }
             count++;
         }
         return maxTf;
@@ -186,6 +176,10 @@ public class MainIndexMaker extends AIndexMaker {
     public Map<String , TempIndexEntry> getTempDictionary(){
 
         return tempDictionary;
+    }
+
+    public Map<String , IndexEntry> getMainDictionary(){
+        return mainDictionary;
     }
 
 
@@ -223,13 +217,174 @@ public class MainIndexMaker extends AIndexMaker {
 
 
    //@TODO
-    public void mergeIndex(Set<String> uniqueWords){
+    public void mergeIndex()
+    {
+        Set<String> uniqueWords = tempDictionary.keySet();
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
-
         Arrays.parallelSort(allTerms);
+        //TESTING
+        System.out.println("num Of Terms before merge: "+ allTerms.length+"\n");
+        //\TESTING
+
+
+        try {
+            IPostingOutputStream postingOutputStream=new BasicPostingOutputStream(path+"\\Postings.txt");
+            for (String term: allTerms ) {
+                if(!tempDictionary.containsKey(term)){
+                    continue;
+                }
+                List<Posting> postingToWrite = new ArrayList<>();
+               String finalTerm = addTermToDictionary(term , postingToWrite);
+                int pointer =(int)postingOutputStream.write(postingToWrite);
+                mainDictionary.get(finalTerm).setPostingPointer(pointer);
+
+            }
+            postingOutputStream.flush();
+            postingOutputStream.close();
+
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        //TESTING
+        System.out.println("num Of Terms after merge: "+ mainDictionary.keySet().size()+"\n");
+        //\TESTING
+        tempDictionary=null;
+
+
+
+       try {
+
+           File file = new File(path);
+           for (File fi : file.listFiles()) {
+//               if (!(fi.getName().equals("Posting.txt"))) {
+//                   fi.delete();
+//               }
+               System.out.println(fi.getName()+'\n');
+           }
+       }catch (NullPointerException e){
+           e.printStackTrace();
+
+       }
 
     }
 
+
+    private String addTermToDictionary(String term , List<Posting> finalPosting) {
+        String termToWrite=term;
+
+        try {
+
+            int totalTF = tempDictionary.get(term).getTfTotal();
+            char c = term.charAt(0);
+            List<Posting> postingList = getTermPostings(term);
+            if (c >= 'a' && c <= 'z') { //if first letter is lower case
+                termToWrite = term;
+                char[] termArray = term.toCharArray();
+                termArray[0] = (char) (c - 32);
+                String newTerm = termArray.toString();
+                finalPosting.addAll(postingList);
+
+                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
+                    List<Posting> newTermPostings = getTermPostings(newTerm);
+                    totalTF += tempDictionary.get(newTerm).getTfTotal();
+                    finalPosting.addAll(mergePostings(postingList, newTermPostings));
+                    tempDictionary.remove(newTerm);
+                }
+
+
+            } else if (c >= 'A' && c <= 'Z') { // if firs letter is a upper case
+                char[] termArray = term.toCharArray();
+                termArray[0] = (char) (c + 32);
+                String newTerm = termArray.toString();
+                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
+                    List<Posting> newTermPostings = getTermPostings(newTerm);
+                    finalPosting.addAll(mergePostings(postingList, newTermPostings));
+                    tempDictionary.remove(newTerm);
+                    termToWrite = term.toLowerCase();
+                } else {
+                    termToWrite = term.toUpperCase();
+                    finalPosting.addAll(postingList);
+                }
+            } else {
+                termToWrite = term;
+                finalPosting.addAll(postingList);
+            }
+
+            tempDictionary.remove(term);
+            IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
+            mainDictionary.put(termToWrite, indexEntry);
+
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return termToWrite;
+    }
+
+
+    private List<Posting>getTermPostings(String term)
+    {
+        List<Posting> postingList = new ArrayList<>();
+        int[] pointers = tempDictionary.get(term).getPointerList();
+        int length = pointers.length;
+        for (int i = 0; i < length; i++) {
+            if (pointers[i] != -1) {
+                IPostingInputStream inputStream = null;
+                try {
+                    inputStream = new PostingInputStream(path + "\\temp" + i + ".txt");
+                    List<Posting> tempPostings = inputStream.readTermPostings((long)pointers[i]);
+                    ((PostingInputStream) inputStream).close();
+
+                    postingList.addAll(tempPostings);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return postingList;
+    }
+
+    private List<Posting> mergePostings(List<Posting>postingList , List<Posting>newTermPostings )
+    {
+
+        int maxTF;
+        List<Posting> finalList = new ArrayList<>();
+        Map<Integer,Posting> newTermPostingMap = new HashMap<>();
+
+        for (Posting post : newTermPostings) {
+            newTermPostingMap.put(post.getDocSerialID(),post);
+        }
+
+
+
+        for (Posting posting: postingList) {
+            int docID=posting.getDocSerialID();
+            int tf = posting.getTf();
+
+            if(!newTermPostingMap.containsKey(docID)){
+                finalList.add(posting);
+            }
+            else { // if there is the same doc in two different lists of the same term
+                Posting samePosting = newTermPostingMap.get(docID);
+                tf+=samePosting.getTf();
+                Posting newPosting = new Posting(posting.getDocSerialID() ,(short)tf ,posting.isInTitle()||samePosting.isInTitle() ,posting.isInBeginning() || samePosting.isInBeginning());
+                finalList.add(newPosting);
+
+                DocIndexEntery docIndexEntery = docsDictionary.get(docID);
+                maxTF = docIndexEntery.getMaxTF();
+                if(tf>maxTF){
+                    docIndexEntery.setMaxTF(tf);
+                }
+                docIndexEntery.setNumOfUniqueWords(docIndexEntery.getNumOfUniqueWords()-1);
+            }
+        }
+        return finalList;
+
+
+    }
 
 
 

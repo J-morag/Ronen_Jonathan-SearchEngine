@@ -1,9 +1,9 @@
 package Indexing.Index;
 
 public class IndexEntry {
-    public final int totalTF;
-    public final int df;
-    public final int postingPointer;
+    private int totalTF;
+    private int df = 0;
+    private int postingPointer;
 
 
     public IndexEntry(int postingPointer , int df ,int totalTF) {
@@ -12,10 +12,40 @@ public class IndexEntry {
         this.totalTF = totalTF;
     }
 
+    public IndexEntry(int totalTF , int df ) {
+        this.totalTF = totalTF;
+        this.df = df;
+        this.postingPointer=postingPointer;
+    }
+
+    public void setTotalTF(int totalTF) {
+        this.totalTF = totalTF;
+    }
+
 
     @Override
     public String toString() {
         return "totalTF=" + totalTF +
-                ", df=" + df ;
+                ", df=" + df;
+    }
+
+    public void setDf(int df) {
+        this.df = df;
+    }
+
+    public void setPostingPointer(int postingPointers) {
+        this.postingPointer = postingPointers;
+    }
+
+    public int getTotalTF() {
+        return totalTF;
+    }
+
+    public int getDf() {
+        return df;
+    }
+
+    public int getPostingPointer() {
+        return postingPointer;
     }
 }

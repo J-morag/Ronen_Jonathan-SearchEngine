@@ -19,8 +19,9 @@ public class MainIndexerTest {
     private static final int termBufferSize = 3;
     private static final int stemmedTermBufferSize = 3;
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
-    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    // private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    private static final String pathToStopWordRONEN ="C:\\Users\\ronen\\Desktop\\stopWords.txt";
 
     private static final String pathToDocumentsFolderAtJM = "C:/Users/John/Downloads/infoRetrieval/corpus";
     private static final String patToStopwordsFileAtJM = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
@@ -38,7 +39,7 @@ public class MainIndexerTest {
 
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
 
-        HashSet<String> stopwords = Parse.getStopWords("");
+        HashSet<String> stopwords = Parse.getStopWords(pathToStopWordRONEN);
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, true));
         Indexer indexer =new Indexer("C:\\Users\\ronen\\Desktop\\test",termDocumentsBuffer,true);
         Thread tIndexer = new Thread(indexer);
@@ -53,22 +54,49 @@ public class MainIndexerTest {
         tIndexer.start();
         tIndexer.join();
         System.out.println(((double) System.currentTimeMillis()-start)/1000);
+        Map<String,TempIndexEntry> tempMap = indexer.getTempMap();
 
+        String path = "C:\\Users\\ronen\\Desktop\\test.txt";
+
+        try {
+            File file = new File(path);
+            OutputStream fo = new FileOutputStream(file);
+
+
+            for (String term : tempMap.keySet()) {
+                //(term+"->"+map.get(term).getPosting()+"\n");
+                int [] pointer=tempMap.get(term).getPointerList();
+                fo.write((term+"->[").getBytes());
+                for (int i = 0; i <pointer.length ; i++) {
+                    fo.write((pointer[i]+",").getBytes());
+                }
+                fo.write(("]\n").getBytes());
+
+
+                //fo.write((term+"->"+map.get(term).getPointerList()[0]+"\n").getBytes());//term+"->"+map.get(term).getPosting()+"\n").getBytes());
+                //System.out.println(map.get(term).getPointerList()+"\n");
+            }
+            fo.flush();
+            fo.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         indexer.mergeMainIndex();
 
         System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
         System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 
-        Map<String,TempIndexEntry> map = indexer.getMainMap();
-/*
-        for (Term term : map.keySet())
-        {
-            System.out.println(map.get(term).getPointerList()+"\n");
-        }
-   */
+        Map<String,IndexEntry> map = indexer.getMainMap();
+        indexer=null;
 
-        String path = "C:\\Users\\ronen\\Desktop\\a.txt";
+
+
+
+         path = "C:\\Users\\ronen\\Desktop\\a.txt";
 
         try {
             File file = new File(path);
@@ -77,15 +105,8 @@ public class MainIndexerTest {
 
         for (String term : map.keySet()) {
              //(term+"->"+map.get(term).getPosting()+"\n");
-            int [] pointer=map.get(term).getPointerList();
-            fo.write((term+"->[").getBytes());
-            for (int i = 0; i <pointer.length ; i++) {
-                if(i+1<pointer.length)
-                    fo.write((pointer[i]+",").getBytes());
-                else
-                    fo.write((pointer[i]+"").getBytes());
-            }
-            fo.write(("]\n").getBytes());
+            int  pointer=map.get(term).getPostingPointer();
+            fo.write((term+"->["+pointer+"]\n").getBytes());
             //fo.write((term+"->"+map.get(term).getPointerList()[0]+"\n").getBytes());//term+"->"+map.get(term).getPosting()+"\n").getBytes());
             //System.out.println(map.get(term).getPointerList()+"\n");
         }
@@ -97,6 +118,10 @@ public class MainIndexerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
+
 
 
     }
