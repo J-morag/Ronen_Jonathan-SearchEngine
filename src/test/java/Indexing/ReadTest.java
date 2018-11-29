@@ -342,7 +342,7 @@ void toUpperCaseTest()
        String a = "Abcd";
        char [] b = a.toCharArray();
        b[0]=(char)(a.charAt(0)+32);
-        System.out.println(b);
+        System.out.println(new String(b));
 
 
     }

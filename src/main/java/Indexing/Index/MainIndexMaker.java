@@ -77,13 +77,13 @@ public class MainIndexMaker extends AIndexMaker {
 
                 }
 
-                if (title.contains(term)){
+                if (title.contains(new Term(term))){
                     posting.setInTitle(true);
                 }
 
                 boolean isInBeginning=false;
                 for (int i = 0; i <beginning && !isInBeginning ; i++) {
-                    if(term.equals(text.get(i)))
+                    if(term.equals(text.get(i).toString()))
                         isInBeginning=true;
                 }
 
@@ -221,14 +221,14 @@ public class MainIndexMaker extends AIndexMaker {
     {
         Set<String> uniqueWords = tempDictionary.keySet();
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
-        Arrays.parallelSort(allTerms);
+       // Arrays.parallelSort(allTerms);
         //TESTING
         System.out.println("num Of Terms before merge: "+ allTerms.length+"\n");
         //\TESTING
 
 
         try {
-            IPostingOutputStream postingOutputStream=new BasicPostingOutputStream(path+"\\Postings.txt");
+            IPostingOutputStream postingOutputStream=new PostingOutputStream(path+"\\Postings");
             for (String term: allTerms ) {
                 if(!tempDictionary.containsKey(term)){
                     continue;
@@ -258,15 +258,15 @@ public class MainIndexMaker extends AIndexMaker {
 
            File file = new File(path);
            for (File fi : file.listFiles()) {
-//               if (!(fi.getName().equals("Posting.txt"))) {
-//                   fi.delete();
-//               }
-               System.out.println(fi.getName()+'\n');
+              if (!(fi.getName().equals("Postings"))) {
+                  fi.delete();
+              }
            }
        }catch (NullPointerException e){
            e.printStackTrace();
 
        }
+
 
     }
 
@@ -283,23 +283,28 @@ public class MainIndexMaker extends AIndexMaker {
                 termToWrite = term;
                 char[] termArray = term.toCharArray();
                 termArray[0] = (char) (c - 32);
-                String newTerm = termArray.toString();
-                finalPosting.addAll(postingList);
+                String newTerm =new String(termArray);
+
 
                 if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
                     List<Posting> newTermPostings = getTermPostings(newTerm);
                     totalTF += tempDictionary.get(newTerm).getTfTotal();
                     finalPosting.addAll(mergePostings(postingList, newTermPostings));
                     tempDictionary.remove(newTerm);
+                }else{
+                    finalPosting.addAll(postingList);
                 }
 
 
             } else if (c >= 'A' && c <= 'Z') { // if firs letter is a upper case
                 char[] termArray = term.toCharArray();
                 termArray[0] = (char) (c + 32);
-                String newTerm = termArray.toString();
-                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
+
+                String newTerm =new String(termArray);
+
+                if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with LOWER case in the corpus
                     List<Posting> newTermPostings = getTermPostings(newTerm);
+                    totalTF += tempDictionary.get(newTerm).getTfTotal();
                     finalPosting.addAll(mergePostings(postingList, newTermPostings));
                     tempDictionary.remove(newTerm);
                     termToWrite = term.toLowerCase();
