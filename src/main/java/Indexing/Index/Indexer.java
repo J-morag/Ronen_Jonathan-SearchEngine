@@ -101,8 +101,8 @@ public class Indexer implements Runnable {
 
     public void mergeMainIndex(){
             ((MainIndexMaker) mainIndex).mergeIndex();
-
     }
+
 
 
 }
