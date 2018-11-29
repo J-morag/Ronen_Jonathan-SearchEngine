@@ -39,7 +39,7 @@ public class MainIndexerTest {
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
 
         HashSet<String> stopwords = Parse.getStopWords("");
-        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
+        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, true));
         Indexer indexer =new Indexer("C:\\Users\\ronen\\Desktop\\test",termDocumentsBuffer,true);
         Thread tIndexer = new Thread(indexer);
 
@@ -113,7 +113,7 @@ public class MainIndexerTest {
         Thread tReader = new Thread(new ReadFile(pathToDocumentsFolderAtJM, documentBuffer));
 
         HashSet<String> stopwords = Parse.getStopWords(patToStopwordsFileAtJM);
-        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
+        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, true));
         Indexer indexer =new Indexer(pathToOutputFolderAtJM,termDocumentsBuffer,true);
         Thread tIndexer = new Thread(indexer);
 

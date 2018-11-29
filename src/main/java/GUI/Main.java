@@ -17,15 +17,6 @@ import java.util.concurrent.BlockingQueue;
 
 public class Main extends Application {
 
-    // GLOBAL PARAMETERS
-    private static final int documentBufferSize = 10;
-    private static final int termBufferSize = 10;
-    private static final int stemmedTermBufferSize = 10;
-
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
-    private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
-    private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         Model model = new Model();
@@ -55,28 +46,5 @@ public class Main extends Application {
 //        createIndex();
     }
 
-    private static void createIndex() throws InterruptedException {
-
-        /*  Concurrent buffers:
-        Thread safe. blocks if empty or full.
-        Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
-        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
-        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
-        BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
-
-
-        //  Worker Threads:
-
-        Thread tReader = new Thread(new ReadFile(pathToDocumentsFolder, documentBuffer));
-        tReader.start();
-
-        HashSet<String> stopwords = Parse.getStopWords(pathToStopwordsFile);
-
-        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer));
-        tParser.start();
-
-        Thread tIndexer = new Thread(new Indexer(pathToOutputFolder, stemmedTermDocumentsBuffer,true));
-        tIndexer.start();
-    }
 
 }

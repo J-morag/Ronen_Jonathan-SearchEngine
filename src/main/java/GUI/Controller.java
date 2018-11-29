@@ -4,6 +4,7 @@ import Indexing.Index.IndexEntry;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Alert;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Controller {
@@ -29,6 +30,7 @@ public class Controller {
         else if (outputLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify output location.");
         else{
             String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+            view.setLanguages(); //TODO send something
             return new Alert(Alert.AlertType.INFORMATION, information);
         }
     }
@@ -60,7 +62,13 @@ public class Controller {
         }
     }
 
-    public void loadDictionary() {
-        model.loadDictionary(view.isUseStemming(), view.getOutputLocation().toString());
+    public Alert loadDictionary() {
+        try {
+            model.loadDictionary(view.isUseStemming(), view.getOutputLocation().toString());
+        } catch (Exception e) {
+            return new Alert(Alert.AlertType.ERROR, "No valid dictionary file found in given output folder.");
+        }
+
+        return new Alert(Alert.AlertType.INFORMATION, "Dictionary loaded");
     }
 }

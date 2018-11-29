@@ -78,14 +78,7 @@ public class View {
 
     public void generateIndex(ActionEvent actionEvent) {
         Alert alert = controller.generateIndex();
-        if(alert.getAlertType() == Alert.AlertType.ERROR){
-            alert.showAndWait();
-        }
-        else{
-            alert.show();
-            btn_reset.setDisable(false);
-            btn_display_dictionary.setDisable(false);
-        }
+        handleNewDictionary(alert);
     }
 
     public void displayDictionary(ActionEvent actionEvent) {
@@ -111,6 +104,10 @@ public class View {
         return txtfld_stopwords_location.getCharacters();
     }
 
+    public void setLanguages() {
+        //TODO implement
+    }
+
 
     static class ObservableTuple{
         StringProperty term;
@@ -123,9 +120,19 @@ public class View {
     }
 
     public void loadDictionary(ActionEvent actionEvent) {
-        controller.loadDictionary();
-        btn_reset.setDisable(false);
-        btn_display_dictionary.setDisable(false);
+        Alert result = controller.loadDictionary();
+        handleNewDictionary(result);
+    }
+
+    private void handleNewDictionary(Alert result) {
+        if(result.getAlertType() == Alert.AlertType.ERROR){
+            result.showAndWait();
+        }
+        else{
+            result.show();
+            btn_reset.setDisable(false);
+            btn_display_dictionary.setDisable(false);
+        }
     }
 
     public void setController(Controller controller) {

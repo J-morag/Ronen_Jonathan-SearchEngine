@@ -4,6 +4,9 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 import org.junit.jupiter.api.Test;
+
+import static Indexing.Parse.isLetter;
+import static Indexing.Parse.isNumeral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
@@ -29,77 +32,11 @@ class ParseTest {
     private static final String pathToDocumentsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval/corpus";
     private static final Stemmer stemmer = new Stemmer();
 
-    @Test
-    void parseConcurrentTestPerformance() {
-
-        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
-        Document doc1 = new Document();
-        doc1.setTitle("Alice's Adventures in Wonderland");
-        doc1.setDocId("Alice01");
-        doc1.setText(alice);
-        Document doc2 = new Document();
-        doc2.setTitle("Technical Document Test");
-        doc2.setDocId("Tech01");
-        doc2.setText(technicalDocument);
-
-        Thread parser1 = new Thread(p);
-        parser1.start();
-//        Thread parser2 = new Thread(p);
-//        parser2.start();
-//        Thread parser3 = new Thread(p);
-//        parser3.start();
-
-
-        Thread dummyConsumer = new Thread(() -> {
-            try {
-                boolean done1=false, done2=true, done3=true;
-                while(!done1 || !done2 || !done3){
-                    if(termDocs.take().getDocId() == null){
-                        if(!done1) done1 = true;
-//                        else if(!done2) done2 = true;
-//                        else done3 = true;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        dummyConsumer.start();
-
-        long startTime = System.currentTimeMillis();
-
-        try {
-            int i =0;
-            while (i<1000) {
-                docs.put(doc1);
-                docs.put(doc2);
-                i++;
-            }
-            Document poison = new Document();
-            poison.setText(null);
-            docs.put(poison);
-//            docs.put(poison);
-//            docs.put(poison);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            dummyConsumer.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(System.currentTimeMillis() - startTime);
-
-    }
 
     @Test
     void testTime(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = false;
         Thread parser1 = new Thread(p);
 
@@ -135,9 +72,8 @@ class ParseTest {
     @Test
     void printTerms(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
-        Parse.debug = false;
-        p.useStemming = true;
+                docs, termDocs, true);
+        Parse.debug = true;
         final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 
@@ -188,11 +124,64 @@ class ParseTest {
     }
 
     @Test
+    void printTermsNonLetterAndNonNumeral(){
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs, true);
+        Parse.debug = true;
+        final boolean saveToDisk = true;
+        Thread parser1 = new Thread(p);
+
+        SortedSet<Term> terms = new TreeSet<>();
+
+        Thread termAccumulator = new Thread(new TermAccumulator(terms, termDocs));
+
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        for (Term t:
+                terms) {
+            if(!(isLetter(t.toString().charAt(0)) || isNumeral(t.toString().charAt(0)) )) System.out.println(t);
+        }
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        System.out.println("total number of terms: " + formatter.format(terms.size()));
+
+        if(saveToDisk){
+            Calendar cal = Calendar.getInstance();
+            Date date=cal.getTime();
+            DateFormat dateFormat = new SimpleDateFormat("YY_MM_DD_HH_mm");
+            String formattedDate=dateFormat.format(date);
+
+            String fullPath= pathToTestResultsFolder + "/justNonNumeralAndNonLetterTerms " + formattedDate + " " + (p.useStemming ? "stemmed" : "unstemmed") +  ".txt";
+            try (PrintWriter out = new PrintWriter(fullPath, "UTF-8")){
+                for (Term t: terms
+                        ) {
+                    if(!(isLetter(t.toString().charAt(0)) || isNumeral(t.toString().charAt(0)) )) out.println(t);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
     void countTermsNonUnique() throws Exception {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = false;
-        p.useStemming = true;
         Thread parser1 = new Thread(p);
 
         SortedSet<Term> terms = new TreeSet<>();
@@ -249,9 +238,8 @@ class ParseTest {
     void parseConcurrentPrintTermsOneFile(){
         String fileName = "/FB396001";
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = false;
-        p.useStemming = true;
         Thread parser1 = new Thread(p);
 
         SortedSet<Term> terms = new TreeSet<>();
@@ -282,7 +270,7 @@ class ParseTest {
     @Test
     void parseConcurrentDebugPrintouts(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = true;
         Thread parser1 = new Thread(p);
 
@@ -322,7 +310,7 @@ class ParseTest {
     @Test
     void parseSerialWithReadFile(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = false;
 
         ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
@@ -351,9 +339,8 @@ class ParseTest {
     @Test
     void parseSerialNumberTestCases(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = true;
-        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDate("AUGUST 2");
         doc1.setTitle("Value-added step-by-step 10-part part-3 6-7 between 18 and 24  I have 3,460 3,000/4 chance\n" +
@@ -382,9 +369,8 @@ class ParseTest {
     @Test
     void acronymTest(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = true;
-        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDocId("01");
         doc1.setCity("new york");
@@ -409,9 +395,8 @@ class ParseTest {
     @Test
     void urlTest(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = true;
-        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDocId("01");
         doc1.setCity("new york");
@@ -437,9 +422,8 @@ class ParseTest {
     @Test
     void parseSerialExampleDoc(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs);
+                docs, termDocs, true);
         Parse.debug = true;
-        p.useStemming = true;
         Document doc1 = new Document();
         doc1.setDate("example");
         doc1.setTitle("example 1");

@@ -40,7 +40,7 @@ public class Parse implements Runnable{
      * @param sinkTermDocumentQueue - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
-    public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue) {
+    public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue, boolean useStemming) {
         this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
@@ -192,13 +192,14 @@ public class Parse implements Runnable{
         //TODO optimize by reversing this statement? (check that it is not a trash char like ',')
     }
 
-    private static boolean isWhitespace(char c){
+    public static boolean isWhitespace(char c){
         return c == ' ' || c == '\n' || c == '\t';
     }
-    private static boolean isSymbol(char c){
+    public static boolean isSymbol(char c){
         return c == '-' || c == '.' ||  c == '$' || c == '%' || c == '/' || c == '\'';
     }
-    private static boolean isLetter(char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');}
+    public static boolean isLetter(char c){ return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');}
+    public static boolean isNumeral(char c){ return (c>='0' && c<='9');}
 
     //          Parsing
 
@@ -228,14 +229,19 @@ public class Parse implements Runnable{
             }
             // NUMBER ->
             else if(currType == TokenType.NUMBER){
-                commitTermToList(parseNumber(iterator, currString, new StringBuilder(), false, lTerms).toString()  , lTerms);
+                commitTermToList(parseNumber(iterator, new StringBuilder(), false, lTerms).toString()  , lTerms);
             }
             // $ -> NUMBER(price) ->
             else if(TokenType.SYMBOL == currType && currString.equals("$")){
                 safeIterateAndCheckType(iterator);
-                currType = TokenType.classify(currString);
                 if(TokenType.NUMBER == currType){
-                    commitTermToList(parseNumber(iterator, currString, new StringBuilder(), true, lTerms).toString()   , lTerms);
+                    commitTermToList(parseNumber(iterator, new StringBuilder(), true, lTerms).toString()   , lTerms);
+                }
+                else if(TokenType.WHITESPACE == currType){
+                    safeIterateAndCheckType(iterator);
+                    if(TokenType.NUMBER == currType){
+                        commitTermToList(parseNumber(iterator, new StringBuilder(), true, lTerms).toString()   , lTerms);
+                    }
                 }
                 else{ //a word starting with a dollar sign
                     currString = '$'+currString;
@@ -267,13 +273,12 @@ public class Parse implements Runnable{
     /**
      * parses a number. always assignes currString to the next token to be parsed (wasn't successfully parsed here).
      * @param iterator iterator from which to get strings to work on
-     * @param number - the number to work on.
      * @param result - a string builder to add the result onto. may be empty or contain prior information.
      * @param has$ - indicates that the number should be treated as a price, regardless of the next token.
      *                should be set to true if a '$' was encountered before the number. should be set to false if unsure.
      * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
-    private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull String number,@NotNull StringBuilder result,
+    private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull StringBuilder result,
                                       boolean has$, List<Term> lTerms){
         //TODO add negative numbers ?
 

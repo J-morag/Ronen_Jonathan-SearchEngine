@@ -16,15 +16,19 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Indexer implements Runnable {
 
-
+    public static String withStemmingOutputFolderName = "postingWithStemming";
+    public static String noStemmingOutputFolderName = "postingWithOutStemming";
+    public static String dictionarySaveName = "dictionary";
 
 
     private String pathToOutputFolder;
     private BlockingQueue<TermDocument> stemmedTermDocumentsBuffer;
     private AIndexMaker mainIndex;
+    private int numIndexedDocs;
     //private boolean withSteming=false;
 
     public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer,boolean withSteming) {
+        numIndexedDocs = 0;
         this.pathToOutputFolder = pathToOutputFolder;
         this.stemmedTermDocumentsBuffer = stemmedTermDocumentsBuffer;
         if(withSteming) {
@@ -51,6 +55,7 @@ public class Indexer implements Runnable {
                 if(document.getSerialID()==-1){
                     done=true;
                 }
+                else numIndexedDocs++;
             }
 
         } catch (InterruptedException e) {
@@ -71,6 +76,10 @@ public class Indexer implements Runnable {
     public Map<String , TempIndexEntry> getMainMap(){
 
         return ((MainIndexMaker)mainIndex).getTempDictionary();
+    }
+
+    public int getNumIndexedDocs(){
+        return numIndexedDocs;
     }
 
     /**
