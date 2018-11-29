@@ -135,7 +135,7 @@ public class MainIndexerTest {
 
         //  Worker Threads:
 
-        Thread tReader = new Thread(new ReadFile(pathToDocumentsFolderAtJM, documentBuffer));
+        Thread tReader = new Thread(new ReadFile("C:\\Users\\John\\Downloads\\infoRetrieval\\200 files", documentBuffer));
 
         HashSet<String> stopwords = Parse.getStopWords(patToStopwordsFileAtJM);
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, true));
