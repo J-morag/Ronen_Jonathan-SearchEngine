@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 
 public class View {
 
@@ -74,11 +73,7 @@ public class View {
     }
 
     public void reset(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure? All relevant files and folders in the output folder will be deleted!");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
-            controller.reset();
-        }
+        controller.reset();
     }
 
     public void generateIndex(ActionEvent actionEvent) {

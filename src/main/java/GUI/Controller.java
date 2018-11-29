@@ -29,15 +29,9 @@ public class Controller {
         else if (stopwordsLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify stopwords file location.");
         else if (outputLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify output location.");
         else{
-            try {
-                String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
-                view.setLanguages();
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, information);
-                alert.setHeaderText("Index Generated!");
-                return alert;
-            } catch (InterruptedException e) {
-                return new Alert(Alert.AlertType.ERROR, "IO error. Please check the paths and try again.");
-            }
+            String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+            view.setLanguages(); //TODO send something
+            return new Alert(Alert.AlertType.INFORMATION, information);
         }
     }
 
@@ -45,7 +39,7 @@ public class Controller {
         Map<String, IndexEntry> dictionary = model.getDictionary(view.isUseStemming());
         List<View.ObservableTuple> res = new LinkedList<>();
         if(null == dictionary){
-           return res;
+            return res;
         }
         else{
             Object[] keysAsObject = (dictionary.keySet().toArray());
@@ -69,17 +63,12 @@ public class Controller {
     }
 
     public Alert loadDictionary() {
-        String corpusLocation = view.getCorpusLocation().toString();
-
-        if(corpusLocation.isEmpty() ) return new Alert(Alert.AlertType.ERROR, "Please specify corpus location.");
         try {
-            model.loadDictionary(view.isUseStemming(), corpusLocation);
+            model.loadDictionary(view.isUseStemming(), view.getOutputLocation().toString());
         } catch (Exception e) {
-            return new Alert(Alert.AlertType.ERROR, "No valid dictionary file found in the given output folder.");
+            return new Alert(Alert.AlertType.ERROR, "No valid dictionary file found in given output folder.");
         }
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Dictionary loaded successfully.");
-        alert.setHeaderText("Dictionary Loaded");
-        return alert;
+        return new Alert(Alert.AlertType.INFORMATION, "Dictionary loaded");
     }
 }

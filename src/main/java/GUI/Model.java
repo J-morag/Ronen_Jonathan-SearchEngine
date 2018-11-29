@@ -63,7 +63,7 @@ public class Model {
         docDictionaryWithStemming = null;
         mainDictionaryNoStemming = null;
         docDictionaryNoStemming  = null;
-        
+
         cleanOutputFiles(outputFolder);
     }
 
@@ -73,35 +73,32 @@ public class Model {
      * @param outputFolder
      */
     private void cleanOutputFiles(String outputFolder) {
-        File dir1 = new File(outputFolder + '/' + Indexer.withStemmingOutputFolderName);
-        File dir2 = new File(outputFolder + '/' + Indexer.noStemmingOutputFolderName);
-        if(dir1.exists()){
-            for(File file : dir1.listFiles()){
+        File dir = new File(outputFolder);
+        for(File subfolder: dir.listFiles()){
+            for(File file : subfolder.listFiles()){
                 file.delete();
             }
-            dir1.delete();
+            subfolder.delete();
         }
-        if(dir2.exists()){
-            for(File file : dir2.listFiles()){
-                file.delete();
-            }
-            dir2.delete();
-        }
+
+
     }
 
-    public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws InterruptedException {
-        /*  Concurrent buffers:
+    public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) {
+/*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
+        BlockingQueue<TermDocument> stemmedTermDocumentsBuffer = new ArrayBlockingQueue<>(stemmedTermBufferSize);
+
 
         //  Worker Threads:
 
         Thread tReader = new Thread(new ReadFile(corpusLocation, documentBuffer));
         HashSet<String> stopwords = Parse.getStopWords(stopwordsLocation);
         Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming));
-        Indexer indexer = new Indexer(outputLocation, termDocumentsBuffer,useStemming);
+        Indexer indexer = new Indexer(outputLocation, stemmedTermDocumentsBuffer,useStemming);
         Thread tIndexer = new Thread(indexer);
 
         long time = System.currentTimeMillis();
@@ -110,15 +107,12 @@ public class Model {
         tParser.start();
         tIndexer.start();
 
-        tIndexer.join();
-        indexer.mergeMainIndex();
-
         if(useStemming){
-            this.mainDictionaryWithStemming = indexer.getMainMap();
+//            this.mainDictionaryWithStemming = indexer.getMainMap();
             this.docDictionaryWithStemming = indexer.getDocsMap();
         }
         else{
-            this.mainDictionaryNoStemming = indexer.getMainMap();
+//            this.mainDictionaryNoStemming = indexer.getMainMap();
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
 
