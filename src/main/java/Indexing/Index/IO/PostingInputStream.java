@@ -9,13 +9,10 @@ import java.util.List;
 
 public class PostingInputStream implements IPostingInputStream {
 
-//    private static int bufferSize = 4 /*header*/ + byteLengthOfSinglePosting() * 100 /*assuming most terms have 100 postings or less*/ ;
     RandomAccessFile postingsFile;
 
     public PostingInputStream(String pathToFile) throws FileNotFoundException {
         this.postingsFile = new RandomAccessFile(pathToFile, "r");
-//        this.postingsFile = new BufferedInputStream(new FileInputStream(pathToFile), bufferSize);
-//        postingsFile.mark(Integer.MAX_VALUE);
     }
 
     protected Posting fieldsToPosting(short[] shortFields, int[] ints , String[] stringFields, boolean[] booleanFields){
@@ -30,13 +27,10 @@ public class PostingInputStream implements IPostingInputStream {
 
     @Override
     public List<Posting> readTermPostings(long pointerToStartOfPostingArray, int maxNumPostings) throws IOException {
-//        postingsFile.reset();
-//        postingsFile.skip(pointerToStartOfPostingArray);
-
         //setup
         postingsFile.seek(pointerToStartOfPostingArray);
-        //read all needed bytes in one read
         int numPostingsToRead = readFourBytesAsInt(postingsFile);
+        //read all needed bytes in one read
         byte[] bytesFromDisk = new byte[Math.min(numPostingsToRead, maxNumPostings)*byteLengthOfSinglePosting()];
         postingsFile.read(bytesFromDisk, 0, bytesFromDisk.length);
         //wrap in an input stream
