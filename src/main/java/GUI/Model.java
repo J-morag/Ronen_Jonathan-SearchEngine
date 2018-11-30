@@ -68,8 +68,8 @@ public class Model {
 
 
     /**
-     * deletes everything in the folder and everything in the folder's subfolders (one layer down).
-     * @param outputFolder
+     * within the given directory, deletes everything within folders created by this program, and the folders themselves.
+     * @param outputFolder - the folder where program output was written, and is now to be deleted.
      */
     private void cleanOutputFiles(String outputFolder) {
         File dir1 = new File(outputFolder + '/' + Indexer.withStemmingOutputFolderName);
