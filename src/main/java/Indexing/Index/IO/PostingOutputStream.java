@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostingOutputStream extends APostingOutputStream implements IPostingOutputStream {
+public class PostingOutputStream extends APostingOutputStream {
 
 //    protected List<byte[]> buffer = new ArrayList<>();
     private Mutex m_postingsFile = new Mutex();
