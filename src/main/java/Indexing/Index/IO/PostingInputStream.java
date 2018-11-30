@@ -2,22 +2,20 @@ package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
-import javafx.geometry.Pos;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostingInputStream implements IPostingInputStream {
 
+//    private static int bufferSize = 4 /*header*/ + byteLengthOfSinglePosting() * 100 /*assuming most terms have 100 postings or less*/ ;
     RandomAccessFile postingsFile;
 
     public PostingInputStream(String pathToFile) throws FileNotFoundException {
-        this.postingsFile = new RandomAccessFile(pathToFile, "rw");
+        this.postingsFile = new RandomAccessFile(pathToFile, "r");
+//        this.postingsFile = new BufferedInputStream(new FileInputStream(pathToFile), bufferSize);
+//        postingsFile.mark(Integer.MAX_VALUE);
     }
 
     protected Posting fieldsToPosting(short[] shortFields, int[] ints , String[] stringFields, boolean[] booleanFields){
@@ -27,27 +25,27 @@ public class PostingInputStream implements IPostingInputStream {
 
     @Override
     public List<Posting> readTermPostings(long pointerToStartOfPostingArray) throws IOException {
-        //TODO clarify
-        postingsFile.seek(pointerToStartOfPostingArray);
-        int numPostingsToRead = readFourBytesAsInt(postingsFile);
-        byte[] bytesFromDisk = new byte[numPostingsToRead*byteLengthOfSinglePosting()];
-        postingsFile.read(bytesFromDisk, 0, bytesFromDisk.length);
-        ByteInputStream input = new ByteInputStream(bytesFromDisk, bytesFromDisk.length);
-        return readNPostings(input, numPostingsToRead);
+        return readTermPostings(pointerToStartOfPostingArray, Integer.MAX_VALUE);
     }
 
     @Override
     public List<Posting> readTermPostings(long pointerToStartOfPostingArray, int maxNumPostings) throws IOException {
-        //TODO clarify
+//        postingsFile.reset();
+//        postingsFile.skip(pointerToStartOfPostingArray);
+
+        //setup
         postingsFile.seek(pointerToStartOfPostingArray);
+        //read all needed bytes in one read
         int numPostingsToRead = readFourBytesAsInt(postingsFile);
         byte[] bytesFromDisk = new byte[Math.min(numPostingsToRead, maxNumPostings)*byteLengthOfSinglePosting()];
         postingsFile.read(bytesFromDisk, 0, bytesFromDisk.length);
-        ByteInputStream input = new ByteInputStream(bytesFromDisk, bytesFromDisk.length);
+        //wrap in an input stream
+        InputStream input = new ByteInputStream(bytesFromDisk, bytesFromDisk.length);
+        //convert bytes to postings and return
         return readNPostings(input, numPostingsToRead);
     }
 
-    private List<Posting> readNPostings(ByteInputStream input, int numberOfPostingsToRead) throws IOException {
+    private static List<Posting> readNPostings(InputStream input, int numberOfPostingsToRead) throws IOException {
         List<Posting>  postings = new ArrayList<>(numberOfPostingsToRead);
         for (int i = 0; i < numberOfPostingsToRead ; i++) {
             postings.add(readSinglePosting(input));
@@ -55,7 +53,7 @@ public class PostingInputStream implements IPostingInputStream {
         return postings;
     }
 
-    private int readFourBytesAsInt(ByteInputStream input) throws IOException {
+    private static int readFourBytesAsInt(RandomAccessFile input) throws IOException {
         byte[] bytes = new byte[4];
         input.read(bytes, 0, 4);
         return  (bytes[0]<<24) & 0xff000000|
@@ -64,7 +62,7 @@ public class PostingInputStream implements IPostingInputStream {
                 (bytes[3]<< 0) & 0x000000ff;
     }
 
-    private int readFourBytesAsInt(RandomAccessFile input) throws IOException {
+    private static int readFourBytesAsInt(InputStream input) throws IOException {
         byte[] bytes = new byte[4];
         input.read(bytes, 0, 4);
         return  (bytes[0]<<24) & 0xff000000|
@@ -73,7 +71,7 @@ public class PostingInputStream implements IPostingInputStream {
                 (bytes[3]<< 0) & 0x000000ff;
     }
 
-    private short readTwoBytesAsShort(ByteInputStream input) throws IOException {
+    private static short readTwoBytesAsShort(InputStream input) throws IOException {
         byte[] bytes = new byte[2];
         input.read(bytes, 0 ,2);
         int res = (((int)bytes[0]) << 8) & 0x0000ff00; //add MSBs
@@ -82,7 +80,7 @@ public class PostingInputStream implements IPostingInputStream {
         return (short)res;
     }
 
-    private Posting readSinglePosting(ByteInputStream input) throws IOException {
+    private static Posting readSinglePosting(InputStream input) throws IOException {
         int[] intFields = new int[Posting.getNumberOfIntFields()];
         short[] shortFields = new short[Posting.getNumberOfShortFields()];
         for (int i = 0; i < intFields.length ; i++) {
@@ -103,7 +101,7 @@ public class PostingInputStream implements IPostingInputStream {
         return new Posting(intFields, shortFields, boolFields);
     }
 
-    private int byteLengthOfSinglePosting(){
+    private static int byteLengthOfSinglePosting(){
         return Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 +  1 /*holds 8 bools*/  ;
     }
 
