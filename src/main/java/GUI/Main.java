@@ -1,19 +1,11 @@
 package GUI;
 
-import Elements.Document;
-import Elements.TermDocument;
-import Indexing.Index.Indexer;
-import Indexing.Parse;
-import Indexing.ReadFile;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.HashSet;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class Main extends Application {
 

@@ -172,4 +172,49 @@ class PostingInputStreamTest {
 
     }
 
+//    @Test
+//    void references() {
+//        Object o1 = new Object();
+//        Object o2 = new Object();
+//        Object o3 = new Object();
+//
+//        ArrayList<Object> container = new ArrayList<>();
+//
+//        container.add(o1);
+//        container.add(o2);
+//        container.add(o3);
+//
+//        o3 = null;
+//
+//        // here everyone is still alive
+//
+//        letsClearIt(container);
+//
+//        //now o3 can be collected by GC. o1, o2 and container are still alive.
+//
+//        o2 = null;
+//
+//        // o2 can be collected
+//
+//        container = null;
+//
+//        // container can be collected
+//
+//        ArrayList<Object> container2 = new ArrayList<>();
+//
+//        container2.add(o1);
+//
+//        o1 = null;
+//
+//        //no effect
+//
+//        container2 = null;
+//
+//        // now container 2 and o1 can be collected
+//    }
+//
+//    @Test
+//    void letsClearIt(ArrayList<Object> container) {
+//        container.clear();
+//    }
 }

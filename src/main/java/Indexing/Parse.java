@@ -824,7 +824,10 @@ public class Parse implements Runnable{
     }
 
     private Term filterTerms(String term){
-        return new Term((term));
+        if(TokenType.WORD == TokenType.classify(term)){
+            term = Character.isLowerCase(term.charAt(0)) ? term.toLowerCase() : term.toUpperCase();
+        }
+        return new Term(term);
 //        if(uniqueTerms.containsKey(term)){
 //            return uniqueTerms.get(term);
 //        }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class IndexEntry implements Serializable {
     private int totalTF;
-    private int df = 0;
+    private int df;
     private int postingPointer;
 
 

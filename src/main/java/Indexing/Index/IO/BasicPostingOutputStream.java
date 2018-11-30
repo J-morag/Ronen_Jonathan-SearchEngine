@@ -14,7 +14,7 @@ import java.util.List;
  * a basic class for outputting Postings to a file.
  * writes all fields as strings.
  */
-public class BasicPostingOutputStream extends APostingOutputStream implements IPostingOutputStream  {
+public class BasicPostingOutputStream extends APostingOutputStream  {
 
     //ADMINISTRATIVE
 
