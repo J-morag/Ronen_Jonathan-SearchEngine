@@ -11,6 +11,7 @@ import java.util.List;
 
 public class PostingInputStream implements IPostingInputStream {
 
+    private static final int prefetchAmount = 11;
     RandomAccessFile postingsFile;
 
     public PostingInputStream(String pathToFile) throws FileNotFoundException {
@@ -29,7 +30,6 @@ public class PostingInputStream implements IPostingInputStream {
 
     @Override
     public List<Posting> readTermPostings(long pointerToStartOfPostingArray, int maxNumPostings) throws IOException {
-        final int prefetchAmount = 10;
         //setup
         postingsFile.seek(pointerToStartOfPostingArray);
         //many terms will have no more than a certain small number of postings, pre-fetching them cuts the number of reads for such a term from 2 to 1.
