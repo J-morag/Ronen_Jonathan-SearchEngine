@@ -4,10 +4,8 @@ import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -19,13 +17,16 @@ public class Indexer implements Runnable {
 
     public static String withStemmingOutputFolderName = "postingWithStemming";
     public static String noStemmingOutputFolderName = "postingWithOutStemming";
-    public static String dictionarySaveName = "dictionary";
+    public static String dictionarySaveName = "Index";
+    public static String docsDictionaryName="DocsIndex";
 
 
     private String pathToOutputFolder;
     private BlockingQueue<TermDocument> stemmedTermDocumentsBuffer;
     private AIndexMaker mainIndex;
     private int numIndexedDocs;
+    private String finalPath="";
+
     //private boolean withSteming=false;
 
     public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer,boolean withSteming) {
@@ -33,12 +34,14 @@ public class Indexer implements Runnable {
         this.pathToOutputFolder = pathToOutputFolder;
         this.stemmedTermDocumentsBuffer = stemmedTermDocumentsBuffer;
         if(withSteming) {
-            new File(pathToOutputFolder +"\\postingWithStemming").mkdir();
-            mainIndex = new MainIndexMaker(pathToOutputFolder + "\\postingWithStemming");
+            finalPath=pathToOutputFolder +"\\postingWithStemming";
+            new File(finalPath).mkdir();
+            mainIndex = new MainIndexMaker(finalPath);
         }
         else {
-            new File(pathToOutputFolder +"\\postingWithOutStemming").mkdir();
-            mainIndex = new MainIndexMaker(pathToOutputFolder + "\\postingWithOutStemming");
+            finalPath=pathToOutputFolder +"\\postingWithOutStemming";
+            new File(finalPath).mkdir();
+            mainIndex = new MainIndexMaker(finalPath);
         }
 }
 
@@ -102,6 +105,57 @@ public class Indexer implements Runnable {
     public void mergeMainIndex(){
             ((MainIndexMaker) mainIndex).mergeIndex();
     }
+
+
+    public void dumpDictionaryToDisk(){
+        try {
+            OutputStream mainIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+dictionarySaveName);
+            ObjectOutputStream mainIndexObjectOutputStream  = new ObjectOutputStream(mainIndexFileOutputStream);
+
+            OutputStream docsIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+docsDictionaryName);
+            ObjectOutputStream docsIndexObjectOutstream  = new ObjectOutputStream(docsIndexFileOutputStream);
+            ((ObjectOutputStream) docsIndexObjectOutstream).writeObject(getDocsMap());
+            mainIndexObjectOutputStream.writeObject(getMainMap());
+
+            mainIndexFileOutputStream.flush();
+            mainIndexObjectOutputStream.flush();
+
+            mainIndexFileOutputStream.close();
+            mainIndexObjectOutputStream.close();
+
+            docsIndexObjectOutstream.flush();
+            docsIndexFileOutputStream.flush();
+
+            docsIndexFileOutputStream.close();
+            docsIndexObjectOutstream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void pritDictionaryToFile(){
+        try {
+            OutputStream mainIndexFileOutputStream = new FileOutputStream(finalPath+"\\dictionaryFile.txt");
+            OutputStreamWriter outputStream= new OutputStreamWriter(mainIndexFileOutputStream);
+            Map<String , IndexEntry> dictionaryToPrint = getMainMap();
+            outputStream.write("term,df,totalTF\n");
+            for (String term : dictionaryToPrint.keySet() )  {
+                outputStream.write(term+","+dictionaryToPrint.get(term).getDf()+','+dictionaryToPrint.get(term).getTotalTF()+"\n");
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
 
 

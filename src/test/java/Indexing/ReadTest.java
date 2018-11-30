@@ -335,14 +335,10 @@ void toUpperCaseTest()
 }
 
     @Test
-    void generalTest()
-    {
+    void generalTest() throws IOException {
 
 
-       String a = "Abcd";
-       char [] b = a.toCharArray();
-       b[0]=(char)(a.charAt(0)+32);
-        System.out.println(new String(b));
+     new File("C:\\Users\\ronen\\Desktop\\shalev.txt").createNewFile();
 
 
     }

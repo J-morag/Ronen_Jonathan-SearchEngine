@@ -5,10 +5,7 @@ import Elements.TermDocument;
 import Indexing.Index.IO.*;
 
 import javax.print.DocFlavor;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.*;
 
 import static javafx.application.Platform.exit;
@@ -221,20 +218,22 @@ public class MainIndexMaker extends AIndexMaker {
     {
         Set<String> uniqueWords = tempDictionary.keySet();
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
-       // Arrays.parallelSort(allTerms);
-        //TESTING
-        System.out.println("num Of Terms before merge: "+ allTerms.length+"\n");
-        //\TESTING
-
-
         try {
-            IPostingOutputStream postingOutputStream=new PostingOutputStream(path+"\\Postings");
+            IPostingOutputStream postingOutputStream=new BasicPostingOutputStream(path+"\\Postings");
             for (String term: allTerms ) {
                 if(!tempDictionary.containsKey(term)){
                     continue;
                 }
                 List<Posting> postingToWrite = new ArrayList<>();
                String finalTerm = addTermToDictionary(term , postingToWrite);
+                Collections.sort(postingToWrite, (o1, o2) -> {
+                    if(o1.getTf()>o2.getTf()){
+                        return -1;
+                    }else if(o1.getTf()==o2.getTf()){
+                        return 0;
+                    }else
+                        return 1;
+                });
                 int pointer =(int)postingOutputStream.write(postingToWrite);
                 mainDictionary.get(finalTerm).setPostingPointer(pointer);
 
@@ -247,9 +246,6 @@ public class MainIndexMaker extends AIndexMaker {
         }catch (IOException e) {
             e.printStackTrace();
         }
-        //TESTING
-        System.out.println("num Of Terms after merge: "+ mainDictionary.keySet().size()+"\n");
-        //\TESTING
         tempDictionary=null;
 
 
@@ -318,8 +314,21 @@ public class MainIndexMaker extends AIndexMaker {
             }
 
             tempDictionary.remove(term);
+            if(tempDictionary.containsKey(termToWrite)){
+                postingList =new ArrayList<>(finalPosting);
+                List<Posting> newTermPostings = getTermPostings(termToWrite);
+                totalTF += tempDictionary.get(termToWrite).getTfTotal();
+                List<Posting>tempPostin = new ArrayList<>();
+                tempPostin.addAll(mergePostings(postingList, newTermPostings));
+                finalPosting.clear();
+                finalPosting.addAll(tempPostin);
+                tempDictionary.remove(termToWrite);
+            }
+
+
             IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
             mainDictionary.put(termToWrite, indexEntry);
+
 
         }catch (NullPointerException e){
             e.printStackTrace();
@@ -354,7 +363,6 @@ public class MainIndexMaker extends AIndexMaker {
 
     private List<Posting> mergePostings(List<Posting>postingList , List<Posting>newTermPostings )
     {
-
         int maxTF;
         List<Posting> finalList = new ArrayList<>();
         Map<Integer,Posting> newTermPostingMap = new HashMap<>();
@@ -362,8 +370,6 @@ public class MainIndexMaker extends AIndexMaker {
         for (Posting post : newTermPostings) {
             newTermPostingMap.put(post.getDocSerialID(),post);
         }
-
-
 
         for (Posting posting: postingList) {
             int docID=posting.getDocSerialID();
@@ -384,13 +390,14 @@ public class MainIndexMaker extends AIndexMaker {
                     docIndexEntery.setMaxTF(tf);
                 }
                 docIndexEntery.setNumOfUniqueWords(docIndexEntery.getNumOfUniqueWords()-1);
+                newTermPostingMap.remove(docID);
             }
         }
+        for (Integer key : newTermPostingMap.keySet()) {
+            finalList.add(newTermPostingMap.get(key));
+        }
         return finalList;
-
-
     }
-
 
 
 }

@@ -2,7 +2,9 @@ package Indexing.Index;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 
-public class DocIndexEntery {
+import java.io.Serializable;
+
+public class DocIndexEntery implements Serializable {
 
     private String docID;
     private int numOfUniqueWords;
