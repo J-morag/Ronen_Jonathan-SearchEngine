@@ -219,7 +219,7 @@ public class MainIndexMaker extends AIndexMaker {
         Set<String> uniqueWords = tempDictionary.keySet();
         String[] allTerms = uniqueWords.stream().toArray(String[]::new);
         try {
-            IPostingOutputStream postingOutputStream=new BasicPostingOutputStream(path+"\\Postings");
+            IPostingOutputStream postingOutputStream=new PostingOutputStream(path+"\\Postings");
             for (String term: allTerms ) {
                 if(!tempDictionary.containsKey(term)){
                     continue;
@@ -277,11 +277,8 @@ public class MainIndexMaker extends AIndexMaker {
             List<Posting> postingList = getTermPostings(term);
             if (c >= 'a' && c <= 'z') { //if first letter is lower case
                 termToWrite = term;
-                char[] termArray = term.toCharArray();
-                termArray[0] = (char) (c - 32);
-                String newTerm =new String(termArray);
 
-
+                String newTerm =new String(term.toUpperCase());
                 if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with upper case in the corpus
                     List<Posting> newTermPostings = getTermPostings(newTerm);
                     totalTF += tempDictionary.get(newTerm).getTfTotal();
@@ -293,11 +290,8 @@ public class MainIndexMaker extends AIndexMaker {
 
 
             } else if (c >= 'A' && c <= 'Z') { // if firs letter is a upper case
-                char[] termArray = term.toCharArray();
-                termArray[0] = (char) (c + 32);
 
-                String newTerm =new String(termArray);
-
+                String newTerm =new String(term.toLowerCase());
                 if (tempDictionary.containsKey(newTerm)) { // if there is also the same term with LOWER case in the corpus
                     List<Posting> newTermPostings = getTermPostings(newTerm);
                     totalTF += tempDictionary.get(newTerm).getTfTotal();
@@ -305,7 +299,7 @@ public class MainIndexMaker extends AIndexMaker {
                     tempDictionary.remove(newTerm);
                     termToWrite = term.toLowerCase();
                 } else {
-                    termToWrite = term.toUpperCase();
+                    termToWrite = term;
                     finalPosting.addAll(postingList);
                 }
             } else {
@@ -314,18 +308,6 @@ public class MainIndexMaker extends AIndexMaker {
             }
 
             tempDictionary.remove(term);
-            if(tempDictionary.containsKey(termToWrite)){
-                postingList =new ArrayList<>(finalPosting);
-                List<Posting> newTermPostings = getTermPostings(termToWrite);
-                totalTF += tempDictionary.get(termToWrite).getTfTotal();
-                List<Posting>tempPostin = new ArrayList<>();
-                tempPostin.addAll(mergePostings(postingList, newTermPostings));
-                finalPosting.clear();
-                finalPosting.addAll(tempPostin);
-                tempDictionary.remove(termToWrite);
-            }
-
-
             IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
             mainDictionary.put(termToWrite, indexEntry);
 

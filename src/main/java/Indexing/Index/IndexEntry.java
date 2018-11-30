@@ -17,7 +17,6 @@ public class IndexEntry implements Serializable {
     public IndexEntry(int totalTF , int df ) {
         this.totalTF = totalTF;
         this.df = df;
-        this.postingPointer=postingPointer;
     }
 
     public void setTotalTF(int totalTF) {
