@@ -12,7 +12,7 @@ import java.util.List;
 public class PostingInputStream implements IPostingInputStream {
 
     private static final int prefetchAmount = 11;
-    RandomAccessFile postingsFile;
+    private RandomAccessFile postingsFile;
 
     public PostingInputStream(String pathToFile) throws FileNotFoundException {
         this.postingsFile = new RandomAccessFile(pathToFile, "r");
