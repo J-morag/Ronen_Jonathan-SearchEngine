@@ -19,8 +19,8 @@ public class MainIndexerTest {
     private static final int termBufferSize = 3;
     private static final int stemmedTermBufferSize = 3;
 
-     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
-    // private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    // private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
     private static final String pathToStopWordRONEN ="C:\\Users\\ronen\\Desktop\\stopWords.txt";
 
     private static final String pathToDocumentsFolderAtJM = "C:/Users/John/Downloads/infoRetrieval/200 files";
@@ -54,8 +54,8 @@ public class MainIndexerTest {
         tIndexer.start();
         tIndexer.join();
         System.out.println(((double) System.currentTimeMillis()-start)/1000);
-     //   Map<String,TempIndexEntry> tempMap = indexer.getTempMap();
-
+//        Map<String,TempIndexEntry> tempMap = indexer.getTempMap();
+//
 //        String path = "C:\\Users\\ronen\\Desktop\\test.txt";
 //
 //        try {
@@ -90,16 +90,16 @@ public class MainIndexerTest {
 
         indexer.mergeMainIndex();
         indexer.dumpDictionaryToDisk();
-        //indexer.pritDictionaryToFile();
+//        indexer.pritDictionaryToFile();
 
         System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
         System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-//
+
 //        Map<String,IndexEntry> map = indexer.getMainMap();
-//
-//
-//
-//
+
+
+
+
 //
 //         path = "C:\\Users\\ronen\\Desktop\\a.txt";
 //
