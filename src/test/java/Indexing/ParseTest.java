@@ -73,7 +73,7 @@ class ParseTest {
     void printTerms(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs, true);
-        Parse.debug = true;
+        Parse.debug = false;
         final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 

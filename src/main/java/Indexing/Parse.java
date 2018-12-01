@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * takes Documents, tokenizes and parses them. does not perform stemming.
@@ -670,6 +668,11 @@ public class Parse implements Runnable{
             else if(firstToken.length() == 1 && currString.equals(".")){
                 tryParseAcronym(iterator, result);
             }
+            //honorific
+            else if(firstToken.equals("mr") || firstToken.equals("ms") || firstToken.equals("mrs")){
+                tryParseHonorificName(iterator, result, lTerms);
+            }
+            //URL
             else if(firstToken.equals("www") && currString.equals(".")){
                 tryParseURL(iterator, result);
             }
@@ -750,7 +753,7 @@ public class Parse implements Runnable{
     }
 
     /**
-     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * assumes the previously encountered string was ".".
      * leaves iterator on the next string after this term if successfully parsed.
      * @param iterator
      * @param result
@@ -771,7 +774,31 @@ public class Parse implements Runnable{
     }
 
     /**
-     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * assumes the previously encountered string was an honorific.
+     * leaves iterator on the next string after this term if successfully parsed.
+     * if successful, also commits the name part as a term.
+     * @param iterator
+     * @param result
+     * @return true if successfully parsed, else returns false.
+     */
+    private boolean tryParseHonorificName(ListIterator<String> iterator, StringBuilder result, List<Term> lTerms) {
+        boolean isName = false;
+        //skip a period and all whitespaces
+        if(currString.equals(".")) safeIterateAndCheckType(iterator);
+        while (TokenType.WHITESPACE == currType) safeIterateAndCheckType(iterator);
+        // found a word. assume it's a name
+        if(TokenType.WORD == currType){
+            isName = true;
+            result.append(". ");
+            result.append(currString);
+            commitTermToList(currString,lTerms);
+            safeIterateAndCheckType(iterator);
+        }
+        return isName;
+    }
+
+    /**
+     * assumes the previously encountered string was ".".
      * rewinds iterator if unsuccessful. leaves iterator on the next string after this term if successfully parsed.
      * @param iterator
      * @param result
@@ -811,6 +838,9 @@ public class Parse implements Runnable{
 
         return numFields>=3;
     }
+
+
+
 
     private void commitTermToList(String term, List<Term> lTerms){
         if(useStemming) {
