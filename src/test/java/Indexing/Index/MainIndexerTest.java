@@ -5,11 +5,13 @@ import Elements.Term;
 import Elements.TermDocument;
 import Indexing.Parse;
 import Indexing.ReadFile;
+import javafx.util.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -157,7 +159,7 @@ public class MainIndexerTest {
     }
 
     @Test
-    void testMainIndexClone() throws InterruptedException {
+    Indexer testMainIndexClone() throws InterruptedException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
@@ -200,6 +202,8 @@ public class MainIndexerTest {
 
         System.out.println("Total time: " + ((double) System.currentTimeMillis()-start)/1000);
 
+        return indexer;
+
 //        System.out.println("Heap size (MBytes): " + toMB(Runtime.getRuntime().totalMemory()));
 //        System.out.println("Memory in use (MBytes): " + toMB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 //
@@ -235,7 +239,232 @@ public class MainIndexerTest {
     }
 
 
+    @Test
+    void statistics() throws InterruptedException, IOException {
+        Indexer index = testMainIndexClone();
 
+        Map<String, IndexEntry> mainDic = index.getMainMap();
+        Map<Integer, DocIndexEntery> docDic = index.getDocsMap();
+
+         // COUNTRIES
+
+        Set<String> countries = new HashSet<>();
+        Set<String> termsThatAreCountries = new HashSet<>();
+        Reader countriesIn = new BufferedReader(new CharArrayReader(this.countries.toCharArray()));
+
+
+        String line = ((BufferedReader) countriesIn).readLine();
+        while (line != null){
+            countries.add(line);
+            line = ((BufferedReader) countriesIn).readLine();
+        }
+
+
+        for (String term: mainDic.keySet()
+             ) {
+            if(countries.contains(term)) termsThatAreCountries.add(term);
+        }
+
+        System.out.println("Number of terms that are countries: " + termsThatAreCountries.size());
+    }
+
+
+    String countries = "AFGHANISTAN\n" +
+            "ALBANIA\n" +
+            "ALGERIA\n" +
+            "ANDORRA\n" +
+            "ANGOLA\n" +
+            "ANTIGUA & BARBUDA\n" +
+            "ARGENTINA\n" +
+            "ARMENIA\n" +
+            "AUSTRALIA\n" +
+            "AUSTRIA\n" +
+            "AZERBAIJAN\n" +
+            "BAHAMAS, THE\n" +
+            "BAHRAIN\n" +
+            "BANGLADESH\n" +
+            "BARBADOS\n" +
+            "BELARUS\n" +
+            "BELGIUM\n" +
+            "BELIZE\n" +
+            "BENIN\n" +
+            "BHUTAN\n" +
+            "BOLIVIA\n" +
+            "BOSNIA & HERZEGOVINA\n" +
+            "BOTSWANA\n" +
+            "BRAZIL\n" +
+            "BRUNEI\n" +
+            "BULGARIA\n" +
+            "BURKINA FASO\n" +
+            "BURUNDI\n" +
+            "CABO VERDE\n" +
+            "CAMBODIA\n" +
+            "CAMEROON\n" +
+            "CANADA\n" +
+            "CENTRAL AFRICAN REPUBLIC\n" +
+            "CHAD\n" +
+            "CHILE\n" +
+            "CHINA\n" +
+            "COLOMBIA\n" +
+            "COMOROS\n" +
+            "CONGO, DEMOCRATIC REPUBLIC OF THE\n" +
+            "COSTA RICA\n" +
+            "CÔTE D'IVOIRE\n" +
+            "CROATIA\n" +
+            "CUBA\n" +
+            "CYPRUS\n" +
+            "CZECH REPUBLIC\n" +
+            "DENMARK\n" +
+            "DJIBOUTI\n" +
+            "DOMINICA\n" +
+            "DOMINICAN REPUBLIC\n" +
+            "ECUADOR\n" +
+            "EGYPT\n" +
+            "EL SALVADOR\n" +
+            "EQUATORIAL GUINEA\n" +
+            "ERITREA\n" +
+            "ESTONIA\n" +
+            "ESWATINI\n" +
+            "ETHIOPIA\n" +
+            "FEDERATED STATES OF MICRONESIA\n" +
+            "FIJI\n" +
+            "FINLAND\n" +
+            "FRANCE\n" +
+            "GABON\n" +
+            "GAMBIA, THE\n" +
+            "GEORGIA\n" +
+            "GERMANY\n" +
+            "GHANA\n" +
+            "GREECE\n" +
+            "GRENADA\n" +
+            "GUATEMALA\n" +
+            "GUINEA\n" +
+            "GUINEA-BISSAU\n" +
+            "GUYANA\n" +
+            "HAITI\n" +
+            "HONDURAS\n" +
+            "HUNGARY\n" +
+            "ICELAND\n" +
+            "INDIA\n" +
+            "INDONESIA\n" +
+            "IRAN\n" +
+            "IRAQ\n" +
+            "IRELAND\n" +
+            "ISRAEL\n" +
+            "ITALY\n" +
+            "JAMAICA\n" +
+            "JAPAN\n" +
+            "JORDAN\n" +
+            "KAZAKHSTAN\n" +
+            "KENYA\n" +
+            "KIRIBATI\n" +
+            "KOSOVO\n" +
+            "KUWAIT\n" +
+            "KYRGYZSTAN\n" +
+            "LAOS\n" +
+            "LATVIA\n" +
+            "LEBANON\n" +
+            "LESOTHO\n" +
+            "LIBERIA\n" +
+            "LIBYA\n" +
+            "LIECHTENSTEIN\n" +
+            "LITHUANIA\n" +
+            "LUXEMBOURG\n" +
+            "MACEDONIA\n" +
+            "MADAGASCAR\n" +
+            "MALAWI\n" +
+            "MALAYSIA\n" +
+            "MALDIVES\n" +
+            "MALI\n" +
+            "MALTA\n" +
+            "MARSHALL ISLANDS\n" +
+            "MAURITANIA\n" +
+            "MAURITIUS\n" +
+            "MEXICO\n" +
+            "MOLDOVA\n" +
+            "MONACO\n" +
+            "MONGOLIA\n" +
+            "MONTENEGRO\n" +
+            "MOROCCO\n" +
+            "MOZAMBIQUE\n" +
+            "MYANMAR\n" +
+            "NAMIBIA\n" +
+            "NAURU\n" +
+            "NEPAL\n" +
+            "NETHERLANDS\n" +
+            "NEW ZEALAND\n" +
+            "NICARAGUA\n" +
+            "NIGER\n" +
+            "NIGERIA\n" +
+            "NORTH KOREA\n" +
+            "NORWAY\n" +
+            "OMAN\n" +
+            "PAKISTAN\n" +
+            "PALAU\n" +
+            "PALESTINE\n" +
+            "PANAMA\n" +
+            "PAPUA NEW GUINEA\n" +
+            "PARAGUAY\n" +
+            "PERU\n" +
+            "PHILIPPINES\n" +
+            "POLAND\n" +
+            "PORTUGAL\n" +
+            "QATAR\n" +
+            "REPUBLIC OF THE CONGO\n" +
+            "ROMANIA\n" +
+            "RUSSIA\n" +
+            "RWANDA\n" +
+            "SAINT KITTS & NEVIS\n" +
+            "SAINT LUCIA\n" +
+            "SAINT VINCENT & THE GRENADINES\n" +
+            "SAMOA\n" +
+            "SAN MARINO\n" +
+            "SÃO TOMÉ & PRÍNCIPE\n" +
+            "SAUDI ARABIA\n" +
+            "SENEGAL\n" +
+            "SERBIA\n" +
+            "SEYCHELLES\n" +
+            "SIERRA LEONE\n" +
+            "SINGAPORE\n" +
+            "SLOVAKIA\n" +
+            "SLOVENIA\n" +
+            "SOLOMON ISLANDS\n" +
+            "SOMALIA\n" +
+            "SOUTH AFRICA\n" +
+            "SOUTH KOREA\n" +
+            "SOUTH SUDAN\n" +
+            "SPAIN\n" +
+            "SRI LANKA\n" +
+            "SUDAN\n" +
+            "SURINAME\n" +
+            "SWEDEN\n" +
+            "SWITZERLAND\n" +
+            "SYRIA\n" +
+            "TAJIKISTAN\n" +
+            "TANZANIA\n" +
+            "THAILAND\n" +
+            "TIMOR-LESTE\n" +
+            "TOGO\n" +
+            "TONGA\n" +
+            "TRINIDAD & TOBAGO\n" +
+            "TUNISIA\n" +
+            "TURKEY\n" +
+            "TURKMENISTAN\n" +
+            "TUVALU\n" +
+            "UGANDA\n" +
+            "UKRAINE\n" +
+            "UNITED ARAB EMIRATES\n" +
+            "UNITED KINGDOM\n" +
+            "UNITED STATES\n" +
+            "URUGUAY\n" +
+            "UZBEKISTAN\n" +
+            "VANUATU\n" +
+            "VATICAN CITY\n" +
+            "VENEZUELA\n" +
+            "VIETNAM\n" +
+            "YEMEN\n" +
+            "ZAMBIA\n" +
+            "ZIMBABWE\n";
 
     public static double toMB(long bytes){
         return bytes/(Math.pow(2, 20));

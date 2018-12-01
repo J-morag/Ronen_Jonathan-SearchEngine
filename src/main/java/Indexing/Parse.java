@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Parse implements Runnable{
     public static boolean debug = false;
     private static final boolean addComponentPartsOfCompoundWord = true;
-    public boolean useStemming = true;
+    public boolean useStemming;
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
@@ -24,8 +24,6 @@ public class Parse implements Runnable{
     private HashMap<String, String> months;
     private TokenType currType;
     private boolean bIteratorHasNext = true;
-
-    private Map<String, Term> uniqueTerms;
 
     private static AtomicInteger docSerialId = new AtomicInteger(0);
 
@@ -39,6 +37,7 @@ public class Parse implements Runnable{
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
     public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue, boolean useStemming) {
+        this.useStemming = useStemming;
         this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
@@ -56,7 +55,6 @@ public class Parse implements Runnable{
         months.put("NOVEMBER", "11");months.put("November", "11");
         months.put("DECEMBER", "12");months.put("December", "12");
 
-        uniqueTerms = new HashMap<>();
     }
 
     /**
@@ -888,9 +886,9 @@ public class Parse implements Runnable{
     }
 
     /**
-     * slphanumerics are also treated as a word
-      */
-    private enum TokenType {
+     * classifies a token (string) to a type of token
+     */
+    public enum TokenType {
         NUMBER, WORD, SYMBOL, WHITESPACE;
 
         /**
