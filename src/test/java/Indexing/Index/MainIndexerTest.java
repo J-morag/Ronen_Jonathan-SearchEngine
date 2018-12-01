@@ -250,19 +250,18 @@ public class MainIndexerTest {
 
         Set<String> countries = new HashSet<>();
         Set<String> termsThatAreCountries = new HashSet<>();
-        Reader countriesIn = new BufferedReader(new CharArrayReader(this.countries.toCharArray()));
+        BufferedReader countriesIn = new BufferedReader(new CharArrayReader(this.countries.toCharArray()));
 
 
-        String line = ((BufferedReader) countriesIn).readLine();
+        String line = countriesIn.readLine();
         while (line != null){
             countries.add(line);
-            line = ((BufferedReader) countriesIn).readLine();
+            line = countriesIn.readLine();
         }
-
 
         for (String term: mainDic.keySet()
              ) {
-            if(countries.contains(term)) termsThatAreCountries.add(term);
+            if(countries.contains(term.toUpperCase())) termsThatAreCountries.add(term.toUpperCase());
         }
 
         System.out.println("Number of terms that are countries: " + termsThatAreCountries.size());
