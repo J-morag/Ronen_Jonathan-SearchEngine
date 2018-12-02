@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * reads postings from a file. meant to read postings in the format that {@link PostingOutputStream PostingOutputStream} writes.
+ * To increase efficiency, reads {@value #prefetchAmount} postings in advance, reducing the amount of reads to 1 when possible.
+ * If more there are more than {@value #prefetchAmount} postings to read, will perform 1 more read operation (2 total reads).
+ */
 public class PostingInputStream implements IPostingInputStream {
 
     private static final int prefetchAmount = 11;

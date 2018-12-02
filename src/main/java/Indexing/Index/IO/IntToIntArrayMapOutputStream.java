@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
+/**
+ * an advanced implementation for writing city information to disk, meant to be efficient and mobile.
+ * it writes the city information as binary information, in a compact manner.
+ * it uses a bufferedOutputStream to increase efficiency.
+ */
 public class IntToIntArrayMapOutputStream {
 
     long filePointer = 0;

@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Data type containing the information pertaining to a single city in the city dictionary.
+ */
 public class CityIndexEntry implements Serializable {
 
     private String countryName;

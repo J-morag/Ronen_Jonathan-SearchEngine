@@ -3,6 +3,10 @@ package Indexing.Index.IO;
 import java.io.*;
 import java.util.Map;
 
+/**
+ * a basic implementation for writing city information (Maps of Integer to int[])to disk, meant for debugging and demonstration.
+ * it is meant to write information in a user-readable format, and is not meant to be efficient or to be read by any input stream.
+ */
 public class BasicIntArrayMapOutputStream {
 
 

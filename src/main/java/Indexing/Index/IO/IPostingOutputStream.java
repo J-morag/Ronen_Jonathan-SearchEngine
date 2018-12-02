@@ -8,6 +8,9 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.List;
 
+/**
+ * describes functions for writing postings to a file.
+ */
 public interface IPostingOutputStream{
 
     /**

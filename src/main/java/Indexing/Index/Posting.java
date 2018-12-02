@@ -1,5 +1,8 @@
 package Indexing.Index;
 
+/**
+ * data type that stores information about the relationship between a term and a document (1:1).
+ */
 public class Posting {
 
     final private int docSerialID;

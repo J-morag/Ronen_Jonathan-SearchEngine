@@ -6,6 +6,9 @@ import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import java.io.*;
 import java.util.*;
 
+/**
+ * reads postings from a file. meant to read postings in the format that {@link IntToIntArrayMapOutputStream IntToIntArrayMapOutputStream} writes.
+ */
 public class IntToIntArrayMapInputStream {
     private RandomAccessFile postingsFile;
 

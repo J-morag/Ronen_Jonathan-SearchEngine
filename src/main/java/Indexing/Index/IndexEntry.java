@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 /**
- * Data type containing the information pertaining to a single Term in the dictionary.
+ * Data type containing the information pertaining to a single Term in the main dictionary.
  */
 public class IndexEntry implements Serializable {
     private int totalTF;

@@ -5,6 +5,11 @@ import Indexing.Index.Posting;
 import java.io.*;
 import java.util.List;
 
+/**
+ * an advanced implementation for writing postings to disk, meant to be efficient and mobile.
+ * it writes the posting information as binary information, in a compact manner.
+ * it uses a bufferedOutputStream to increase efficiency.
+ */
 public class PostingOutputStream extends APostingOutputStream {
 
 

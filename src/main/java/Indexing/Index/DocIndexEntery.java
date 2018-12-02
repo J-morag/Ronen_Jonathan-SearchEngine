@@ -4,6 +4,9 @@ import org.omg.CORBA.PRIVATE_MEMBER;
 
 import java.io.Serializable;
 
+/**
+ * Data type containing the information pertaining to a single Document in the document dictionary.
+ */
 public class DocIndexEntery implements Serializable {
 
     private String docID;

@@ -5,10 +5,11 @@ import Indexing.Index.Posting;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * describes functions for reading postings from a file.
+ */
 public interface IPostingInputStream {
 
-//    Posting read(int numberOfConsecutivePostings);
-//    Posting read(int numberOfConsecutivePostings, int pointerToStartOfPosting);
 
     /**
      * Reads all postings from the pointer, until the end of a pointer array.

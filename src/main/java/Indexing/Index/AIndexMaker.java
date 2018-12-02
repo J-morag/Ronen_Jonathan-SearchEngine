@@ -6,6 +6,9 @@ import Indexing.DocumentProcessing.TermDocument;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * abstract class for index makers.
+ */
 public abstract class AIndexMaker {
 
     protected Map<Term,IndexEntry> index;

@@ -11,8 +11,8 @@ import java.util.List;
 
 
 /**
- * a basic class for outputting Postings to a file.
- * writes all fields as strings.
+ * a basic implementation for writing postings to disk, meant for debugging and demonstration.
+ * it is meant to write postings in a user-readable format, and is not meant to be efficient or to be read by any input stream.
  */
 public class BasicPostingOutputStream extends APostingOutputStream  {
 

@@ -5,6 +5,9 @@ import Indexing.Index.Posting;
 import java.io.*;
 import java.nio.MappedByteBuffer;
 
+/**
+ * abstract class for posting output streams.
+ */
 public abstract class APostingOutputStream implements IPostingOutputStream{
 
     long filePointer = 0;

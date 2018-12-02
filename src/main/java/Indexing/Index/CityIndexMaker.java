@@ -11,6 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * creates the city index.
+ * holds the dictionary as a field. It can be retrieved with {@link #getCityDictionary()}.
+ */
 public class CityIndexMaker extends AIndexMaker {
 
     Map<String , CityIndexEntry> cityDictionary=null;

@@ -9,6 +9,10 @@ import java.util.*;
 
 import static javafx.application.Platform.exit;
 
+/**
+ * creates the main index.
+ * holds both dictionaries as fields. They can be retrieved with {@link #getMainDictionary getMainDictionary} and {@link #getDocsDictionary getDocsDictionary}.
+ */
 public class MainIndexMaker extends AIndexMaker {
 
     //the size of the group of documents that will be indexed every time.
