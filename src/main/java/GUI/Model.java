@@ -107,7 +107,6 @@ public class Model {
         tIndexer.start();
 
         tIndexer.join();
-        indexer.mergeMainIndex();
 
         time = (System.currentTimeMillis() - time)/1000;
 

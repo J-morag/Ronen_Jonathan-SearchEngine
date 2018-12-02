@@ -7,7 +7,7 @@ import java.util.Map;
  * a basic implementation for writing city information (Maps of Integer to int[])to disk, meant for debugging and demonstration.
  * it is meant to write information in a user-readable format, and is not meant to be efficient or to be read by any input stream.
  */
-public class BasicIntArrayMapOutputStream {
+public class BasicIntToIntArrayMapOutputStream {
 
 
     long filePointer = 0;
@@ -19,7 +19,7 @@ public class BasicIntArrayMapOutputStream {
      * @param pathToFile
      * @throws IOException
      */
-    public BasicIntArrayMapOutputStream(String pathToFile) throws IOException {
+    public BasicIntToIntArrayMapOutputStream(String pathToFile) throws IOException {
         this.postingsFile = new BufferedWriter(new PrintWriter(pathToFile));
     }
 

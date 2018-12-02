@@ -54,7 +54,7 @@ class IntToIntArrayMapStreamsTest {
     @Test
     void basicOutputStreamTest() throws IOException {
 
-        BasicIntArrayMapOutputStream out = new BasicIntArrayMapOutputStream(path);
+        BasicIntToIntArrayMapOutputStream out = new BasicIntToIntArrayMapOutputStream(path);
 
         Map<Integer, int[]> original = new LinkedHashMap<>();
 
