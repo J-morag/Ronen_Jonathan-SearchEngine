@@ -9,8 +9,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * takes Documents, tokenizes and parses them. does not perform stemming.
@@ -18,7 +16,7 @@ import java.util.logging.Logger;
 public class Parse implements Runnable{
     public static boolean debug = false;
     private static final boolean addComponentPartsOfCompoundWord = true;
-    public boolean useStemming = true;
+    public boolean useStemming;
     private HashSet<String> stopWords;
     private BlockingQueue<Document> sourceDocumentsQueue;
     private BlockingQueue<TermDocument> sinkTermDocumentQueue;
@@ -26,8 +24,6 @@ public class Parse implements Runnable{
     private HashMap<String, String> months;
     private TokenType currType;
     private boolean bIteratorHasNext = true;
-
-    private Map<String, Term> uniqueTerms;
 
     private static AtomicInteger docSerialId = new AtomicInteger(0);
 
@@ -41,6 +37,7 @@ public class Parse implements Runnable{
      *                     End of queue will be marked by a "poison" List with just a null Term.
      */
     public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue, boolean useStemming) {
+        this.useStemming = useStemming;
         this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
@@ -58,7 +55,6 @@ public class Parse implements Runnable{
         months.put("NOVEMBER", "11");months.put("November", "11");
         months.put("DECEMBER", "12");months.put("December", "12");
 
-        uniqueTerms = new HashMap<>();
     }
 
     /**
@@ -670,6 +666,11 @@ public class Parse implements Runnable{
             else if(firstToken.length() == 1 && currString.equals(".")){
                 tryParseAcronym(iterator, result);
             }
+            //honorific
+            else if(firstToken.equals("mr") || firstToken.equals("ms") || firstToken.equals("mrs")){
+                tryParseHonorificName(iterator, result, lTerms);
+            }
+            //URL
             else if(firstToken.equals("www") && currString.equals(".")){
                 tryParseURL(iterator, result);
             }
@@ -750,7 +751,7 @@ public class Parse implements Runnable{
     }
 
     /**
-     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * assumes the previously encountered string was ".".
      * leaves iterator on the next string after this term if successfully parsed.
      * @param iterator
      * @param result
@@ -771,7 +772,31 @@ public class Parse implements Runnable{
     }
 
     /**
-     * assumes the previously encountered string was ".", and that that string was already appended to result.
+     * assumes the previously encountered string was an honorific.
+     * leaves iterator on the next string after this term if successfully parsed.
+     * if successful, also commits the name part as a term.
+     * @param iterator
+     * @param result
+     * @return true if successfully parsed, else returns false.
+     */
+    private boolean tryParseHonorificName(ListIterator<String> iterator, StringBuilder result, List<Term> lTerms) {
+        boolean isName = false;
+        //skip a period and all whitespaces
+        if(currString.equals(".")) safeIterateAndCheckType(iterator);
+        while (TokenType.WHITESPACE == currType) safeIterateAndCheckType(iterator);
+        // found a word. assume it's a name
+        if(TokenType.WORD == currType){
+            isName = true;
+            result.append(". ");
+            result.append(currString);
+            commitTermToList(currString,lTerms);
+            safeIterateAndCheckType(iterator);
+        }
+        return isName;
+    }
+
+    /**
+     * assumes the previously encountered string was ".".
      * rewinds iterator if unsuccessful. leaves iterator on the next string after this term if successfully parsed.
      * @param iterator
      * @param result
@@ -811,6 +836,9 @@ public class Parse implements Runnable{
 
         return numFields>=3;
     }
+
+
+
 
     private void commitTermToList(String term, List<Term> lTerms){
         if(useStemming) {
@@ -858,9 +886,9 @@ public class Parse implements Runnable{
     }
 
     /**
-     * slphanumerics are also treated as a word
-      */
-    private enum TokenType {
+     * classifies a token (string) to a type of token
+     */
+    public enum TokenType {
         NUMBER, WORD, SYMBOL, WHITESPACE;
 
         /**

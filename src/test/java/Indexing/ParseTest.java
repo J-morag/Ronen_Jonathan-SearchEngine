@@ -72,8 +72,8 @@ class ParseTest {
     @Test
     void printTerms(){
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
-                docs, termDocs, true);
-        Parse.debug = true;
+                docs, termDocs, false);
+        Parse.debug = false;
         final boolean saveToDisk = false;
         Thread parser1 = new Thread(p);
 
@@ -232,6 +232,71 @@ class ParseTest {
         DecimalFormat formatter = new DecimalFormat("#,###");
         System.out.println("total number of terms: " + formatter.format(terms.size()));
         System.out.println("Total number of non unique terms: " + formatter.format(totalNonUniqueTerms.get()));
+    }
+
+    @Test
+    void countTermsUniqueNumbers() throws Exception {
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs, true);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        SortedSet<Term> termsNumberOrPriceOrPercent = new TreeSet<>();
+
+        Callable<Integer> termAccumulatorNumbersOnly = () -> {
+            try {
+                boolean done = false;
+                SortedSet<Term> termsPureNumbers = new TreeSet<>();
+                while (!done) {
+                    TermDocument termDoc = termDocs.take();
+                    if (termDoc.getText() == null) {
+                        done = true;
+                    } else {
+                        for (Term t : termDoc.getText()
+                        ) {
+                            if(Parse.isNumeral(t.toString().charAt(0))) {
+                                termsNumberOrPriceOrPercent.add(t);
+                            }
+                            if(Parse.TokenType.classify(t.toString()) == Parse.TokenType.NUMBER){
+                                termsPureNumbers.add(t);
+                            }
+                        }
+                        for (Term t : termDoc.getTitle()
+                        ) {
+                            if(Parse.isNumeral(t.toString().charAt(0))) {
+                                termsNumberOrPriceOrPercent.add(t);
+                            }
+                            if(Parse.TokenType.classify(t.toString()) == Parse.TokenType.NUMBER){
+                                termsPureNumbers.add(t);
+                            }
+                        }
+                    }
+                }
+                return termsPureNumbers.size();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+        FutureTask<Integer> numUniquePureNumberTerms = new FutureTask<>(termAccumulatorNumbersOnly);
+        Thread t_termAccumulator = new Thread(numUniquePureNumberTerms);
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        t_termAccumulator.start();
+        reader.start();
+        parser1.start();
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        System.out.println("Total number of unique number/price/percent terms: " + formatter.format(termsNumberOrPriceOrPercent.size()));
+        System.out.println("Total number of unique pure number terms: " + formatter.format(numUniquePureNumberTerms.get()));
     }
 
     @Test
