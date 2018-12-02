@@ -28,7 +28,6 @@ public class IntToIntArrayMapOutputStream {
         long startIdx = getCursor();
 
         byte[] outBytes = mapToByteArray(map);
-//        buffer.add(outBytes);
         postingsFile.write(outBytes);
 
         filePointer += outBytes.length;
@@ -56,7 +55,8 @@ public class IntToIntArrayMapOutputStream {
         int dataIndex = 0;
 
         //fill data array
-        APostingOutputStream.intToByteArray(totalNumInts, data, dataIndex);
+        APostingOutputStream.intToByteArray(
+                totalNumInts-1 /*indicates how many ints to read after the int indicating how many ints to read*/, data, dataIndex);
         dataIndex += 4;
         for (Map.Entry<Integer, int[]> entry : map.entrySet()
              ) {

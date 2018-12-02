@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +30,22 @@ class IntToIntArrayMapStreamsTest {
         int pointer = (int)out.write(original);
 
         Map<Integer, int[]> input = in.readIntegerArraysMap(pointer);
-        assertArrayEquals(original.entrySet().toArray(), input.entrySet().toArray());
+
+        assertEquals(original.size(), input.size());
+
+        Set<Integer> originalEntries = (original.keySet());
+        Set<Integer> inputEntries = (input.keySet());
+
+        assertEquals(originalEntries, inputEntries);
+
+        int[][] originalValues = new int[original.size()][];
+        original.values().toArray(originalValues);
+        int[][] inputValues = new int[input.size()][];
+        input.values().toArray(inputValues);
+
+        for (int i = 0; i < originalValues.length ; i++) {
+            assertArrayEquals(originalValues[i], inputValues[i]);
+        }
+
     }
 }
