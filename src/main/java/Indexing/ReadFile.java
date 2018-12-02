@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import Elements.Document;
 
@@ -25,6 +26,7 @@ import Elements.Document;
 public class ReadFile implements Runnable {
     private String pathToDocumentsFolder;
     static BlockingQueue<Document> documentBuffer; //@TODO: need to see how to make the queue not static.
+    Map<String, CityIndexEntry> cityMap = null;
 
 
     /**
@@ -44,6 +46,10 @@ public class ReadFile implements Runnable {
      */
 
     private void read() {
+
+
+
+
         File f = new File(pathToDocumentsFolder);
         Elements docs;
         File[] allSubFiles = f.listFiles();
@@ -131,6 +137,9 @@ public class ReadFile implements Runnable {
 
     public void run() {
         read();
+
+
+
     }
 
 
@@ -239,6 +248,9 @@ public class ReadFile implements Runnable {
                     }
                 }
                 doc.setCity(s.toString().replace(" ",""));
+                if (!cityMap.containsKey(s.toString().replace(" ",""))){
+                    cityMap.put(s.toString().replace(" ",""),new CityIndexEntry(null,null,null,true));
+                }
                 s=null;
                 city=false;
             }

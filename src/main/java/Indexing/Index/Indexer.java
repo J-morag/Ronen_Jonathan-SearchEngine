@@ -3,6 +3,7 @@ package Indexing.Index;
 import Elements.Document;
 import Elements.Term;
 import Elements.TermDocument;
+import Indexing.CityIndexEntry;
 
 import java.io.*;
 import java.util.*;
@@ -24,6 +25,7 @@ public class Indexer implements Runnable {
     private String pathToOutputFolder;
     private BlockingQueue<TermDocument> stemmedTermDocumentsBuffer;
     private AIndexMaker mainIndex;
+    private AIndexMaker cityIndex;
     private int numIndexedDocs;
     private String finalPath="";
 
@@ -36,13 +38,15 @@ public class Indexer implements Runnable {
         if(withSteming) {
             finalPath=pathToOutputFolder +"\\postingWithStemming";
             new File(finalPath).mkdir();
-            mainIndex = new MainIndexMaker(finalPath);
         }
         else {
             finalPath=pathToOutputFolder +"\\postingWithOutStemming";
             new File(finalPath).mkdir();
             mainIndex = new MainIndexMaker(finalPath);
         }
+
+        mainIndex = new MainIndexMaker(finalPath);
+        cityIndex = new CityIndexMaker(finalPath);
 }
 
     /**
@@ -56,11 +60,15 @@ public class Indexer implements Runnable {
             while (!done) {
                 TermDocument document = stemmedTermDocumentsBuffer.take();
                 mainIndex.addToIndex(document);
+//                cityIndex.addToIndex(document);
                 if(document.getSerialID()==-1){
                     done=true;
                 }
                 else numIndexedDocs++;
             }
+            mergeMainIndex();
+            dumpDictionaryToDisk();
+
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -154,6 +162,10 @@ public class Indexer implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    public Map<String , CityIndexEntry> getCityMap(){
+        return ((CityIndexMaker)cityIndex).getCityDictionary();
     }
 
 
