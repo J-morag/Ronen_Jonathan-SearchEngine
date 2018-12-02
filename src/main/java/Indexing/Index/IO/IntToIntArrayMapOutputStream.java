@@ -1,5 +1,6 @@
 package Indexing.Index.IO;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,7 +9,7 @@ import java.util.Map;
 public class IntToIntArrayMapOutputStream {
 
     long filePointer = 0;
-    OutputStream postingsFile;
+    BufferedOutputStream postingsFile;
 
     /**
      * if the file doesn't exist, creates it.
@@ -17,7 +18,7 @@ public class IntToIntArrayMapOutputStream {
      * @throws IOException
      */
     public IntToIntArrayMapOutputStream(String pathToFile) throws IOException {
-        this.postingsFile = new FileOutputStream(pathToFile);
+        this.postingsFile = new BufferedOutputStream( new FileOutputStream(pathToFile));
     }
 
     public long getCursor() {

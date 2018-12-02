@@ -40,20 +40,6 @@ public class BasicPostingOutputStream extends APostingOutputStream  {
         result.append(';');
     }
 
-//    @Override
-//    public long write(@NotNull Posting p) throws IOException {
-//        // ';' denotes the end of a single posting
-//        postingsFile.writeBytes(postingToStringTuple(p));
-//        return postingsFile.getFilePointer();
-//    }
-//
-//    @Override
-//    public long writeln(Posting p) throws IOException {
-//        String output = p!=null? (postingToStringTuple(p)+"\n") : "\n";
-//        postingsFile.writeBytes(output);
-//        return postingsFile.getFilePointer();
-//    }
-
 
     @Override
     public long write(@NotNull List<Posting> postings) throws NullPointerException, IOException {

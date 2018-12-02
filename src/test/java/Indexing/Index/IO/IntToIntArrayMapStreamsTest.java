@@ -28,6 +28,8 @@ class IntToIntArrayMapStreamsTest {
         original.put(98327, new int[]{0, -23487});
 
         int pointer = (int)out.write(original);
+        out.flush();
+        out.close();
 
         Map<Integer, int[]> input = in.readIntegerArraysMap(pointer);
 
@@ -46,6 +48,25 @@ class IntToIntArrayMapStreamsTest {
         for (int i = 0; i < originalValues.length ; i++) {
             assertArrayEquals(originalValues[i], inputValues[i]);
         }
+
+    }
+
+    @Test
+    void basicOutputStreamTest() throws IOException {
+
+        BasicIntArrayMapOutputStream out = new BasicIntArrayMapOutputStream(path);
+
+        Map<Integer, int[]> original = new LinkedHashMap<>();
+
+        original.put(653, new int[]{37, 239847, 50, 1});
+        original.put(6, new int[]{3732, 243984, 530, 0, 23478 , 60, -3, 23897, 549, 5984, 90});
+        original.put(98327, new int[]{0, -23487});
+
+        int pointer = (int)out.write(original);
+        pointer = (int)out.write(original);
+
+        out.flush();
+        out.close();
 
     }
 }
