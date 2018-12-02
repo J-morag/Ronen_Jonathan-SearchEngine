@@ -1,9 +1,7 @@
 package Indexing.Index;
 
-import Elements.Term;
-import Elements.TermDocument;
-import Indexing.CityIndexEntry;
-import org.omg.CORBA.portable.ValueOutputStream;
+import Indexing.DocumentProcessing.Term;
+import Indexing.DocumentProcessing.TermDocument;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

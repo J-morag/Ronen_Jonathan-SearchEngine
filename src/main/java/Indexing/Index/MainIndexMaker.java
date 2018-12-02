@@ -1,10 +1,9 @@
 package Indexing.Index;
 
-import Elements.Term;
-import Elements.TermDocument;
+import Indexing.DocumentProcessing.Term;
+import Indexing.DocumentProcessing.TermDocument;
 import Indexing.Index.IO.*;
 
-import javax.print.DocFlavor;
 import java.io.*;
 import java.util.*;
 

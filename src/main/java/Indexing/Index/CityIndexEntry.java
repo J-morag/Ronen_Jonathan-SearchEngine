@@ -1,4 +1,4 @@
-package Indexing;
+package Indexing.Index;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;

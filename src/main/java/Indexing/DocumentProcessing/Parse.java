@@ -1,8 +1,5 @@
-package Indexing;
+package Indexing.DocumentProcessing;
 
-import Elements.Document;
-import Elements.Term;
-import Elements.TermDocument;
 import com.sun.istack.internal.NotNull;
 
 import java.io.*;

@@ -1,13 +1,12 @@
 package GUI;
 
-import Elements.Document;
-import Elements.TermDocument;
+import Indexing.DocumentProcessing.Document;
+import Indexing.DocumentProcessing.TermDocument;
 import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
-import Indexing.Parse;
-import Indexing.ReadFile;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+import Indexing.DocumentProcessing.Parse;
+import Indexing.DocumentProcessing.ReadFile;
 
 import java.io.*;
 import java.util.HashSet;

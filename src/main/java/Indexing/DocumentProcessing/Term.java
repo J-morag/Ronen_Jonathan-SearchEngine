@@ -1,6 +1,4 @@
-package Elements;
-
-import java.util.List;
+package Indexing.DocumentProcessing;
 
 /**
  * this class is a data type that represents a term.

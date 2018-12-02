@@ -1,15 +1,13 @@
 package Indexing.Index;
 
-import Elements.Document;
-import Elements.TermDocument;
-import Indexing.CityIndexEntry;
-import Indexing.Parse;
-import Indexing.ReadFile;
+import Indexing.DocumentProcessing.Document;
+import Indexing.DocumentProcessing.TermDocument;
+import Indexing.DocumentProcessing.Parse;
+import Indexing.DocumentProcessing.ReadFile;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.jsoup.parser.Parser;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;

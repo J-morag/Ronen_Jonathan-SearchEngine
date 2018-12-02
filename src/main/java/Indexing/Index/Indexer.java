@@ -1,9 +1,6 @@
 package Indexing.Index;
 
-import Elements.Document;
-import Elements.Term;
-import Elements.TermDocument;
-import Indexing.CityIndexEntry;
+import Indexing.DocumentProcessing.TermDocument;
 
 import java.io.*;
 import java.util.*;

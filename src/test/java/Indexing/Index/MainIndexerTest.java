@@ -1,11 +1,9 @@
 package Indexing.Index;
 
-import Elements.Document;
-import Elements.Term;
-import Elements.TermDocument;
-import Indexing.Parse;
-import Indexing.ReadFile;
-import javafx.util.Pair;
+import Indexing.DocumentProcessing.Document;
+import Indexing.DocumentProcessing.TermDocument;
+import Indexing.DocumentProcessing.Parse;
+import Indexing.DocumentProcessing.ReadFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;

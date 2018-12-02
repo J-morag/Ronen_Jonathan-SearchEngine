@@ -1,12 +1,9 @@
-package Indexing;
+package Indexing.DocumentProcessing;
 
-import Elements.Document;
-import Elements.Term;
-import Elements.TermDocument;
 import org.junit.jupiter.api.Test;
 
-import static Indexing.Parse.isLetter;
-import static Indexing.Parse.isNumeral;
+import static Indexing.DocumentProcessing.Parse.isLetter;
+import static Indexing.DocumentProcessing.Parse.isNumeral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
@@ -19,8 +16,6 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 class ParseTest {

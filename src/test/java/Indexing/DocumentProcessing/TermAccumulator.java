@@ -1,7 +1,4 @@
-package Indexing;
-
-import Elements.Term;
-import Elements.TermDocument;
+package Indexing.DocumentProcessing;
 
 import java.util.SortedSet;
 import java.util.concurrent.ArrayBlockingQueue;

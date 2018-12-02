@@ -1,4 +1,4 @@
-package Elements;
+package Indexing.DocumentProcessing;
 
 import java.util.List;
 

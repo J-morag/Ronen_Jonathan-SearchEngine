@@ -1,4 +1,4 @@
-package Elements;
+package Indexing.DocumentProcessing;
 
 import com.sun.scenario.effect.impl.prism.PrImage;
 

@@ -1,10 +1,8 @@
 package Indexing.Index;
 
-import Elements.Document;
-import Elements.Term;
-import Elements.TermDocument;
+import Indexing.DocumentProcessing.Term;
+import Indexing.DocumentProcessing.TermDocument;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

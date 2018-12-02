@@ -1,4 +1,4 @@
-package Indexing;
+package Indexing.DocumentProcessing;
 /*
 
    Porter stemmer in Java. The original paper is in
