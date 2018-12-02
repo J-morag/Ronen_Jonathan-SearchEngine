@@ -1,18 +1,12 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
-import javafx.geometry.Pos;
-import sun.awt.Mutex;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostingOutputStream extends APostingOutputStream {
 
-//    protected List<byte[]> buffer = new ArrayList<>();
-    private Mutex m_postingsFile = new Mutex();
 
     /**
      * if the file doesn't exist, creates it.
@@ -42,46 +36,14 @@ public class PostingOutputStream extends APostingOutputStream {
     @Override
     public void flush() throws IOException {
         postingsFile.flush();
-//        int totalByte = 0;
-//        for (byte[] arr: buffer
-//                ) {
-//            totalByte += arr.length;
-//        }
-//        byte[] data = new byte[totalByte];
-//
-//        int idx = 0;
-//        for (byte[] arr: buffer
-//                ) {
-//            for (byte b: arr
-//                    ) {
-//                data[idx] = b;
-//                idx++;
-//            }
-//        }
-//        writeOut(data);
-//        buffer.clear();
     }
-
-//    protected void writeOut(byte[] bytes) throws IOException {
-//        Thread t = new Thread(() -> {
-//            m_postingsFile.lock();
-//            try {
-//                postingsFile.write(bytes);
-//                postingsFile.flush();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            m_postingsFile.unlock();
-//        });
-//        t.run();
-//    }
 
     protected byte[] postingsArrayToByteArray(List<Posting> postings){
         int numPostings = postings.size();
         byte[] data = new byte[4 + numPostings *
                 (Posting.getNumberOfShortFields()*2 + Posting.getNumberOfIntFields()*4 + 1 /*holds 8 bools*/  )];
 
-        intToBytes(numPostings, data, 0);
+        intToByteArray(numPostings, data, 0);
 
         int dataIdx = 4;
 
@@ -90,7 +52,7 @@ public class PostingOutputStream extends APostingOutputStream {
             int[] intFieldsFori = extractIntegerFields(p);
             for (int integer: intFieldsFori
                     ) {
-                intToBytes(integer, data, dataIdx);
+                intToByteArray(integer, data, dataIdx);
                 dataIdx += 4;
             }
 
@@ -114,30 +76,7 @@ public class PostingOutputStream extends APostingOutputStream {
     }
 
 
-    protected byte short8MSB(short s){
-        return (byte)(s >> 8);
-    }
 
-    protected byte short8LSB(short s){
-        return (byte)s;
-    }
-
-    /**
-     * big endian:  In this order, the bytes of a multibyte value are ordered from most significant to least significant.
-     * @param i
-     * @param bytes
-     * @param startIdx
-     * @throws IndexOutOfBoundsException
-     */
-    protected void intToBytes(int i, byte[] bytes, int startIdx) throws IndexOutOfBoundsException{
-        bytes[startIdx] = (byte)(i >> 24);
-        startIdx++;
-        bytes[startIdx] = (byte)(i >> 16);
-        startIdx++;
-        bytes[startIdx] = (byte)(i >> 8);
-        startIdx++;
-        bytes[startIdx] = (byte)(i);
-    }
 
 
     @Override

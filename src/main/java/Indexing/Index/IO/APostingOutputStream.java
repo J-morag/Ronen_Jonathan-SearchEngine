@@ -28,18 +28,44 @@ public abstract class APostingOutputStream implements IPostingOutputStream{
 
 
 
-    protected short[] extractShortFields(Posting posting){
+    static short[] extractShortFields(Posting posting){
         return posting.getShortFields();
     }
 
-    protected int[] extractIntFields(Posting posting){
+    static int[] extractIntFields(Posting posting){
         return posting.getIntegerFields();
     }
-    protected int[] extractIntegerFields(Posting posting){
+    static int[] extractIntegerFields(Posting posting){
         return posting.getIntegerFields();
     }
-    protected boolean[] extractBooleanFields(Posting posting){
+    static boolean[] extractBooleanFields(Posting posting){
         return posting.getBooleanFields();
+    }
+
+
+    static byte short8MSB(short s){
+        return (byte)(s >> 8);
+    }
+
+    static byte short8LSB(short s){
+        return (byte)s;
+    }
+
+    /**
+     * big endian:  In this order, the bytes of a multibyte value are ordered from most significant to least significant.
+     * @param i
+     * @param bytes
+     * @param startIdx
+     * @throws IndexOutOfBoundsException
+     */
+    static void intToByteArray(int i, byte[] bytes, int startIdx) throws IndexOutOfBoundsException{
+        bytes[startIdx] = (byte)(i >> 24);
+        startIdx++;
+        bytes[startIdx] = (byte)(i >> 16);
+        startIdx++;
+        bytes[startIdx] = (byte)(i >> 8);
+        startIdx++;
+        bytes[startIdx] = (byte)(i);
     }
 
 
