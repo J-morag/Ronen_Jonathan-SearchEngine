@@ -512,7 +512,7 @@ public class Parse implements Runnable{
      * @param isPercent
      * @param isFractional
      */
-    public static void finalizeNumber(@NotNull StringBuilder unformattedNumber,@NotNull StringBuilder result, long kmbtMultiplier,
+    private void finalizeNumber(@NotNull StringBuilder unformattedNumber,@NotNull StringBuilder result, long kmbtMultiplier,
                                 String decimals, boolean isPrice, boolean isPercent, boolean isFractional, String dateMonth)
     {
         boolean isDate = dateMonth != null;

@@ -28,111 +28,79 @@ public class CityIndexMaker extends AIndexMaker {
     @Override
     public void addToIndex(TermDocument doc) {
         if (doc.getSerialID() != -1) {
-            String docCity = "";
-            if (null != doc.getCity())
-                docCity = doc.getCity().toString();
-
-            Map<String, Integer> apearanceMap = new LinkedHashMap<>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
-            countApearance(title, text, apearanceMap);
-            int index = 1;
-            for (Term term : title) {
-                String trm = term.toString().toUpperCase();
-                if (apearanceMap.containsKey(trm)) {
-                    CityIndexEntry cityIndexEntry = cityDictionary.get(trm);
-                    Map<Integer, int[]> docsMap = cityIndexEntry.getDocsMap();
-                    if (!docsMap.containsKey(doc.getSerialID())) {
-                        if (docCity.equals(trm)) {
-                            cityIndexEntry.addDocToMap(doc.getSerialID(), new int[apearanceMap.get(trm) + 1]);
-                            docsMap.get(doc.getSerialID())[0] = 0;
-                            docsMap.get(doc.getSerialID())[1] = index;
-                            apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                        } else {
-                            cityIndexEntry.addDocToMap(doc.getSerialID(), new int[apearanceMap.get(trm)]);
-                            docsMap.get(doc.getSerialID())[0] = index;
-                            apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                        }
-                    } else {
+            Map<String , Integer> counterMap = new LinkedHashMap<>();
 
-                        docsMap.get(doc.getSerialID())[docsMap.get(doc.getSerialID()).length - apearanceMap.get(trm)] = index;
-                        apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                    }
-                } else {
-                    index++;
-                    continue;
+            String cityDoc;
+            try{
+                cityDoc=doc.getCity().toString();
+            }catch (NullPointerException e ){
+                cityDoc="";
+            }
+            if(!cityDoc.equals("") && (cityDoc.charAt(0)>='A' && cityDoc.charAt(0)<='Z')) {
+                if(!cityDictionary.containsKey(cityDoc)) {
+                    CityIndexEntry cityIndexEntry = new CityIndexEntry(null, null, null);
+                    cityDictionary.put(cityDoc,cityIndexEntry);
                 }
-                index++;
+                countApearance( text, counterMap, cityDoc);
+                int index=0;
+                for (Term term : text) {
+                    String trm = term.toString().toUpperCase();
+                    if (trm.equals(cityDoc)){
+                        addToCityDictionary(trm , doc.getSerialID() , counterMap ,index);
+                        index++;
+                    }
+
+                }
 
             }
-
-
-            for (Term term : text) {
-                String trm = term.toString().toUpperCase();
-                if (apearanceMap.containsKey(trm)) {
-                    CityIndexEntry cityIndexEntry = cityDictionary.get(trm);
-                    Map<Integer, int[]> docsMap = cityIndexEntry.getDocsMap();
-                    if (!docsMap.containsKey(doc.getSerialID())) {
-                        if (docCity.equals(trm)) {
-                            cityIndexEntry.addDocToMap(doc.getSerialID(), new int[apearanceMap.get(trm) + 1]);
-                            docsMap.get(doc.getSerialID())[0] = 0;
-                            docsMap.get(doc.getSerialID())[1] = index;
-                            apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                        } else {
-                            cityIndexEntry.addDocToMap(doc.getSerialID(), new int[apearanceMap.get(trm)]);
-                            docsMap.get(doc.getSerialID())[0] = index;
-                            apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                        }
-                    } else {
-
-                        docsMap.get(doc.getSerialID())[docsMap.get(doc.getSerialID()).length - apearanceMap.get(trm)] = index;
-                        apearanceMap.put(trm, apearanceMap.get(trm) - 1);
-                    }
-                } else {
-                    index++;
-                    continue;
-                }
-                index++;
-            }
-
-
-            title.clear();
-            text.clear();
-            apearanceMap.clear();
 
         }
+        else {
+        dumpToDisk();
+        }
+    }
+
+    private void dumpToDisk() {
+        for ( String key : cityDictionary.keySet()  ) {
+
+        }
+    }
+
+    private void addToCityDictionary(String trm, int serialID, Map<String, Integer> counterMap ,int index) {
+        CityIndexEntry cityIndexEntry = cityDictionary.get(trm);
+        Map<Integer , int[]> appearanceMap = cityIndexEntry.getDocsMap();
+
+        if(!appearanceMap.containsKey(serialID)){
+            int [] appearanceAray = new int[counterMap.get(trm)];
+            appearanceAray[0]=index;
+            counterMap.put(trm,counterMap.get(trm)-1);
+            cityIndexEntry.addDocToMap(serialID,appearanceAray);
+        }else {
+            cityIndexEntry.addDocToMap(serialID,index,counterMap.get(trm));
+            counterMap.put(trm,counterMap.get(trm)-1);
+        }
+
     }
 
 
 
 
 
-
-
-
-
-    private void countApearance(List<Term> title , List<Term> text , Map<String , Integer> apearanceMap){
-        for (Term term : title ) {
-            String trm= term.toString().toUpperCase();
-            if(cityDictionary.containsKey(trm)){
-                if (!apearanceMap.containsKey(trm)){
-                    apearanceMap.put(trm,1);
-                }else {
-                    apearanceMap.put(trm,new Integer(apearanceMap.get(trm)+1));
-                }
-
-            }
-        }
+    private void countApearance( List<Term> text , Map<String , Integer> apearanceMap , String cityDoc){
 
         for (Term term : text ) {
             String trm= term.toString().toUpperCase();
-            if(cityDictionary.containsKey(trm)){
-                if (!apearanceMap.containsKey(trm)){
-                    apearanceMap.put(trm,1);
-                }else {
-                    apearanceMap.put(trm,new Integer(apearanceMap.get(trm)+1));
-                }
+            if(cityDoc.equals(trm)) {
+                if (cityDictionary.containsKey(trm)) {
+                    if (!apearanceMap.containsKey(trm)) {
+                        apearanceMap.put(trm, 1);
+                    } else {
+                        apearanceMap.put(trm, new Integer(apearanceMap.get(trm) + 1));
+                    }
 
+                }
             }
         }
     }
@@ -143,7 +111,7 @@ public class CityIndexMaker extends AIndexMaker {
     private void getDictionaryFromDisk(){
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream("citiesDictionary");
+            fileInputStream = new FileInputStream("resources\\citiesDictionary");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             cityDictionary= (Map<String, CityIndexEntry>) objectInputStream.readObject();
 

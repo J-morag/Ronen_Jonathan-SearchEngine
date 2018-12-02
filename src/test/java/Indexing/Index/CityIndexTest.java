@@ -52,7 +52,7 @@ public class CityIndexTest {
 
 
 
-                FileOutputStream fileOutputStream = new FileOutputStream("citiesDictionary");
+                FileOutputStream fileOutputStream = new FileOutputStream("resources\\citiesDictionary");
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
                 objectOutputStream.writeObject(cityMap);
 
@@ -83,7 +83,7 @@ public class CityIndexTest {
 
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream("citiesDictionary");
+            fileInputStream = new FileInputStream("resources\\citiesDictionary");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
              cityMap= (Map<String, CityIndexEntry>) objectInputStream.readObject();
              

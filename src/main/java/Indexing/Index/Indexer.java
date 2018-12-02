@@ -43,7 +43,7 @@ public class Indexer implements Runnable {
         }
 
         mainIndex = new MainIndexMaker(finalPath);
-        cityIndex = new CityIndexMaker(finalPath);
+        //cityIndex = new CityIndexMaker(finalPath);
 }
 
     /**

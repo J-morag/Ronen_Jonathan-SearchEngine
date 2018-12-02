@@ -247,9 +247,6 @@ public class ReadFile implements Runnable {
                     }
                 }
                 doc.setCity(s.toString().replace(" ",""));
-                if (!cityMap.containsKey(s.toString().replace(" ",""))){
-                    cityMap.put(s.toString().replace(" ",""),new CityIndexEntry(null,null,null,true));
-                }
                 s=null;
                 city=false;
             }

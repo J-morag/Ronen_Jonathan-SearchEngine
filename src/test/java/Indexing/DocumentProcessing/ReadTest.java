@@ -326,8 +326,14 @@ void toUpperCaseTest()
     void generalTest() throws IOException {
 
 
-     new File("C:\\Users\\ronen\\Desktop\\shalev.txt").createNewFile();
+    String a ="abcde,adasdad,dasdad,dadsa";
 
+    byte [] b=a.getBytes();
+
+        for (int i = 0; i <b.length ; i++) {
+
+        }
+    StringBuilder sb = new StringBuilder();
 
     }
 

@@ -14,6 +14,7 @@ public class CityIndexEntry implements Serializable {
     private String population;
     private boolean isPartOfCorpus=false;
     private Map<Integer , int[]> docsMap;
+    private int pointer;
 
 
     public CityIndexEntry(String countryName , String currency , String population , boolean isPartOfCorpus){
@@ -39,6 +40,14 @@ public class CityIndexEntry implements Serializable {
         docsMap.put(docNum,positions);
     }
 
+    public void addDocToMap(int docNum , int index , int numLeft ){
+
+        int [] arr =docsMap.get(docNum);
+        int pointer = arr.length-numLeft;
+        arr[pointer]=index;
+
+    }
+
     public Map<Integer , int[]> getDocsMap (){
         return docsMap;
     }
@@ -56,5 +65,11 @@ public class CityIndexEntry implements Serializable {
     }
     public Boolean isInCorpus(){
         return isPartOfCorpus;
+    }
+
+    public int getPointer(){return pointer;}
+
+    public void setPointer(int newPointer){
+        pointer=newPointer;
     }
 }
