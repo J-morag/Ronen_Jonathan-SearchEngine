@@ -249,7 +249,6 @@ public class MainIndexMaker extends AIndexMaker {
         tempDictionary=null;
 
 
-
        try {
 
            File file = new File(path);
