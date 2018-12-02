@@ -7,6 +7,9 @@ import javafx.scene.control.Alert;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * MVC controller
+ */
 public class Controller {
 
     Model model;

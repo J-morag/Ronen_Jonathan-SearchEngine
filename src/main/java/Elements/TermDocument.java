@@ -2,6 +2,9 @@ package Elements;
 
 import java.util.List;
 
+/**
+ * this class is a data type that represents a document after it has been parsed into terms.
+ */
 public class TermDocument {
     final private int serialID;
     final private String docId;

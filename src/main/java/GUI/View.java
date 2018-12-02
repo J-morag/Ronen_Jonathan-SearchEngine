@@ -13,6 +13,9 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * MVC view
+ */
 public class View {
 
     private Controller controller;

@@ -2,6 +2,9 @@ package Elements;
 
 import java.util.List;
 
+/**
+ * this class is a data type that represents a term.
+ */
 public class Term implements Comparable {
     final String string;
 //    boolean isInHeader = false;

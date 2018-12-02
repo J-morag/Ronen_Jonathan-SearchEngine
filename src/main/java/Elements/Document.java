@@ -2,6 +2,9 @@ package Elements;
 
 import com.sun.scenario.effect.impl.prism.PrImage;
 
+/**
+ * this class is a data type that represents a document.
+ */
 public class Document {
     private  String docId;
     private String title = "";

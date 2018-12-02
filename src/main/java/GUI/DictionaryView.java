@@ -7,6 +7,9 @@ import javafx.scene.control.TableView;
 
 import java.util.List;
 
+/**
+ * displays a dictionary in a table.
+ */
 public class DictionaryView {
 
     // DICTIONARY_VIEW

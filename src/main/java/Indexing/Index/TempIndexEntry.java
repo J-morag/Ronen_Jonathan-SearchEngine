@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Data type containing the information pertaining to a single Term in the temporary dictionary.
+ */
 public class TempIndexEntry {
     private int tfTotal;
     private int df;

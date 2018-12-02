@@ -11,7 +11,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * takes Documents, tokenizes and parses them. does not perform stemming.
+ * Runnable.
+ * Takes Documents, tokenizes and parses them.
+ * Meant to work in a producer consumer architecture, however, it can be run in a serial manner by using {@link #parseOneDocument(Document)}  parseOneDocument}.
+ * This object's state does not change as a result of parsing any number of documents.
  */
 public class Parse implements Runnable{
     public static boolean debug = false;
@@ -32,9 +35,8 @@ public class Parse implements Runnable{
     /**
      * @param stopWords - a set of stopwords to ignore when parsing. if a term is generated when parsing and it consists of just a stopword, it will be eliminated.
      *                  the set is copied to a local copy.
-     * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with null text field.
-     * @param sinkTermDocumentQueue - a blocking queue to be filled with lists of Term. Each List representing the Terms from a single documents.
-     *                     End of queue will be marked by a "poison" List with just a null Term.
+     * @param sourceDocumentsQueue - a blocking queue of documents to parse. End of queue will be marked by a "poison" Document with all fields set to null.
+     * @param sinkTermDocumentQueue - a blocking queue to be filled with TermDocuments. End of queue will be marked by a "poison" TermDocument with all Term fields set to null.
      */
     public Parse(@NotNull HashSet<String> stopWords,@NotNull  BlockingQueue<Document> sourceDocumentsQueue,@NotNull  BlockingQueue<TermDocument> sinkTermDocumentQueue, boolean useStemming) {
         this.useStemming = useStemming;
@@ -599,7 +601,7 @@ public class Parse implements Runnable{
     }
 
     private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, float number){
-//        number -= number%0.00001; //remove anything beyond the five digits past the decimal point
+        number -= number%0.01; //remove anything beyond the two digits past the decimal point
         if( number % 1 == 0 ){
             long numberWithoutDecimals = ((long)number);
             result.append(numberWithoutDecimals);

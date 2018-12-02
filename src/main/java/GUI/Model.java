@@ -16,6 +16,10 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * MVC model.
+ * holds program state and logic.
+ */
 public class Model {
 
     // GLOBAL PARAMETERS
