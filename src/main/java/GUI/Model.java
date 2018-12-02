@@ -7,6 +7,7 @@ import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
+import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.util.HashSet;
@@ -41,13 +42,6 @@ public class Model {
 
     public Map<String, IndexEntry> getDictionary(boolean useStemming) {
         return useStemming ? mainDictionaryWithStemming : mainDictionaryNoStemming;
-//        HashMap<String, IndexEntry> map = new HashMap<>();
-//        Random rnd = new Random();
-//        for (int i = 0; i < 60 ; i++) {
-//            map.put("test" + i, new IndexEntry( rnd.nextInt(30000), rnd.nextInt(30000), rnd.nextInt(30000)));
-//
-//        }
-//        return map;
     }
 
     public void loadDictionary(boolean useStemming, String outputFolder) throws IOException, ClassNotFoundException, ClassCastException {
@@ -115,6 +109,8 @@ public class Model {
         tIndexer.join();
         indexer.mergeMainIndex();
 
+        time = (System.currentTimeMillis() - time)/1000;
+
         if(useStemming){
             this.mainDictionaryWithStemming = indexer.getMainMap();
             this.docDictionaryWithStemming = indexer.getDocsMap();
@@ -126,7 +122,6 @@ public class Model {
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();
-        time = (System.currentTimeMillis() - time)/1000;
 
         return "Number of indexed documents = " + numIndexedDocs + "\n" +
                 "Number of unique terms = " + numUniqueTerms + "\n" +

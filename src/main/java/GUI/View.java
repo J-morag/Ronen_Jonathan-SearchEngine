@@ -80,7 +80,15 @@ public class View {
     }
 
     public void generateIndex(ActionEvent actionEvent) {
+        Alert generatingAlert = new Alert(Alert.AlertType.INFORMATION, "Generating Index");
+        generatingAlert.setHeaderText("Generating Index");
+        generatingAlert.setTitle("Generating Index");
+        generatingAlert.show();
+
         Alert alert = controller.generateIndex();
+
+        generatingAlert.close();
+
         handleNewDictionary(alert);
     }
 
