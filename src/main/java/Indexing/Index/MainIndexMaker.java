@@ -26,12 +26,14 @@ public class MainIndexMaker extends AIndexMaker {
     private int numOfDocs;
     private short tempFileNumber;
     private String path="";
+    private Set<String> languages;
 
     public MainIndexMaker (String path ){
         super();
         this.tempDictionary=new LinkedHashMap<>();
         this.mainDictionary = new LinkedHashMap<>();
         this.docsDictionary = new LinkedHashMap<>();
+        languages=new HashSet<>();
         numOfDocs=0;
         tempFileNumber=0;
         this.path=path;
@@ -56,6 +58,10 @@ public class MainIndexMaker extends AIndexMaker {
             }
             if(doc.getLanguage()!=null) {
                 language = doc.getLanguage();
+            }
+
+            if(!language.equals("")){
+                languages.add(language);
             }
 
 // add a document to the DocIndex
@@ -253,11 +259,11 @@ public class MainIndexMaker extends AIndexMaker {
         tempDictionary=null;
 
 
-       try {
 
+       try {
            File file = new File(path);
            for (File fi : file.listFiles()) {
-              if (!(fi.getName().equals("Postings"))) {
+              if (!(fi.getName().equals("Postings"))&& !(fi.getName().equals("CitiesPosting"))) {
                   fi.delete();
               }
            }
@@ -382,6 +388,10 @@ public class MainIndexMaker extends AIndexMaker {
             finalList.add(newTermPostingMap.get(key));
         }
         return finalList;
+    }
+
+    public Set<String> getLanguages(){
+        return languages;
     }
 
 

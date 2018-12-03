@@ -23,8 +23,8 @@ public class CityIndexTest {
     private static final int termBufferSize = 3;
     private static final int stemmedTermBufferSize = 3;
 
-    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
-     private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus"; //TODO temporary! should come from UI
+    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
     private static final String pathToStopWordRONEN ="C:\\Users\\ronen\\Desktop\\stopWords.txt";
 
     @Test
@@ -129,24 +129,7 @@ public class CityIndexTest {
         tIndexer.start();
         tIndexer.join();
 
-        Map<String , CityIndexEntry> map = indexer.getCityMap();
 
-        for (String city : map.keySet()) {
-            CityIndexEntry cityIndexEntry = map.get(city);
-            if(!cityIndexEntry.isInCorpus() || cityIndexEntry.getDocsMap().size()==0){
-                continue;
-            }
-
-            else{
-                Map<Integer , int [] > docsMap = cityIndexEntry.getDocsMap();
-                System.out.print(city+"->");
-                for ( Integer key: docsMap.keySet() ) {
-                    System.out.print(key+",");
-                }
-                System.out.println("\n");
-            }
-
-        }
 
     }
 }
