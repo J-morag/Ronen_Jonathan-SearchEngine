@@ -17,6 +17,8 @@ public class Indexer implements Runnable {
     public static String noStemmingOutputFolderName = "postingWithOutStemming";
     public static String dictionarySaveName = "Index";
     public static String docsDictionaryName="DocsIndex";
+    public static String cityDictionaryName="CityDictionary";
+    public static String languages="Languages";
 
 
     private String pathToOutputFolder;
@@ -43,7 +45,7 @@ public class Indexer implements Runnable {
         }
 
         mainIndex = new MainIndexMaker(finalPath);
-        //cityIndex = new CityIndexMaker(finalPath);
+        cityIndex = new CityIndexMaker(finalPath);
 }
 
     /**
@@ -57,7 +59,7 @@ public class Indexer implements Runnable {
             while (!done) {
                 TermDocument document = stemmedTermDocumentsBuffer.take();
                 mainIndex.addToIndex(document);
-//                cityIndex.addToIndex(document);
+                cityIndex.addToIndex(document);
                 if(document.getSerialID()==-1){
                     done=true;
                 }
@@ -65,6 +67,7 @@ public class Indexer implements Runnable {
             }
             mergeMainIndex();
             dumpDictionaryToDisk();
+
 
 
         } catch (InterruptedException e) {
@@ -105,7 +108,9 @@ public class Indexer implements Runnable {
         return ((MainIndexMaker)mainIndex).getDocsDictionary();
     }
 
-
+    public Set<String> getLanguages(){
+        return ((MainIndexMaker)mainIndex).getLanguages();
+    }
 
     public void mergeMainIndex(){
             ((MainIndexMaker) mainIndex).mergeIndex();
@@ -119,20 +124,41 @@ public class Indexer implements Runnable {
 
             OutputStream docsIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+docsDictionaryName);
             ObjectOutputStream docsIndexObjectOutstream  = new ObjectOutputStream(docsIndexFileOutputStream);
-            ((ObjectOutputStream) docsIndexObjectOutstream).writeObject(getDocsMap());
+
+            OutputStream cityIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+cityDictionaryName);
+            ObjectOutputStream cityIndexObjectOutstream  = new ObjectOutputStream(cityIndexFileOutputStream);
+
+
+            OutputStream languagesFileOutputStream = new FileOutputStream(finalPath+"\\"+languages);
+            ObjectOutputStream languagesObjectOutputStream  = new ObjectOutputStream(languagesFileOutputStream);
+
+
+            docsIndexObjectOutstream.writeObject(getDocsMap());
             mainIndexObjectOutputStream.writeObject(getMainMap());
+            cityIndexObjectOutstream.writeObject(getCityMap());
+
+            languagesObjectOutputStream.writeObject(getLanguages());
 
             mainIndexFileOutputStream.flush();
             mainIndexObjectOutputStream.flush();
-
             mainIndexFileOutputStream.close();
             mainIndexObjectOutputStream.close();
 
             docsIndexObjectOutstream.flush();
             docsIndexFileOutputStream.flush();
-
             docsIndexFileOutputStream.close();
             docsIndexObjectOutstream.close();
+
+            cityIndexFileOutputStream.flush();
+            cityIndexObjectOutstream.flush();
+            cityIndexFileOutputStream.close();
+            cityIndexObjectOutstream.close();
+
+            languagesFileOutputStream.flush();
+            languagesObjectOutputStream.flush();
+            languagesFileOutputStream.close();
+            languagesObjectOutputStream.close();
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

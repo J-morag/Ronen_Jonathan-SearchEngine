@@ -2,14 +2,13 @@ package Indexing.Index;
 
 import Indexing.DocumentProcessing.Term;
 import Indexing.DocumentProcessing.TermDocument;
+import Indexing.Index.IO.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * creates the city index.
@@ -18,10 +17,12 @@ import java.util.Map;
 public class CityIndexMaker extends AIndexMaker {
 
     Map<String , CityIndexEntry> cityDictionary=null;
+    String path;
 
     public CityIndexMaker(String path) {
         super();
         getDictionaryFromDisk();
+        this.path=path;
 
     }
 
@@ -39,18 +40,31 @@ public class CityIndexMaker extends AIndexMaker {
                 cityDoc="";
             }
             if(!cityDoc.equals("") && (cityDoc.charAt(0)>='A' && cityDoc.charAt(0)<='Z')) {
+                countApearance( text, counterMap, cityDoc);
                 if(!cityDictionary.containsKey(cityDoc)) {
                     CityIndexEntry cityIndexEntry = new CityIndexEntry(null, null, null);
                     cityDictionary.put(cityDoc,cityIndexEntry);
                 }
-                countApearance( text, counterMap, cityDoc);
+                CityIndexEntry cityIndexEntry=cityDictionary.get(cityDoc);
+                if(counterMap.containsKey(cityDoc)) {
+                    cityIndexEntry.addDocToMap(doc.getSerialID(), new int[counterMap.get(cityDoc)]);
+                }
+                else {
+                    cityIndexEntry.addDocToMap(doc.getSerialID(), new int[1]);
+                    cityIndexEntry.addDocToMap(doc.getSerialID(),-1,1);
+                }
+
                 int index=0;
                 for (Term term : text) {
+                    if(!counterMap.containsKey(cityDoc)) {
+                        continue;
+                    }
                     String trm = term.toString().toUpperCase();
                     if (trm.equals(cityDoc)){
                         addToCityDictionary(trm , doc.getSerialID() , counterMap ,index);
-                        index++;
+
                     }
+                    index++;
 
                 }
 
@@ -63,24 +77,33 @@ public class CityIndexMaker extends AIndexMaker {
     }
 
     private void dumpToDisk() {
-        for ( String key : cityDictionary.keySet()  ) {
 
+        try {
+            IntToIntArrayMapOutputStream out = new IntToIntArrayMapOutputStream (path + "\\CitiesPosting");
+            Set<String> keySet =new HashSet<>(cityDictionary.keySet());
+            for (String key : keySet) {
+                if (!cityDictionary.get(key).isInCorpus()) {
+                    cityDictionary.remove(key);
+                    continue;
+                }
+                CityIndexEntry cityIndexEntry = cityDictionary.get(key);
+                Map<Integer , int[]> docsMap = cityIndexEntry.getDocsMap();
+                int pointer = (int) out.write(docsMap);
+                cityIndexEntry.setPointer(pointer);
+
+            }
+            out.flush();
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void addToCityDictionary(String trm, int serialID, Map<String, Integer> counterMap ,int index) {
         CityIndexEntry cityIndexEntry = cityDictionary.get(trm);
-        Map<Integer , int[]> appearanceMap = cityIndexEntry.getDocsMap();
-
-        if(!appearanceMap.containsKey(serialID)){
-            int [] appearanceAray = new int[counterMap.get(trm)];
-            appearanceAray[0]=index;
-            counterMap.put(trm,counterMap.get(trm)-1);
-            cityIndexEntry.addDocToMap(serialID,appearanceAray);
-        }else {
-            cityIndexEntry.addDocToMap(serialID,index,counterMap.get(trm));
-            counterMap.put(trm,counterMap.get(trm)-1);
-        }
+        cityIndexEntry.addDocToMap(serialID,index,counterMap.get(trm));
+        counterMap.put(trm,counterMap.get(trm)-1);
 
     }
 
