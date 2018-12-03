@@ -105,7 +105,7 @@ public class TempIndexEntry {
             array[index] = intToInsert;
         }
         else { // index >= array.length
-            int size = index+2;
+            int size = index+1;
             int [] newArray = new int[size];
             int i;
             for (i = 0; i <array.length ; i++) {
