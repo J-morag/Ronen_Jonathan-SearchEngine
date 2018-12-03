@@ -52,6 +52,10 @@ public class Model {
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
         ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream(outputFolder + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
+        ObjectInputStream inCityDictionay = new ObjectInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.cityDictionaryName));
+        ObjectInputStream inLanguages = new ObjectInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.languages));
 
         if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
@@ -61,6 +65,8 @@ public class Model {
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
             this.docDictionaryNoStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
         }
+        this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
+        this.languages = (Set<String>) inLanguages.readObject();
 
     }
 
@@ -128,7 +134,8 @@ public class Model {
             this.mainDictionaryNoStemming = indexer.getMainMap();
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
-//        this.cityDictionary = indexer.getCityMap();
+        this.cityDictionary = indexer.getCityMap();
+        this.languages = indexer.getLanguages();
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();
