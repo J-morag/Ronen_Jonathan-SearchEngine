@@ -72,11 +72,11 @@ public class Controller {
     }
 
     public Alert loadDictionary() {
-        String corpusLocation = view.getCorpusLocation().toString();
+        String outputLocation = view.getOutputLocation().toString();
 
-        if(corpusLocation.isEmpty() ) return new Alert(Alert.AlertType.ERROR, "Please specify corpus location.");
+        if(outputLocation.isEmpty() ) return new Alert(Alert.AlertType.ERROR, "Please specify output folder location.");
         try {
-            model.loadDictionary(view.isUseStemming(), corpusLocation);
+            model.loadDictionary(view.isUseStemming(), outputLocation);
         } catch (Exception e) {
             return new Alert(Alert.AlertType.ERROR, "No valid dictionary file found in the given output folder.");
         }
