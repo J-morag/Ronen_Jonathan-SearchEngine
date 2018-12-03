@@ -598,7 +598,7 @@ public class Parse implements Runnable{
     }
 
     private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, float number){
-        number -= number%0.01; //remove anything beyond the two digits past the decimal point
+//        number -= number%0.01; //remove anything beyond the two digits past the decimal point
         if( number % 1 == 0 ){
             long numberWithoutDecimals = ((long)number);
             result.append(numberWithoutDecimals);

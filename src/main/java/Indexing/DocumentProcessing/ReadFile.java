@@ -259,7 +259,7 @@ public class ReadFile implements Runnable {
                         continue;
                     }
                 }
-                doc.setLanguage(s.toString().toUpperCase());
+                doc.setLanguage(s.toString().toUpperCase().intern());
                 s=null;
                 language=false;
             }

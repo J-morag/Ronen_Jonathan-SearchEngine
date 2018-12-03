@@ -2,6 +2,7 @@ package GUI;
 
 import Indexing.DocumentProcessing.Document;
 import Indexing.DocumentProcessing.TermDocument;
+import Indexing.Index.CityIndexEntry;
 import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
@@ -31,6 +32,7 @@ public class Model {
     private Map<Integer, DocIndexEntery> docDictionaryWithStemming;
     private Map<String, IndexEntry> mainDictionaryNoStemming;
     private Map<Integer, DocIndexEntery> docDictionaryNoStemming;
+    private Map<String , CityIndexEntry> cityDictionary;
 
     public void setController(Controller controller) {
         this.controller = controller;
@@ -47,10 +49,17 @@ public class Model {
     public void loadDictionary(boolean useStemming, String outputFolder) throws IOException, ClassNotFoundException, ClassCastException {
         ObjectInputStream inDictionary = new ObjectInputStream(new FileInputStream(outputFolder + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
-        if(useStemming)
+        ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
+
+        if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
-        else
+            this.docDictionaryWithStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+        }
+        else{
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
+            this.docDictionaryNoStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+        }
 
     }
 
@@ -118,6 +127,7 @@ public class Model {
             this.mainDictionaryNoStemming = indexer.getMainMap();
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
+        this.cityDictionary = indexer.getCityMap();
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();

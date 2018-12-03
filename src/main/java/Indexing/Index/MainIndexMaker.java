@@ -12,6 +12,7 @@ import static javafx.application.Platform.exit;
 /**
  * creates the main index.
  * holds both dictionaries as fields. They can be retrieved with {@link #getMainDictionary getMainDictionary} and {@link #getDocsDictionary getDocsDictionary}.
+ * every {@value partialGroupSize} documents, dumps postings into a temporary file.
  */
 public class MainIndexMaker extends AIndexMaker {
 

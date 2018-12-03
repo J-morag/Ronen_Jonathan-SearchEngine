@@ -238,11 +238,28 @@ public class MainIndexerTest {
 
 
     @Test
-    void statistics() throws InterruptedException, IOException {
-        Indexer index = testMainIndexClone();
+    void statistics() throws InterruptedException, IOException, ClassNotFoundException {
+        boolean useStemming = true;
+        ObjectInputStream inDictionary = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
+        ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
 
-        Map<String, IndexEntry> mainDic = index.getMainMap();
-        Map<Integer, DocIndexEntery> docDic = index.getDocsMap();
+        Map<String, IndexEntry> mainDic = (Map<String, IndexEntry>) inDictionary.readObject();
+        Map<Integer, DocIndexEntery> docDic = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+
+        ObjectInputStream inDictionaryNS = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
+        ObjectInputStream inDocDictionaryNS = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
+
+        Map<String, IndexEntry> mainDicNS = (Map<String, IndexEntry>) inDictionaryNS.readObject();
+        Map<Integer, DocIndexEntery> docDicNS = (Map<Integer, DocIndexEntery>) inDocDictionaryNS.readObject();
+
+
+
+        System.out.println("Number of terms w/stemming: " + mainDic.size());
+        System.out.println("Number of terms wo/stemming: " + mainDicNS.size());
 
          // COUNTRIES
 
@@ -257,10 +274,11 @@ public class MainIndexerTest {
             line = countriesIn.readLine();
         }
 
-        for (String term: mainDic.keySet()
+        for (String term: mainDicNS.keySet()
              ) {
             if(countries.contains(term.toUpperCase())) termsThatAreCountries.add(term.toUpperCase());
         }
+
 
         System.out.println("Number of terms that are countries: " + termsThatAreCountries.size());
     }
