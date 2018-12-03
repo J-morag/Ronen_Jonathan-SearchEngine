@@ -33,6 +33,7 @@ public class Model {
     private Map<String, IndexEntry> mainDictionaryNoStemming;
     private Map<Integer, DocIndexEntery> docDictionaryNoStemming;
     private Map<String , CityIndexEntry> cityDictionary;
+    private Set<String> languages;
 
     public void setController(Controller controller) {
         this.controller = controller;
@@ -127,7 +128,7 @@ public class Model {
             this.mainDictionaryNoStemming = indexer.getMainMap();
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
-        this.cityDictionary = indexer.getCityMap();
+//        this.cityDictionary = indexer.getCityMap();
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();

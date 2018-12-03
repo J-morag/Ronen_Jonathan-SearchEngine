@@ -31,6 +31,8 @@ public class View {
     public Button btn_load_dictionary;
     public Button btn_display_dictionary;
 
+    public ChoiceBox choiceBox_languages;
+
     public CheckBox chkbox_use_stemming;
 
     public CharSequence getOutputLocation(){
@@ -116,6 +118,7 @@ public class View {
     }
 
     public void setLanguages() {
+        choiceBox_languages.setDisable(false);
         //TODO implement
     }
 

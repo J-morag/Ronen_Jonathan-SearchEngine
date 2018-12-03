@@ -196,7 +196,6 @@ public class MainIndexerTest {
         tIndexer.start();
         tIndexer.join();
 
-        indexer.mergeMainIndex();
 
         System.out.println("Total time: " + ((double) System.currentTimeMillis()-start)/1000);
 
@@ -240,13 +239,15 @@ public class MainIndexerTest {
     @Test
     void statistics() throws InterruptedException, IOException, ClassNotFoundException {
         boolean useStemming = true;
-        ObjectInputStream inDictionary = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+        ObjectInputStream inDictionary = new ObjectInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
-        ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+        ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
 
         Map<String, IndexEntry> mainDic = (Map<String, IndexEntry>) inDictionary.readObject();
         Map<Integer, DocIndexEntery> docDic = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+
+        useStemming = false;
 
         ObjectInputStream inDictionaryNS = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
@@ -256,7 +257,7 @@ public class MainIndexerTest {
         Map<String, IndexEntry> mainDicNS = (Map<String, IndexEntry>) inDictionaryNS.readObject();
         Map<Integer, DocIndexEntery> docDicNS = (Map<Integer, DocIndexEntery>) inDocDictionaryNS.readObject();
 
-
+        // GENERAL
 
         System.out.println("Number of terms w/stemming: " + mainDic.size());
         System.out.println("Number of terms wo/stemming: " + mainDicNS.size());
@@ -280,9 +281,39 @@ public class MainIndexerTest {
         }
 
 
-        System.out.println("Number of terms that are countries: " + termsThatAreCountries.size());
+        System.out.println("Number of unique terms that are countries: " + termsThatAreCountries.size());
+
+
+
     }
 
+    @Test
+    void statisticsFBIS33366() throws InterruptedException {
+        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
+        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
+
+
+        //  Worker Threads:
+
+        Thread tReader = new Thread(new ReadFile("C:\\Users\\John\\Downloads\\infoRetrieval\\just FBIS3-3366", documentBuffer));
+
+        HashSet<String> stopwords = Parse.getStopWords(patToStopwordsFileAtJM);
+        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, true));
+        Indexer indexer =new Indexer(pathToOutputFolderAtJM,termDocumentsBuffer,true);
+        Thread tIndexer = new Thread(indexer);
+
+
+        tReader.start();
+        tParser.start();
+        tIndexer.start();
+        tIndexer.join();
+
+        Map<String, IndexEntry> mainDic = indexer.getMainMap();
+
+
+
+
+    }
 
     String countries = "AFGHANISTAN\n" +
             "ALBANIA\n" +

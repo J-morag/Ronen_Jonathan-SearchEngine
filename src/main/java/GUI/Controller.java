@@ -34,6 +34,7 @@ public class Controller {
         else{
             try {
                 String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+                //TODO get languages
                 view.setLanguages();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, information);
                 alert.setHeaderText("Index Generated!");
@@ -83,6 +84,9 @@ public class Controller {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Dictionary loaded successfully.");
         alert.setHeaderText("Dictionary Loaded");
+
+        //TODO display languages
+
         return alert;
     }
 }
