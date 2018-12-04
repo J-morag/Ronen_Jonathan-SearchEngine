@@ -1,6 +1,8 @@
 package GUI;
 
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -128,9 +130,9 @@ public class View {
         return txtfld_stopwords_location.getCharacters();
     }
 
-    public void setLanguages() {
+    public void setLanguages(ObservableList languages) {
         choiceBox_languages.setDisable(false);
-        //TODO implement
+        choiceBox_languages.setItems(languages);
     }
 
 

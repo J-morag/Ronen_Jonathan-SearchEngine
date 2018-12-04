@@ -26,10 +26,10 @@ public class ReadTest {
     private static final int stemmedTermBufferSize = 10;
 
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001"; //TODO temporary! should come from UI
-    private static final String pathToStopwordsFile = "/stopwords"; //TODO temporary! should come from UI
-    private static final String pathToOutputFolder = "/output"; //TODO temporary! should come from UI
-    public static BlockingQueue<Document> documentBuffer; //@TODO: need to see how to make the queue not static.
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+    private static final String pathToStopwordsFile = "/stopwords";
+    private static final String pathToOutputFolder = "/output";
+    public static BlockingQueue<Document> documentBuffer;
 
     @Test
     void createIndex() throws InterruptedException {

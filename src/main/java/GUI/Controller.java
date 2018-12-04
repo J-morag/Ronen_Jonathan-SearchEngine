@@ -2,6 +2,8 @@ package GUI;
 
 import Indexing.Index.IndexEntry;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
@@ -42,8 +44,8 @@ public class Controller {
                     information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
 
 
-                //TODO get languages
-                view.setLanguages();
+                ObservableList<String> languages = FXCollections.observableArrayList(model.getLanguages());
+                view.setLanguages(languages);
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, information);
                 alert.setHeaderText("Index Generated!");
@@ -58,9 +60,6 @@ public class Controller {
         }
     }
 
-    private void setLanguages(){
-
-    }
 
     public List<View.ObservableTuple> getDictionary() {
         Map<String, IndexEntry> dictionary = model.getDictionary(view.isUseStemming());
@@ -102,7 +101,8 @@ public class Controller {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Dictionary loaded successfully.");
         alert.setHeaderText("Dictionary Loaded");
 
-        //TODO display languages
+        ObservableList<String> languages = FXCollections.observableArrayList(model.getLanguages());
+        view.setLanguages(languages);
 
         return alert;
     }

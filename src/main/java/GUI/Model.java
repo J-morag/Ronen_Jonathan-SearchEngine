@@ -115,7 +115,8 @@ public class Model {
     }
 
     public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws Exception {
-        threadPool = Executors.newFixedThreadPool(4);
+        //setup
+        setupToGenerateIndex(useStemming);
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -144,7 +145,8 @@ public class Model {
     }
 
     public String generateIndexTwoPhase(final boolean useStemming, final String corpusLocation, final String outputLocation, String stopwordsLocation) throws Exception {
-        threadPool = Executors.newFixedThreadPool(4);
+        //setup
+        setupToGenerateIndex(useStemming);
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -189,6 +191,8 @@ public class Model {
         // wait until all docs are parsed and written to file
         threadPool.shutdown();
         threadPool.awaitTermination(60, TimeUnit.MINUTES);
+        //clear memory
+        System.gc();
 
         // read TermDocuments and feed them to indexer
         threadPool = Executors.newFixedThreadPool(4);
@@ -201,7 +205,6 @@ public class Model {
                     try {
                         doc = (TermDocument) in.readObject();
                         termDocumentsBuffer.put(doc);
-                        System.out.println(doc.getDocId());
                     }catch(Exception e){
                         doc = null;
                     }
@@ -230,6 +233,20 @@ public class Model {
         time = (System.currentTimeMillis() - time)/1000;
 
         return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
+    }
+
+    private void setupToGenerateIndex(boolean useStemming){
+        threadPool = Executors.newFixedThreadPool(4);
+        cityDictionary = null;
+        languages = null;
+        if(useStemming){
+            mainDictionaryWithStemming = null;
+            docDictionaryWithStemming = null;
+        }
+        else{
+            mainDictionaryNoStemming = null;
+            docDictionaryNoStemming  = null;
+        }
     }
 
     private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long time, boolean timeoutReached) throws Exception {
