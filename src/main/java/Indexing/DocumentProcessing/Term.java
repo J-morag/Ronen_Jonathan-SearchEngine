@@ -1,9 +1,11 @@
 package Indexing.DocumentProcessing;
 
+import java.io.Serializable;
+
 /**
  * this class is a data type that represents a term.
  */
-public class Term implements Comparable {
+public class Term implements Comparable, Serializable {
     final String string;
 //    boolean isInHeader = false;
 //    boolean isInTitle = false;

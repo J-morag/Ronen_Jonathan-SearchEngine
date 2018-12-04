@@ -2,6 +2,7 @@ package GUI;
 
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -34,6 +35,14 @@ public class View {
     public ChoiceBox choiceBox_languages;
 
     public CheckBox chkbox_use_stemming;
+    public CheckBox chkbox_memory_saver;
+
+    @FXML
+    private void initialize(){
+        Tooltip tooltip = new Tooltip();
+        tooltip.setText("Checking this will prioritize using less system memory, but greatly increase runtime");
+        chkbox_memory_saver.setTooltip(tooltip);
+    }
 
     public CharSequence getOutputLocation(){
         return txtfld_output_location.getCharacters();
@@ -89,7 +98,7 @@ public class View {
         generatingAlert.setTitle("Generating Index");
         generatingAlert.show();
 
-        Alert alert = controller.generateIndex();
+        Alert alert = controller.generateIndex(chkbox_memory_saver.isSelected());
 
         generatingAlert.close();
 
