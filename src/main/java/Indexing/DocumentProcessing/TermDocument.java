@@ -1,11 +1,12 @@
 package Indexing.DocumentProcessing;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * this class is a data type that represents a document after it has been parsed into terms.
  */
-public class TermDocument {
+public class TermDocument implements Serializable {
     final private int serialID;
     final private String docId;
     private Term city;

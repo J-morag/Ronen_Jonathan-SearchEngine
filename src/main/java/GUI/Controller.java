@@ -24,7 +24,7 @@ public class Controller {
         model.reset(view.getOutputLocation().toString());
     }
 
-    public Alert generateIndex() {
+    public Alert generateIndex(boolean memorySaver) {
         String corpusLocation = view.getCorpusLocation().toString();
         String stopwordsLocation = view.getStopwordsLocation().toString();
         String outputLocation = view.getOutputLocation().toString();
@@ -33,7 +33,14 @@ public class Controller {
         else if (outputLocation.isEmpty()) return new Alert(Alert.AlertType.ERROR, "Please specify output location.");
         else{
             try {
-                String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+
+                String information;
+                if(memorySaver){
+                    information = model.generateIndexTwoPhase(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+                }
+                else
+                    information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+
 
                 //TODO get languages
                 view.setLanguages();
@@ -45,6 +52,7 @@ public class Controller {
                 return new Alert(Alert.AlertType.ERROR, "IO error. Please check the paths and try again.");
             }
             catch (Exception e){
+                e.printStackTrace();
                 return new Alert(Alert.AlertType.ERROR, "Fatal error encountered during index generation: " + e.getMessage());
             }
         }

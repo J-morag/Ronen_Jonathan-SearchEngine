@@ -37,7 +37,6 @@ public class Model {
 
 
     public Model(){
-        threadPool = Executors.newFixedThreadPool(4);
         exceptionHandler = new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread th, Throwable ex) {
                 isExceptionThrownDuringGeneration = true;
@@ -51,7 +50,7 @@ public class Model {
     }
 
     public Set<String> getLanguages(){
-        return null; //TODO implement
+        return languages;
     }
 
     public Map<String, IndexEntry> getDictionary(boolean useStemming) {
@@ -114,6 +113,7 @@ public class Model {
     }
 
     public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws Exception {
+        threadPool = Executors.newFixedThreadPool(4);
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -132,50 +132,103 @@ public class Model {
 
         long time = System.currentTimeMillis();
 
-        boolean timeoutReached = !(threadPool.awaitTermination(40, TimeUnit.MINUTES));
+        //wait for indexing to finish
+        threadPool.shutdown();
+        boolean timeoutReached = !(threadPool.awaitTermination(60, TimeUnit.MINUTES));
 
         time = (System.currentTimeMillis() - time)/1000;
 
         return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
     }
 
-//    public String generateIndexTwoPhase(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws InterruptedException {
-//
-//
-//        /*  Concurrent buffers:
-//        Thread safe. blocks if empty or full.
-//        Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
-//        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
-//        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
-//
-//        //  Worker Threads:
-//
-//        Thread tReader = new Thread(new ReadFile(corpusLocation, documentBuffer));
-//        HashSet<String> stopwords = Parse.getStopWords(stopwordsLocation);
-//        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming));
-//
-////        // saving termDocs to file
-////        Thread termDocsToFile = new Thread(() -> {
-////
-////        })
-//
-//
-//
-//        Indexer indexer = new Indexer(outputLocation, termDocumentsBuffer,useStemming);
-//        Thread tIndexer = new Thread(indexer);
-//
-//        long time = System.currentTimeMillis();
-//
-//        tReader.start();
-//        tParser.start();
-//        tIndexer.start();
-//
-//        tIndexer.join();
-//
-//        time = (System.currentTimeMillis() - time)/1000;
-//
-//        return handleNewIndexGeneration(indexer, useStemming, time);
-//    }
+    public String generateIndexTwoPhase(final boolean useStemming, final String corpusLocation, final String outputLocation, String stopwordsLocation) throws Exception {
+        threadPool = Executors.newFixedThreadPool(4);
+        /*  Concurrent buffers:
+        Thread safe. blocks if empty or full.
+        Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
+        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
+        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
+
+        long time = System.currentTimeMillis();
+
+        //  Worker Threads:
+        //reading
+        threadPool.submit(new Thread(new ReadFile(corpusLocation, documentBuffer)));
+        HashSet<String> stopwords = Parse.getStopWords(stopwordsLocation);
+        //parsing
+        threadPool.submit(new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming)));
+
+        // saving termDocs to file
+        Thread termDocsToFile = new Thread(() -> {
+            final String filePath = outputLocation +"\\tmp_termDocuments";
+            try {
+                ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePath, true )));
+                Boolean done = false;
+                while (!done) { //extract from buffer until poison element is encountered
+                    TermDocument currDoc = null;
+                    try {
+                        currDoc = termDocumentsBuffer.take();
+                        if (null == currDoc.getText()) done=true; //end of files (poison element)
+                        else {
+                            out.writeObject(currDoc);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                out.flush();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        threadPool.submit(termDocsToFile);
+
+        // wait until all docs are parsed and written to file
+        threadPool.shutdown();
+        threadPool.awaitTermination(60, TimeUnit.MINUTES);
+
+        // read TermDocuments and feed them to indexer
+        threadPool = Executors.newFixedThreadPool(4);
+        Thread fileToTermDocs = new Thread(() -> {
+            final String filePath = outputLocation +"\\tmp_termDocuments";
+            try {
+                ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath )));
+                TermDocument doc = (TermDocument) in.readObject();
+                while (doc != null) { //insert to buffer until file end
+                    try {
+                        doc = (TermDocument) in.readObject();
+                        termDocumentsBuffer.put(doc);
+                        System.out.println(doc.getDocId());
+                    }catch(Exception e){
+                        doc = null;
+                    }
+                }
+                // poison element at end
+                TermDocument poison = new TermDocument(-1,null);
+                termDocumentsBuffer.put(poison);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        threadPool.submit(fileToTermDocs);
+
+        //indexing
+        Indexer indexer = new Indexer(outputLocation, termDocumentsBuffer,useStemming);
+        threadPool.submit(new Thread(indexer));
+
+        //wait for indexing to finish
+        threadPool.shutdown();
+        boolean timeoutReached = !(threadPool.awaitTermination(60, TimeUnit.MINUTES));
+
+        time = (System.currentTimeMillis() - time)/1000;
+
+        return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
+    }
 
     private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long time, boolean timeoutReached) throws Exception {
         if(timeoutReached) throw new Exception("Timeout reached during execution");
