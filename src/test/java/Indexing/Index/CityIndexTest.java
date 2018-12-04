@@ -104,7 +104,7 @@ public class CityIndexTest {
     }
 
     @Test
-    public void testCityIndex() throws InterruptedException {
+    public void testCityIndex() throws InterruptedException, FileNotFoundException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);

@@ -35,7 +35,7 @@ public class IntToIntArrayMapInputStream {
             arrNum++;
         }
 
-        Map<Integer, int[]> res = new LinkedHashMap<>(arrNum-1);
+        Map<Integer, int[]> res = new HashMap<>(arrNum-1);
 
         for (int i = 0; i < i_arr_dataIn.length ;) {
             int key = i_arr_dataIn[i];

@@ -8,14 +8,12 @@ import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
-import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * MVC model.
@@ -33,6 +31,22 @@ public class Model {
     private Map<String, IndexEntry> mainDictionaryNoStemming;
     private Map<Integer, DocIndexEntery> docDictionaryNoStemming;
     private Map<String , CityIndexEntry> cityDictionary;
+    private Set<String> languages;
+    private ExecutorService threadPool;
+    private Thread.UncaughtExceptionHandler exceptionHandler;
+    private boolean isExceptionThrownDuringGeneration = false;
+    private Exception exceptionThrownDuringGeneration;
+
+
+    public Model(){
+        threadPool = Executors.newFixedThreadPool(4);
+        exceptionHandler = new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread th, Throwable ex) {
+                isExceptionThrownDuringGeneration = true;
+                threadPool.shutdownNow();
+            }
+        };
+    }
 
     public void setController(Controller controller) {
         this.controller = controller;
@@ -50,6 +64,10 @@ public class Model {
         ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' + (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
         ObjectInputStream inDocDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName )));
+        ObjectInputStream inCityDictionay = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.cityDictionaryName)));
+        ObjectInputStream inLanguages = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.languages)));
 
         if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
@@ -59,6 +77,8 @@ public class Model {
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
             this.docDictionaryNoStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
         }
+        this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
+        this.languages = (Set<String>) inLanguages.readObject();
 
     }
 
@@ -67,6 +87,8 @@ public class Model {
         docDictionaryWithStemming = null;
         mainDictionaryNoStemming = null;
         docDictionaryNoStemming  = null;
+        cityDictionary = null;
+        languages = null;
         
         cleanOutputFiles(outputFolder);
     }
@@ -93,7 +115,7 @@ public class Model {
         }
     }
 
-    public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws InterruptedException {
+    public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws Exception {
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -101,22 +123,68 @@ public class Model {
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
 
         //  Worker Threads:
-
-        Thread tReader = new Thread(new ReadFile(corpusLocation, documentBuffer));
+        //reading
+        threadPool.submit(new Thread(new ReadFile(corpusLocation, documentBuffer)));
         HashSet<String> stopwords = Parse.getStopWords(stopwordsLocation);
-        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming));
+        //parsing
+        threadPool.submit(new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming)));
+        //indexing
         Indexer indexer = new Indexer(outputLocation, termDocumentsBuffer,useStemming);
-        Thread tIndexer = new Thread(indexer);
+        threadPool.submit(new Thread(indexer));
 
         long time = System.currentTimeMillis();
 
-        tReader.start();
-        tParser.start();
-        tIndexer.start();
-
-        tIndexer.join();
+        boolean timeoutReached = !(threadPool.awaitTermination(40, TimeUnit.MINUTES));
 
         time = (System.currentTimeMillis() - time)/1000;
+
+        return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
+    }
+
+//    public String generateIndexTwoPhase(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws InterruptedException {
+//
+//
+//        /*  Concurrent buffers:
+//        Thread safe. blocks if empty or full.
+//        Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
+//        BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
+//        BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
+//
+//        //  Worker Threads:
+//
+//        Thread tReader = new Thread(new ReadFile(corpusLocation, documentBuffer));
+//        HashSet<String> stopwords = Parse.getStopWords(stopwordsLocation);
+//        Thread tParser = new Thread(new Parse(stopwords, documentBuffer, termDocumentsBuffer, useStemming));
+//
+////        // saving termDocs to file
+////        Thread termDocsToFile = new Thread(() -> {
+////
+////        })
+//
+//
+//
+//        Indexer indexer = new Indexer(outputLocation, termDocumentsBuffer,useStemming);
+//        Thread tIndexer = new Thread(indexer);
+//
+//        long time = System.currentTimeMillis();
+//
+//        tReader.start();
+//        tParser.start();
+//        tIndexer.start();
+//
+//        tIndexer.join();
+//
+//        time = (System.currentTimeMillis() - time)/1000;
+//
+//        return handleNewIndexGeneration(indexer, useStemming, time);
+//    }
+
+    private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long time, boolean timeoutReached) throws Exception {
+        if(timeoutReached) throw new Exception("Timeout reached during execution");
+        else if(this.isExceptionThrownDuringGeneration){
+            isExceptionThrownDuringGeneration = false;
+            throw exceptionThrownDuringGeneration;
+        }
 
         if(useStemming){
             this.mainDictionaryWithStemming = indexer.getMainMap();
@@ -127,6 +195,7 @@ public class Model {
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
         this.cityDictionary = indexer.getCityMap();
+        this.languages = indexer.getLanguages();
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();

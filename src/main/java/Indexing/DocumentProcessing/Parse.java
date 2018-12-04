@@ -66,9 +66,8 @@ public class Parse implements Runnable{
         while (!done) { //extract from buffer until poison element is encountered
             Document currDoc = sourceDocumentsQueue.take();
             if (null == currDoc.getText()) done=true; //end of files (poison element)
-            else{
+            else if (!currDoc.getText().isEmpty()){
                 sinkTermDocumentQueue.put(parseOneDocument(currDoc));
-
             }
         }
         TermDocument poison = new TermDocument(-1,null);

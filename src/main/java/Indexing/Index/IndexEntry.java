@@ -53,4 +53,5 @@ public class IndexEntry implements Serializable {
     public int getPostingPointer() {
         return postingPointer;
     }
+
 }

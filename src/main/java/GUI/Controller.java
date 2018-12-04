@@ -44,6 +44,9 @@ public class Controller {
             } catch (InterruptedException e) {
                 return new Alert(Alert.AlertType.ERROR, "IO error. Please check the paths and try again.");
             }
+            catch (Exception e){
+                return new Alert(Alert.AlertType.ERROR, "Fatal error encountered during index generation: " + e.getMessage());
+            }
         }
     }
 

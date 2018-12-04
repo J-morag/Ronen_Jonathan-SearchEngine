@@ -7,9 +7,7 @@ import Indexing.DocumentProcessing.ReadFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -28,7 +26,7 @@ public class MainIndexerTest {
     private static final String pathToOutputFolderAtJM = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
 
     @Test
-    void testMainIndex() throws InterruptedException {
+    void testMainIndex() throws InterruptedException, FileNotFoundException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
@@ -157,7 +155,7 @@ public class MainIndexerTest {
     }
 
     @Test
-    Indexer testMainIndexClone() throws InterruptedException {
+    Indexer testMainIndexClone() throws InterruptedException, FileNotFoundException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
@@ -239,20 +237,20 @@ public class MainIndexerTest {
     @Test
     void statistics() throws InterruptedException, IOException, ClassNotFoundException {
         boolean useStemming = true;
-        ObjectInputStream inDictionary = new ObjectInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
-                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
-        ObjectInputStream inDocDictionary = new ObjectInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
-                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
+        ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
+        ObjectInputStream inDocDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(pathToOutputFolderAtJM + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName )));
 
         Map<String, IndexEntry> mainDic = (Map<String, IndexEntry>) inDictionary.readObject();
         Map<Integer, DocIndexEntery> docDic = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
 
         useStemming = false;
 
-        ObjectInputStream inDictionaryNS = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
-                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName ));
-        ObjectInputStream inDocDictionaryNS = new ObjectInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
-                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName ));
+        ObjectInputStream inDictionaryNS = new ObjectInputStream(new BufferedInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
+        ObjectInputStream inDocDictionaryNS = new ObjectInputStream(new BufferedInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName )));
 
         Map<String, IndexEntry> mainDicNS = (Map<String, IndexEntry>) inDictionaryNS.readObject();
         Map<Integer, DocIndexEntery> docDicNS = (Map<Integer, DocIndexEntery>) inDocDictionaryNS.readObject();
@@ -283,12 +281,51 @@ public class MainIndexerTest {
 
         System.out.println("Number of unique terms that are countries: " + termsThatAreCountries.size());
 
+        // top 10 totalTF and bottom 10
 
+        Map.Entry<String, IndexEntry>[] entriesNS = new Map.Entry[mainDicNS.size()];
+        mainDicNS.entrySet().toArray(entriesNS);
+
+        Arrays.sort(entriesNS, (Comparator.comparingInt(e -> -1 * e.getValue().getTotalTF())));
+
+        System.out.println("Ten most common terms: ");
+        for (int i = 0; i < 10 ; i++) {
+            System.out.print("term: " + entriesNS[i].getKey());
+            System.out.println(", TotalTF: " + entriesNS[i].getValue().getTotalTF());
+        }
+
+        System.out.println("Ten least common terms: ");
+        for (int i = entriesNS.length-1; entriesNS.length - i <= 10  ; i--) {
+            System.out.print("term: " + entriesNS[i].getKey());
+            System.out.println(", TotalTF: " + entriesNS[i].getValue().getTotalTF());
+        }
+
+        // dictionary to csv
+
+//        PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(pathToOutputFolderAtJM + "/ mainDic.csv")));
+        PrintWriter csvWriterNS = new PrintWriter(new BufferedOutputStream(new FileOutputStream(pathToOutputFolderAtJM + "/ mainDicNS.csv")));
+
+        csvWriterNS.println("term,TotalTf,df");
+
+        for (Map.Entry<String, IndexEntry> entry: entriesNS
+             ) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(entry.getKey());
+            sb.append(",");
+            sb.append(entry.getValue().getTotalTF());
+            sb.append(",");
+            sb.append(entry.getValue().getDf());
+            sb.append(",");
+            csvWriterNS.println(sb);
+        }
+
+        csvWriterNS.flush();
+        csvWriterNS.close();
 
     }
 
     @Test
-    void statisticsFBIS33366() throws InterruptedException {
+    void statisticsFBIS33366() throws InterruptedException, FileNotFoundException {
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
 
