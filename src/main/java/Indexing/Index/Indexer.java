@@ -103,7 +103,7 @@ public class Indexer implements Runnable {
      * get the Document dictionary from MainIndexMaker
      * @return - Doc dictionary
      */
-    public Map<Integer , DocIndexEntery> getDocsMap()
+    public List<DocIndexEntery> getDocsMap()
     {
         return ((MainIndexMaker)mainIndex).getDocsDictionary();
     }

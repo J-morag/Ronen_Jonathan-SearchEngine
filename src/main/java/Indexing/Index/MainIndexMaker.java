@@ -22,7 +22,7 @@ public class MainIndexMaker extends AIndexMaker {
 
     private Map<String, TempIndexEntry> tempDictionary;
     private Map <String, IndexEntry> mainDictionary;
-    private Map <Integer,DocIndexEntery> docsDictionary;
+    private List<DocIndexEntery> docsDictionary;
     private int numOfDocs;
     private short tempFileNumber;
     private String path="";
@@ -32,7 +32,7 @@ public class MainIndexMaker extends AIndexMaker {
         super();
         this.tempDictionary=new HashMap<>();
         this.mainDictionary = new HashMap<>();
-        this.docsDictionary = new HashMap<>();
+        this.docsDictionary = new ArrayList<>();
         languages=new HashSet<>();
         numOfDocs=0;
         tempFileNumber=0;
@@ -66,7 +66,7 @@ public class MainIndexMaker extends AIndexMaker {
 
 // add a document to the DocIndex
             DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language);
-            docsDictionary.put(doc.getSerialID(),docIndexEntery);
+            docsDictionary.add(docIndexEntery);
             docIndexEntery=null;
 
 
@@ -192,7 +192,7 @@ public class MainIndexMaker extends AIndexMaker {
     }
 
 
-    public Map<Integer , DocIndexEntery> getDocsDictionary(){
+    public List<DocIndexEntery> getDocsDictionary(){
         return docsDictionary;
     }
 
