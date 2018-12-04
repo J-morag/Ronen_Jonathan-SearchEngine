@@ -30,7 +30,7 @@ public class Indexer implements Runnable {
 
     //private boolean withSteming=false;
 
-    public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer,boolean withSteming) {
+    public Indexer(String pathToOutputFolder, BlockingQueue<TermDocument> stemmedTermDocumentsBuffer,boolean withSteming) throws FileNotFoundException {
         numIndexedDocs = 0;
         this.pathToOutputFolder = pathToOutputFolder;
         this.stemmedTermDocumentsBuffer = stemmedTermDocumentsBuffer;

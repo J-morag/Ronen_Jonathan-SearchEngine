@@ -19,9 +19,10 @@ public class CityIndexMaker extends AIndexMaker {
     Map<String , CityIndexEntry> cityDictionary=null;
     String path;
 
-    public CityIndexMaker(String path) {
+    public CityIndexMaker(String path) throws FileNotFoundException {
         super();
-        getDictionaryFromDisk();
+        FileNotFoundException e = getDictionaryFromDisk();
+        if(e != null) throw e;
         this.path=path;
 
     }
@@ -131,21 +132,21 @@ public class CityIndexMaker extends AIndexMaker {
 
 
 
-    private void getDictionaryFromDisk(){
+    private FileNotFoundException getDictionaryFromDisk(){
         FileInputStream fileInputStream = null;
+        final String citiesDictionaryName = "citiesDictionary"; //TODO change name
         try {
-            fileInputStream = new FileInputStream("resources\\citiesDictionary");
+            fileInputStream = new FileInputStream("resources\\" + citiesDictionaryName);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             cityDictionary= (Map<String, CityIndexEntry>) objectInputStream.readObject();
-
-
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return new FileNotFoundException("Missing resource: " + citiesDictionaryName);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public Map<String, CityIndexEntry> getCityDictionary() {

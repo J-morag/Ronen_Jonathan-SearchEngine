@@ -26,7 +26,7 @@ public class MainIndexerTest {
     private static final String pathToOutputFolderAtJM = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
 
     @Test
-    void testMainIndex() throws InterruptedException {
+    void testMainIndex() throws InterruptedException, FileNotFoundException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
@@ -155,7 +155,7 @@ public class MainIndexerTest {
     }
 
     @Test
-    Indexer testMainIndexClone() throws InterruptedException {
+    Indexer testMainIndexClone() throws InterruptedException, FileNotFoundException {
 
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
@@ -325,7 +325,7 @@ public class MainIndexerTest {
     }
 
     @Test
-    void statisticsFBIS33366() throws InterruptedException {
+    void statisticsFBIS33366() throws InterruptedException, FileNotFoundException {
         BlockingQueue<Document> documentBuffer = new ArrayBlockingQueue<Document>(documentBufferSize);
         BlockingQueue<TermDocument> termDocumentsBuffer = new ArrayBlockingQueue<>(termBufferSize);
 
