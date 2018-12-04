@@ -198,6 +198,11 @@ public class Parse implements Runnable{
 
     //          Parsing
 
+    /**
+     * takes a list of String tokens and parses them into Terms.
+     * @param lTokens - tokens to parse
+     * @return - list of parsed terms
+     */
     private List<Term> parseWorker(List<String> lTokens){
         List<Term> lTerms = new ArrayList<>();
         ListIterator<String> iterator = lTokens.listIterator(0);
@@ -266,7 +271,7 @@ public class Parse implements Runnable{
     }
 
     /**
-     * parses a number. always assignes currString to the next token to be parsed (wasn't successfully parsed here).
+     * parses a number. always assigns currString to the next token to be parsed (wasn't successfully parsed here).
      * @param iterator iterator from which to get strings to work on
      * @param result - a string builder to add the result onto. may be empty or contain prior information.
      * @param has$ - indicates that the number should be treated as a price, regardless of the next token.
@@ -275,8 +280,6 @@ public class Parse implements Runnable{
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull StringBuilder result,
                                       boolean has$, List<Term> lTerms){
-        //TODO add negative numbers ?
-
         long kmbtMultiplier = 1;
         String decimals = null;
         StringBuilder unformattedNumber = new StringBuilder(); //start concatenating number parts to build full number
@@ -410,6 +413,11 @@ public class Parse implements Runnable{
         return result;
     }
 
+    /**
+     * iterates while concatenating number parts into a single numeric string
+     * @param iterator - iterator over the list of tokens
+     * @param unformattedNumber - result will be appended here.
+     */
     private void buildNumber(@NotNull ListIterator<String> iterator, StringBuilder unformattedNumber) {
         while(currType == TokenType.NUMBER){
             unformattedNumber.append(currString);
@@ -597,6 +605,13 @@ public class Parse implements Runnable{
         }
     }
 
+    /**
+     * append number to {@param result}.
+     * Removes decimals if the number is a natural number.
+     * keeps 5 digits past the decimal point.
+     * @param result - the number will be appended here
+     * @param number - the number to append.
+     */
     private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, float number){
         number -= number%0.00001; //remove anything beyond the 5 digits past the decimal point
         if( number % 1 == 0 ){
@@ -606,6 +621,14 @@ public class Parse implements Runnable{
         else result.append(number);
     }
 
+    /**
+     * parses a term that starts with a word.
+     * @param iterator - iterator over the list of tokens.
+     * @param word - the word to start parsing from.
+     * @param result - the result will be appended here.
+     * @param lTerms - if more than one term is parsed, it will be added here.
+     * @return - if it was just an ordinary word (or stopword) result contains that word. else it contains the parsed expression.
+     */
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
         // MONTH -> MM-DD
         if (months.containsKey(word)){
@@ -837,8 +860,13 @@ public class Parse implements Runnable{
     }
 
 
-
-
+    /**
+     * when a string is ready to be committed as a new term, it is passed here.
+     * stemming (if necessary) will be done here.
+     * if the string is a stopword, it will not be committed as a new Term.
+     * @param term - the term to commit.
+     * @param lTerms - the list of committed Terms to add to.
+     */
     private void commitTermToList(String term, List<Term> lTerms){
         if(useStemming) {
             Stemmer stemmer = new Stemmer();
@@ -850,6 +878,11 @@ public class Parse implements Runnable{
         else if ((isLetter(term.charAt(0)) || isNumeral(term.charAt(0))) && !stopWords.contains(term.toLowerCase())) lTerms.add(filterTerms(term));
     }
 
+    /**
+     * limits terms to either being completely lowercase, or completely uppercase.
+     * @param term - a term to filter.
+     * @return - the term, after filtering and putting it in a new instance of Term.
+     */
     private Term filterTerms(String term){
         if(TokenType.WORD == TokenType.classify(term)){
             term = Character.isLowerCase(term.charAt(0)) ? term.toLowerCase() : term.toUpperCase();
@@ -933,6 +966,11 @@ public class Parse implements Runnable{
     }
 
 
+    /**
+     * tries to get a set of stopwords from the given file.
+     * @param pathTostopwordsFile - path to the stopwords file.
+     * @return - a set of stopwords.
+     */
     public static HashSet<String> getStopWords(String pathTostopwordsFile) {
         HashSet<String> stopWords = new HashSet<>();
 
