@@ -78,6 +78,8 @@ public class View {
     }
 
     public void reset(ActionEvent actionEvent) {
+        btn_display_dictionary.setDisable(true);
+        choiceBox_languages.setDisable(true);
         controller.reset();
     }
 

@@ -75,6 +75,8 @@ public class Model {
         docDictionaryWithStemming = null;
         mainDictionaryNoStemming = null;
         docDictionaryNoStemming  = null;
+        cityDictionary = null;
+        languages = null;
         
         cleanOutputFiles(outputFolder);
     }

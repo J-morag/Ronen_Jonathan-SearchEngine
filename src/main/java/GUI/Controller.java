@@ -34,8 +34,10 @@ public class Controller {
         else{
             try {
                 String information = model.generateIndex(view.isUseStemming() , corpusLocation, outputLocation, stopwordsLocation );
+
                 //TODO get languages
                 view.setLanguages();
+
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, information);
                 alert.setHeaderText("Index Generated!");
                 return alert;
@@ -43,6 +45,10 @@ public class Controller {
                 return new Alert(Alert.AlertType.ERROR, "IO error. Please check the paths and try again.");
             }
         }
+    }
+
+    private void setLanguages(){
+
     }
 
     public List<View.ObservableTuple> getDictionary() {
