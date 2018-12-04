@@ -191,6 +191,7 @@ public class Model {
         // wait until all docs are parsed and written to file
         threadPool.shutdown();
         threadPool.awaitTermination(60, TimeUnit.MINUTES);
+        threadPool = null;
         //clear memory
         System.gc();
 
@@ -204,6 +205,7 @@ public class Model {
                 while (doc != null) { //insert to buffer until file end
                     try {
                         doc = (TermDocument) in.readObject();
+                        doc.language = doc.language.intern();
                         termDocumentsBuffer.put(doc);
                     }catch(Exception e){
                         doc = null;
@@ -239,14 +241,10 @@ public class Model {
         threadPool = Executors.newFixedThreadPool(4);
         cityDictionary = null;
         languages = null;
-        if(useStemming){
-            mainDictionaryWithStemming = null;
-            docDictionaryWithStemming = null;
-        }
-        else{
-            mainDictionaryNoStemming = null;
-            docDictionaryNoStemming  = null;
-        }
+        mainDictionaryWithStemming = null;
+        docDictionaryWithStemming = null;
+        mainDictionaryNoStemming = null;
+        docDictionaryNoStemming  = null;
     }
 
     private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long time, boolean timeoutReached) throws Exception {

@@ -55,7 +55,7 @@
             </VBox>
             <Label text="Stopwords File Location" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
             <TextField fx:id="txtfld_stopwords_location" promptText="Stopwords File Location" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <CheckBox fx:id="chkbox_memory_saver" accessibleHelp="Sacrifices performance to consume less memory" mnemonicParsing="false" text="Memory Saver (see Readme)" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+            <CheckBox fx:id="chkbox_memory_saver" accessibleHelp="Sacrifices performance to consume less memory" disable="true" mnemonicParsing="false" text="Memory Saver (see Readme)" visible="false" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
             <Button fx:id="btn_stopwords_browse" mnemonicParsing="false" onAction="#browseStopwordsLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
          </children>
       </GridPane>

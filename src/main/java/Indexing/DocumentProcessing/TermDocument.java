@@ -13,7 +13,7 @@ public class TermDocument implements Serializable {
     private List<Term> title;
     private List<Term> text;
     private List<Term> date;
-    private String language="";
+    public String language="";
 
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
@@ -31,6 +31,7 @@ public class TermDocument implements Serializable {
     public TermDocument(int serialID, Document doc, List<Term>[] fields) {
         this.serialID = serialID;
         this.docId = doc.getDocId();
+        this.language = doc.getLanguage();
         this.title = fields[0];
         this.text = fields[1];
         this.date = fields[2];
