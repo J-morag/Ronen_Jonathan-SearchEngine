@@ -134,7 +134,7 @@ public class CityIndexMaker extends AIndexMaker {
 
     private FileNotFoundException getDictionaryFromDisk(){
         FileInputStream fileInputStream = null;
-        final String citiesDictionaryName = "citiesDictionary"; //TODO change name
+        final String citiesDictionaryName = "citiesDictionary"; //TODO change name please
         try {
             fileInputStream = new FileInputStream("resources\\" + citiesDictionaryName);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
