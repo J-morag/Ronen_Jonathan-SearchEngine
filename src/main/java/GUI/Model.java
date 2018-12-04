@@ -10,9 +10,7 @@ import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -27,9 +25,9 @@ public class Model {
 
     private Controller controller;
     private Map<String, IndexEntry> mainDictionaryWithStemming;
-    private Map<Integer, DocIndexEntery> docDictionaryWithStemming;
+    private List<DocIndexEntery> docDictionaryWithStemming;
     private Map<String, IndexEntry> mainDictionaryNoStemming;
-    private Map<Integer, DocIndexEntery> docDictionaryNoStemming;
+    private List <DocIndexEntery> docDictionaryNoStemming;
     private Map<String , CityIndexEntry> cityDictionary;
     private Set<String> languages;
     private ExecutorService threadPool;
@@ -71,11 +69,11 @@ public class Model {
 
         if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
-            this.docDictionaryWithStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+            this.docDictionaryWithStemming = (ArrayList)inDocDictionary.readObject();
         }
         else{
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
-            this.docDictionaryNoStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
+            this.docDictionaryNoStemming = (ArrayList) inDocDictionary.readObject();
         }
         this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
         this.languages = (Set<String>) inLanguages.readObject();
