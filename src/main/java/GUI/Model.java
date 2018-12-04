@@ -33,6 +33,7 @@ public class Model {
     private Map<String, IndexEntry> mainDictionaryNoStemming;
     private Map<Integer, DocIndexEntery> docDictionaryNoStemming;
     private Map<String , CityIndexEntry> cityDictionary;
+    private Set<String> languages;
 
     public void setController(Controller controller) {
         this.controller = controller;
@@ -50,6 +51,10 @@ public class Model {
         ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' + (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
         ObjectInputStream inDocDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
                 (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.docsDictionaryName )));
+        ObjectInputStream inCityDictionay = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.cityDictionaryName)));
+        ObjectInputStream inLanguages = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.languages)));
 
         if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
@@ -59,6 +64,8 @@ public class Model {
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
             this.docDictionaryNoStemming = (Map<Integer, DocIndexEntery>) inDocDictionary.readObject();
         }
+        this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
+        this.languages = (Set<String>) inLanguages.readObject();
 
     }
 
@@ -67,6 +74,8 @@ public class Model {
         docDictionaryWithStemming = null;
         mainDictionaryNoStemming = null;
         docDictionaryNoStemming  = null;
+        cityDictionary = null;
+        languages = null;
         
         cleanOutputFiles(outputFolder);
     }
@@ -127,6 +136,7 @@ public class Model {
             this.docDictionaryNoStemming = indexer.getDocsMap();
         }
         this.cityDictionary = indexer.getCityMap();
+        this.languages = indexer.getLanguages();
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();
