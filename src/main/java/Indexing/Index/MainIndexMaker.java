@@ -30,9 +30,9 @@ public class MainIndexMaker extends AIndexMaker {
 
     public MainIndexMaker (String path ){
         super();
-        this.tempDictionary=new LinkedHashMap<>();
-        this.mainDictionary = new LinkedHashMap<>();
-        this.docsDictionary = new LinkedHashMap<>();
+        this.tempDictionary=new HashMap<>();
+        this.mainDictionary = new HashMap<>();
+        this.docsDictionary = new HashMap<>();
         languages=new HashSet<>();
         numOfDocs=0;
         tempFileNumber=0;
@@ -79,8 +79,7 @@ public class MainIndexMaker extends AIndexMaker {
                 try {
                     beginning = (int)(text.size()*0.1);
                 }catch (NullPointerException e ){
-                    System.out.println(numOfDocs);
-                    exit();
+                    beginning = 0;
 
                 }
 
@@ -113,6 +112,7 @@ public class MainIndexMaker extends AIndexMaker {
             if(numOfDocs==partialGroupSize){
                 dumpToDisk();
             }
+
             tfMap=null;
         }else {
             dumpToDisk();
@@ -120,6 +120,8 @@ public class MainIndexMaker extends AIndexMaker {
 
 
     }
+
+
 
 
     /**

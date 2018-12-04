@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class CityIndexTest {
     public void testJASON()
     {
         JSONParser jp =  new JSONParser();
-        Map<String, CityIndexEntry> cityMap =new LinkedHashMap<>();
+        Map<String, CityIndexEntry> cityMap =new HashMap<>();
 
         try {
             Object obj = jp.parse(new FileReader("C:\\Users\\ronen\\Desktop\\jason.txt"));

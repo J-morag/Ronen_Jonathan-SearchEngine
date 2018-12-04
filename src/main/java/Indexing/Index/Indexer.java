@@ -120,17 +120,22 @@ public class Indexer implements Runnable {
     public void dumpDictionaryToDisk(){
         try {
             OutputStream mainIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+dictionarySaveName);
-            ObjectOutputStream mainIndexObjectOutputStream  = new ObjectOutputStream(mainIndexFileOutputStream);
+            BufferedOutputStream mainIndexBufferedOutputStream = new BufferedOutputStream(mainIndexFileOutputStream);
+            ObjectOutputStream mainIndexObjectOutputStream  = new ObjectOutputStream(mainIndexBufferedOutputStream);
+
 
             OutputStream docsIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+docsDictionaryName);
-            ObjectOutputStream docsIndexObjectOutstream  = new ObjectOutputStream(docsIndexFileOutputStream);
+            BufferedOutputStream docsIndexBufferedOutputStream = new BufferedOutputStream(docsIndexFileOutputStream);
+            ObjectOutputStream docsIndexObjectOutstream  = new ObjectOutputStream(docsIndexBufferedOutputStream);
 
             OutputStream cityIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+cityDictionaryName);
-            ObjectOutputStream cityIndexObjectOutstream  = new ObjectOutputStream(cityIndexFileOutputStream);
+            BufferedOutputStream cityIndexBufferedOutputStream = new BufferedOutputStream(cityIndexFileOutputStream);
+            ObjectOutputStream cityIndexObjectOutstream  = new ObjectOutputStream(cityIndexBufferedOutputStream);
 
 
             OutputStream languagesFileOutputStream = new FileOutputStream(finalPath+"\\"+languages);
-            ObjectOutputStream languagesObjectOutputStream  = new ObjectOutputStream(languagesFileOutputStream);
+            BufferedOutputStream languagesBufferedOutputStream = new BufferedOutputStream(languagesFileOutputStream);
+            ObjectOutputStream languagesObjectOutputStream  = new ObjectOutputStream(languagesBufferedOutputStream);
 
 
             docsIndexObjectOutstream.writeObject(getDocsMap());
@@ -140,23 +145,34 @@ public class Indexer implements Runnable {
             languagesObjectOutputStream.writeObject(getLanguages());
 
             mainIndexFileOutputStream.flush();
+            mainIndexBufferedOutputStream.flush();
             mainIndexObjectOutputStream.flush();
+
             mainIndexFileOutputStream.close();
+            mainIndexBufferedOutputStream.close();
             mainIndexObjectOutputStream.close();
 
-            docsIndexObjectOutstream.flush();
+
             docsIndexFileOutputStream.flush();
+            docsIndexBufferedOutputStream.flush();
+            docsIndexObjectOutstream.flush();
+
             docsIndexFileOutputStream.close();
+            docsIndexBufferedOutputStream.close();
             docsIndexObjectOutstream.close();
 
             cityIndexFileOutputStream.flush();
+            cityIndexBufferedOutputStream.flush();
             cityIndexObjectOutstream.flush();
             cityIndexFileOutputStream.close();
+            cityIndexBufferedOutputStream.close();
             cityIndexObjectOutstream.close();
 
             languagesFileOutputStream.flush();
+            languagesBufferedOutputStream.flush();
             languagesObjectOutputStream.flush();
             languagesFileOutputStream.close();
+            languagesBufferedOutputStream.close();
             languagesObjectOutputStream.close();
 
 

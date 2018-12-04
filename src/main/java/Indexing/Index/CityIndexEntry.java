@@ -1,6 +1,7 @@
 package Indexing.Index;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,14 +23,14 @@ public class CityIndexEntry implements Serializable {
         this.currency=currency;
         this.population=population;
         this.isPartOfCorpus=isPartOfCorpus;
-        docsMap=new LinkedHashMap<>();
+        docsMap=new HashMap<>();
     }
 
     public CityIndexEntry(String countryName , String currency , String population ){
         this.countryName=countryName;
         this.currency=currency;
         this.population=population;
-        docsMap=new LinkedHashMap<>();
+        docsMap=new HashMap<>();
     }
 
 
