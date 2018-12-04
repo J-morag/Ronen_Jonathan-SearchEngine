@@ -251,18 +251,18 @@ class ParseTest {
                         ) {
                             if(Parse.isNumeral(t.toString().charAt(0))) {
                                 termsNumberOrPriceOrPercent.add(t);
-                            }
-                            if(Parse.TokenType.classify(t.toString()) == Parse.TokenType.NUMBER){
-                                termsPureNumbers.add(t);
+                                if(!t.toString().contains("$") && !t.toString().contains("%")){
+                                    termsPureNumbers.add(t);
+                                }
                             }
                         }
                         for (Term t : termDoc.getTitle()
                         ) {
                             if(Parse.isNumeral(t.toString().charAt(0))) {
                                 termsNumberOrPriceOrPercent.add(t);
-                            }
-                            if(Parse.TokenType.classify(t.toString()) == Parse.TokenType.NUMBER){
-                                termsPureNumbers.add(t);
+                                if(!t.toString().contains("$") && !t.toString().contains("%")){
+                                    termsPureNumbers.add(t);
+                                }
                             }
                         }
                     }
