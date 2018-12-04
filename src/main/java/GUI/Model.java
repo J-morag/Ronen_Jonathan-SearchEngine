@@ -77,6 +77,10 @@ public class Model {
         this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
         this.languages = (Set<String>) inLanguages.readObject();
 
+        inDictionary.close();
+        inDocDictionary.close();
+        inCityDictionay.close();
+        inLanguages.close();
     }
 
     public void reset(String outputFolder) {
@@ -212,6 +216,7 @@ public class Model {
                 // poison element at end
                 TermDocument poison = new TermDocument(-1,null);
                 termDocumentsBuffer.put(poison);
+                in.close();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -262,6 +267,7 @@ public class Model {
         }
         this.cityDictionary = indexer.getCityMap();
         this.languages = indexer.getLanguages();
+        this.threadPool = null;
 
         int numIndexedDocs = indexer.getNumIndexedDocs();
         int numUniqueTerms = useStemming ? mainDictionaryWithStemming.size() : mainDictionaryNoStemming.size();

@@ -25,7 +25,7 @@ public class Parse implements Runnable{
     private TokenType currType;
     private boolean bIteratorHasNext = true;
 
-    private static AtomicInteger docSerialId = new AtomicInteger(0);
+    private AtomicInteger docSerialId;
 
     //          Administrative
 
@@ -40,6 +40,7 @@ public class Parse implements Runnable{
         this.stopWords = new HashSet<>(stopWords);
         this.sourceDocumentsQueue = sourceDocumentsQueue;
         this.sinkTermDocumentQueue = sinkTermDocumentQueue;
+        docSerialId = new AtomicInteger(0);
         this.months = new HashMap<String, String>(24);
         months.put("JANUARY", "01"); months.put("January", "01");
         months.put("FEBRUARY", "02");months.put("February", "02");
