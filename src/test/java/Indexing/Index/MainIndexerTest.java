@@ -302,25 +302,38 @@ public class MainIndexerTest {
 
         // dictionary to csv
 
-//        PrintWriter writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(pathToOutputFolderAtJM + "/ mainDic.csv")));
-        PrintWriter csvWriterNS = new PrintWriter(new BufferedOutputStream(new FileOutputStream(pathToOutputFolderAtJM + "/ mainDicNS.csv")));
+//        PrintWriter csvWriterNS = new PrintWriter(new BufferedOutputStream(new FileOutputStream(pathToOutputFolderAtJM + "/ mainDicNS.csv")));
+//
+//        csvWriterNS.println("term,TotalTf,df");
+//
+//        for (Map.Entry<String, IndexEntry> entry: entriesNS
+//             ) {
+//            StringBuilder sb = new StringBuilder();
+//            sb.append(entry.getKey());
+//            sb.append(",");
+//            sb.append(entry.getValue().getTotalTF());
+//            sb.append(",");
+//            sb.append(entry.getValue().getDf());
+//            sb.append(",");
+//            csvWriterNS.println(sb);
+//        }
+//
+//        csvWriterNS.flush();
+//        csvWriterNS.close();
 
-        csvWriterNS.println("term,TotalTf,df");
+        // cities
 
-        for (Map.Entry<String, IndexEntry> entry: entriesNS
-             ) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(entry.getKey());
-            sb.append(",");
-            sb.append(entry.getValue().getTotalTF());
-            sb.append(",");
-            sb.append(entry.getValue().getDf());
-            sb.append(",");
-            csvWriterNS.println(sb);
-        }
+        ObjectInputStream inCityDictionaryNS = new ObjectInputStream(new BufferedInputStream(new FileInputStream("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing" + '/' +
+                (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.cityDictionaryName )));
 
-        csvWriterNS.flush();
-        csvWriterNS.close();
+        Map<String , CityIndexEntry> citiesIndexNS = (Map<String , CityIndexEntry>) inCityDictionaryNS.readObject();
+
+        Map.Entry<String , CityIndexEntry>[] citiesEntriesNS = new Map.Entry[citiesIndexNS.size()];
+        citiesIndexNS.entrySet().toArray(citiesEntriesNS);
+
+//        Arrays.sort(citiesEntriesNS, (Comparator.comparingInt(e -> -1 * e.getValue().())));
+
+
 
     }
 
