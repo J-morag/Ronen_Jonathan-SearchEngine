@@ -51,6 +51,7 @@ public class Controller {
                 alert.setHeaderText("Index Generated!");
                 return alert;
             } catch (InterruptedException e) {
+                e.printStackTrace();
                 return new Alert(Alert.AlertType.ERROR, "IO error. Please check the paths and try again.");
             }
             catch (Exception e){
@@ -95,6 +96,7 @@ public class Controller {
         try {
             model.loadDictionary(view.isUseStemming(), outputLocation);
         } catch (Exception e) {
+            e.printStackTrace();
             return new Alert(Alert.AlertType.ERROR, "No valid dictionary file found in the given output folder.");
         }
 

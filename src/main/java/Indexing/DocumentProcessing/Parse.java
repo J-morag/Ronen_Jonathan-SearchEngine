@@ -984,7 +984,7 @@ public class Parse implements Runnable{
         } catch (FileNotFoundException e) {
             System.out.println("stopwords file not found in the specified path. running without stopwords");
         } catch (IOException e){
-            e.printStackTrace();
+            System.out.println("stopwords file not found in the specified path. running without stopwords");
         }
         return stopWords;
     }

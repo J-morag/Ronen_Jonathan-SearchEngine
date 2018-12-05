@@ -238,7 +238,8 @@ public class MainIndexMaker extends AIndexMaker {
     public void mergeIndex()
     {
         Set<String> uniqueWords = tempDictionary.keySet();
-        String[] allTerms = uniqueWords.stream().toArray(String[]::new);
+        String[] allTerms = new String[uniqueWords.size()];
+        uniqueWords.toArray(allTerms);
         try {
             IPostingOutputStream postingOutputStream=new PostingOutputStream(path+"\\Postings");
             for (String term: allTerms ) {
