@@ -18,6 +18,10 @@ public abstract class AIndexMaker {
 
     }
 
+    /**
+     * this method receive a Term doc and adds the relevant data to the index
+     * @param doc - termDoc object which we want to index
+     */
     abstract public void  addToIndex(TermDocument doc);
 
 

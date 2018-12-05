@@ -33,7 +33,12 @@ public class CityIndexEntry implements Serializable {
         docsMap=new HashMap<>();
     }
 
-
+    /**
+     * this method add a new doc and positions array to the docsMap
+     * and change the #isPartOfCorpus flag if it is a new city
+     * @param docNum - the doc id that we want to add
+     * @param positions - int array  of positions of this doc
+     */
     public void addDocToMap(int docNum , int [] positions ){
         if(!isPartOfCorpus){
             isPartOfCorpus=true;
@@ -41,6 +46,12 @@ public class CityIndexEntry implements Serializable {
         docsMap.put(docNum,positions);
     }
 
+    /**
+     * this  method adds a new position of a city in the text  to a specific doc in #docsMap
+     * @param docNum- the doc id that we want to add a  value to it
+     * @param index - the index of the city in the text
+     * @param numLeft - number of appearances of the city that we didnt insert yet (helps to know in which index of the array to insert the data)
+     */
     public void addDocToMap(int docNum , int index , int numLeft ){
 
         int [] arr =docsMap.get(docNum);

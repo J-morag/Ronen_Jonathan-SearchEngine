@@ -22,8 +22,8 @@ public class CityIndexTest {
     private static final int termBufferSize = 3;
     private static final int stemmedTermBufferSize = 3;
 
-    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Documents\\לימודים\\שנה ג\\איחזור מידע\\עבודות\\מסמכים מנוע חיפוש\\corpus";
-    //private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
+
+    private static final String pathToDocumentsFolder = "C:\\Users\\ronen\\Desktop\\FB396001";
     private static final String pathToStopWordRONEN ="C:\\Users\\ronen\\Desktop\\stopWords.txt";
 
     @Test
