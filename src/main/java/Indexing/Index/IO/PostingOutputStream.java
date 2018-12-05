@@ -24,6 +24,13 @@ public class PostingOutputStream extends APostingOutputStream {
         postingsFile = new BufferedOutputStream(new FileOutputStream(pathToFile));
     }
 
+    /**
+     * see interface PostingOutputStream
+     * @param postings  - an array of postings to write.
+     * @return
+     * @throws NullPointerException
+     * @throws IOException
+     */
     @Override
     public long write(List<Posting> postings) throws NullPointerException, IOException {
         long startIdx = getCursor();
@@ -38,6 +45,10 @@ public class PostingOutputStream extends APostingOutputStream {
     }
 
 
+    /**
+     * see interface PostingOutputStream
+     * @throws IOException
+     */
     @Override
     public void flush() throws IOException {
         postingsFile.flush();

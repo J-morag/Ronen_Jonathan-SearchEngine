@@ -30,6 +30,13 @@ public class IntToIntArrayMapOutputStream {
         return filePointer;
     }
 
+    /**
+     * writes (appending) a single Map< Integer, int[]>
+     * @param map - the map to write.
+     * @return - a pointer to the first byte where the map was written in the file.
+     * @throws NullPointerException - if the map or an element inside is null.
+     * @throws IOException - if an IOException happens when accessing the file.
+     */
     public long write(Map<Integer, int[]> map) throws NullPointerException, IOException {
         long startIdx = getCursor();
 

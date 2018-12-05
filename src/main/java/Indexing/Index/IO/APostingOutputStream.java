@@ -24,6 +24,10 @@ public abstract class APostingOutputStream implements IPostingOutputStream{
         this.postingsFile = new FileOutputStream(pathToFile);
     }
 
+    /**
+     * see interface PostingOutputStream
+     * @return
+     */
     @Override
     public long getCursor() {
         return filePointer;

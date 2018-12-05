@@ -75,6 +75,10 @@ public class Parse implements Runnable{
         TermDocument poison = new TermDocument(-1,null);
         sinkTermDocumentQueue.put(poison);
 
+        //free memory
+        months = null;
+        stopWords = null;
+
     }
 
     /**
@@ -889,14 +893,6 @@ public class Parse implements Runnable{
             term = Character.isLowerCase(term.charAt(0)) ? term.toLowerCase() : term.toUpperCase();
         }
         return new Term(term);
-//        if(uniqueTerms.containsKey(term)){
-//            return uniqueTerms.get(term);
-//        }
-//        else{
-//            Term newTerm = new Term(term);
-//            uniqueTerms.put(term, newTerm);
-//            return newTerm;
-//        }
     }
 
     /**
@@ -988,10 +984,8 @@ public class Parse implements Runnable{
         } catch (FileNotFoundException e) {
             System.out.println("stopwords file not found in the specified path. running without stopwords");
         } catch (IOException e){
-            e.printStackTrace();
+            System.out.println("stopwords file not found in the specified path. running without stopwords");
         }
-
-
         return stopWords;
     }
 }
