@@ -116,8 +116,9 @@ public class ReadFile implements Runnable {
                 saxParser = factory.newSAXParser();
                 UserHandler userhandler = new UserHandler();
 
-                String st = elm.toString();
+                String st = new String (elm.toString().getBytes(),"UTF-8");
                 InputStream is = new ByteArrayInputStream(st.getBytes());
+
                 saxParser.parse(is,userhandler);
             } catch (SAXException e) {
                 e.printStackTrace();
