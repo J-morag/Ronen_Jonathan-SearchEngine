@@ -13,7 +13,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Model model = new Model();
 
-        primaryStage.setTitle("!GOOGLE");
+        primaryStage.setTitle("¬GOOGLE");
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = fxmlLoader.load(getClass().getResource("View.fxml").openStream());
         Scene scene = new Scene(root, 600, 400);
@@ -28,7 +28,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         launch(args);
     }
 

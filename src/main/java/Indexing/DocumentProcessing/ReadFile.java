@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -85,7 +86,7 @@ public class ReadFile implements Runnable {
 
         try {
             fi = new FileInputStream(fileToGenerate);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fi));
+            BufferedReader br = new BufferedReader(new InputStreamReader(fi, StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             String line = null;
             line = br.readLine();

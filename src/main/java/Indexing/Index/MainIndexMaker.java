@@ -80,7 +80,7 @@ public class MainIndexMaker extends AIndexMaker {
                     beginning = (int)(text.size()*0.1);
                 }catch (NullPointerException e ){
                     beginning = 0;
-
+                    e.printStackTrace();
                 }
 
                 if (title.contains(new Term(term))){
