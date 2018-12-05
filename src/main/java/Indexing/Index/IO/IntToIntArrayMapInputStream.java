@@ -16,6 +16,12 @@ public class IntToIntArrayMapInputStream {
         this.postingsFile = new RandomAccessFile(pathToFile, "r");
     }
 
+    /**
+     * reads a Map< Integer, int[]> in the format defined by {@link IntToIntArrayMapOutputStream IntToIntArrayMapOutputStream}
+     * @param pointerToStartOfMap
+     * @return
+     * @throws IOException
+     */
     public Map<Integer, int[]> readIntegerArraysMap(long pointerToStartOfMap) throws IOException {
         postingsFile.seek(pointerToStartOfMap);
 
