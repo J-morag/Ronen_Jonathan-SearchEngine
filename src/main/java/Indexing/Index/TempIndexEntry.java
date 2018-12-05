@@ -33,11 +33,19 @@ public class TempIndexEntry {
         df++;
     }
 
+    /**
+     * this metho increase the TotalTF field by an n value
+     * @param n - the value that we want to add to TotalTF
+     */
     public void increaseTfByN(int n){
 
         tfTotal+=n;
     }
 
+    /**
+     * this method add a posting to the Posting list
+     * @param pos - Posting Object to add
+     */
     public void addPosting(Posting pos){
         posting.add(pos);
         df++;
@@ -47,6 +55,9 @@ public class TempIndexEntry {
         return posting;
     }
 
+    /**
+     * sort the posting list by the tf value of each posting  the max tf will be first
+     */
     public void sortPosting(){
         Collections.sort(posting, new Comparator<Posting>() {
             @Override

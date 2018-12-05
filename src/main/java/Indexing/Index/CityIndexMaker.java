@@ -28,6 +28,13 @@ public class CityIndexMaker extends AIndexMaker {
     }
 
     @Override
+    /**
+     *  this method receive a docs of Terms and adding the city that represent the doc to the #CityDictionary.
+     *  its counts the number of times that the city that represent the doc is appears in the text and save the locations of them.
+     *  finally  for each city , there is a City Index entry with all the information about the city and the docs  represented by this city
+     *  and the positions of the city in the text
+     *
+     */
     public void addToIndex(TermDocument doc) {
         if (doc.getSerialID() != -1) {
             List<Term> title = doc.getTitle();

@@ -18,8 +18,6 @@ public class MainIndexMaker extends AIndexMaker {
 
     //the size of the group of documents that will be indexed every time.
     private static final short partialGroupSize = 10000;
-
-
     private Map<String, TempIndexEntry> tempDictionary;
     private Map <String, IndexEntry> mainDictionary;
     private List<DocIndexEntery> docsDictionary;
@@ -41,6 +39,11 @@ public class MainIndexMaker extends AIndexMaker {
     }
 
     @Override
+    /**
+     * this method receive a docs of Terms and adding them to the index.
+     * at first it adding terms to the temporary index and finally adds all to the main dictionary
+     * after  #partialGroupSize docs that ware indexed we dump the temporary postings to the disk
+     */
     public void addToIndex(TermDocument doc) {
         if(doc.getSerialID() != -1){
 
@@ -197,7 +200,9 @@ public class MainIndexMaker extends AIndexMaker {
     }
 
 
-
+    /**
+     * this method creates a temporary posting file and write them to disk
+     */
     public void  dumpToDisk()
     {
 
@@ -224,8 +229,12 @@ public class MainIndexMaker extends AIndexMaker {
     }
 
 
-
-   //@TODO
+    /**
+     * this method merge all temporary postings files to a single and final posting file
+     * by iterating over the key of the temporary dictionary and getting its posting from all of the temp postings files,
+     * sort them , write them to the disk and save the pointer to them in the main dictionary.
+     * finally it deleting the term from the temp dictionary.
+     */
     public void mergeIndex()
     {
         Set<String> uniqueWords = tempDictionary.keySet();

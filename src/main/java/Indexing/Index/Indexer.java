@@ -118,7 +118,9 @@ public class Indexer implements Runnable {
             ((MainIndexMaker) mainIndex).mergeIndex();
     }
 
-
+    /**
+     * this method write the main Dictionary , the docs Dictionary and the languages set to the disk
+     */
     public void dumpDictionaryToDisk(){
         try {
             OutputStream mainIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+dictionarySaveName);
@@ -180,6 +182,9 @@ public class Indexer implements Runnable {
     }
 
 
+    /**
+     * this method writs the cities dictionary to the disk
+     */
     private void dumpCityDictionaryToDisk() {
 
 
