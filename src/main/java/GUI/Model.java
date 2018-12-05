@@ -116,9 +116,18 @@ public class Model {
         }
     }
 
+    /**
+     * generate a new index, including all sub indexes.
+     * @param useStemming
+     * @param corpusLocation
+     * @param outputLocation
+     * @param stopwordsLocation
+     * @return - a String containing statistics about the generation process.
+     * @throws Exception
+     */
     public String generateIndex(boolean useStemming, String corpusLocation, String outputLocation, String stopwordsLocation) throws Exception {
         //setup
-        setupToGenerateIndex(useStemming);
+        setupToGenerateIndex();
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -146,9 +155,19 @@ public class Model {
         return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
     }
 
+    /**
+     * Experimental!
+     * similar to {@link #generateIndex(boolean, String, String, String)}, but separates indexing to a parsing and an indexing phase to avoid high memory use.
+     * @param useStemming
+     * @param corpusLocation
+     * @param outputLocation
+     * @param stopwordsLocation
+     * @return
+     * @throws Exception
+     */
     public String generateIndexTwoPhase(final boolean useStemming, final String corpusLocation, final String outputLocation, String stopwordsLocation) throws Exception {
         //setup
-        setupToGenerateIndex(useStemming);
+        setupToGenerateIndex();
         /*  Concurrent buffers:
         Thread safe. blocks if empty or full.
         Remember it is imperative that the user manually synchronize on the returned list when iterating over it */
@@ -240,7 +259,10 @@ public class Model {
         return handleNewIndexGeneration(indexer, useStemming, time, timeoutReached);
     }
 
-    private void setupToGenerateIndex(boolean useStemming){
+    /**
+     * creates a new thread pool and sets all other fields to null.
+     */
+    private void setupToGenerateIndex(){
         threadPool = Executors.newFixedThreadPool(4);
         cityDictionary = null;
         languages = null;
@@ -250,9 +272,21 @@ public class Model {
         docDictionaryNoStemming  = null;
     }
 
-    private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long time, boolean timeoutReached) throws Exception {
+    /**
+     * checks if the index was generated successfully, if not, throws and exception.
+     * takes the output of an index generation and saves it to local fields.
+     * sets thread pool to null to free system resources.
+     * @param indexer - contains the results of the index generation (dictionaries).
+     * @param useStemming
+     * @param executionTime - execution time.
+     * @param timeoutReached - indicates if the thread pool cosed prematurely because of a timeout.
+     * @return - a String containing statistics about the generation process.
+     * @throws Exception - if an exception was thrown by one of the worker threads.
+     */
+    private String handleNewIndexGeneration(Indexer indexer, boolean useStemming, long executionTime, boolean timeoutReached) throws Exception {
         if(timeoutReached) throw new Exception("Timeout reached during execution");
         else if(this.isExceptionThrownDuringGeneration){
+            this.threadPool = null;
             isExceptionThrownDuringGeneration = false;
             throw exceptionThrownDuringGeneration;
         }
@@ -274,6 +308,6 @@ public class Model {
 
         return "Number of indexed documents = " + numIndexedDocs + "\n" +
                 "Number of unique terms = " + numUniqueTerms + "\n" +
-                "Total time (seconds) = " + time ;
+                "Total time (seconds) = " + executionTime ;
     }
 }
