@@ -24,8 +24,8 @@ import java.util.concurrent.BlockingQueue;
  */
 public class ReadFile implements Runnable {
     private String pathToDocumentsFolder;
-    static BlockingQueue<Document> documentBuffer; //@TODO: need to see how to make the queue not static.
-    Map<String, CityIndexEntry> cityMap = null;
+    static BlockingQueue<Document> documentBuffer;
+    
 
 
     /**
