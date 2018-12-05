@@ -42,8 +42,8 @@
             <Label text="Corpus Folder Location" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             <Label text="Output Folder Location" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
             <CheckBox fx:id="chkbox_use_stemming" mnemonicParsing="false" selected="true" text="Use Stemming" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-            <TextField fx:id="txtfld_corpus_location" promptText="Corpus Folder Location" GridPane.columnIndex="1" />
-            <TextField fx:id="txtfld_output_location" promptText="Output Folder Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="txtfld_corpus_location" promptText="Corpus Folder Location" GridPane.columnIndex="1" text="C:\Users\John\Downloads\infoRetrieval\50 files" />
+            <TextField fx:id="txtfld_output_location" promptText="Output Folder Location" GridPane.columnIndex="1" GridPane.rowIndex="2" text="C:\Users\John\Downloads\infoRetrieval\test results\indexing"/>
             <Button fx:id="btn_corpus_browse" mnemonicParsing="false" onAction="#browseCorpusLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <Button fx:id="btn_output_browse" mnemonicParsing="false" onAction="#browseOutputLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
@@ -54,7 +54,7 @@
                </children>
             </VBox>
             <Label text="Stopwords File Location" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <TextField fx:id="txtfld_stopwords_location" promptText="Stopwords File Location" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="txtfld_stopwords_location" promptText="Stopwords File Location" GridPane.columnIndex="1" GridPane.rowIndex="1" text="C:\Users\John\Downloads\infoRetrieval\stop_words.txt"/>
             <CheckBox fx:id="chkbox_memory_saver" accessibleHelp="Sacrifices performance to consume less memory" disable="true" mnemonicParsing="false" text="Memory Saver (see Readme)" visible="false" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
             <Button fx:id="btn_stopwords_browse" mnemonicParsing="false" onAction="#browseStopwordsLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
          </children>

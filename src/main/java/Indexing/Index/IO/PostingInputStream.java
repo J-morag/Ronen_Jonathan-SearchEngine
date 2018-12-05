@@ -1,7 +1,6 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -57,7 +56,7 @@ public class PostingInputStream implements IPostingInputStream {
         }
 
         //wrap in an input stream
-        InputStream input = new ByteInputStream(bytesFromDisk, bytesFromDisk.length);
+        InputStream input = new ByteArrayInputStream(bytesFromDisk, 0, bytesFromDisk.length);
 
         //convert bytes to postings and return
         return readNPostings(input, numPostingsForTerm);
