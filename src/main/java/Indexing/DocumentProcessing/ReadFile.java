@@ -253,8 +253,8 @@ public class ReadFile implements Runnable {
             else if (language) {
                 StringBuilder s = new StringBuilder();
                 for (int i = start; i < length - 1; i++) {
-                    if (ch[i] != ' ' && ch[i] != '\n') {
-                        s.append(ch[i]);
+                    if ((ch[i] != ' ' && ch[i] != '\n') && ((ch[i]>='a' && ch[i]<='z')|| (ch[i]>='A' && ch[i]<='Z'))  ) {
+                            s.append(ch[i]);
                     }else {
                         continue;
                     }

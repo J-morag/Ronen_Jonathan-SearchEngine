@@ -65,7 +65,8 @@ public class Indexer implements Runnable {
                 }
                 else numIndexedDocs++;
             }
-            mergeMainIndex();
+            dumpCityDictionaryToDisk();
+             mergeMainIndex();
             dumpDictionaryToDisk();
 
 
@@ -75,6 +76,7 @@ public class Indexer implements Runnable {
         }
         stemmedTermDocumentsBuffer=null;
     }
+
 
     public void run() {
         index();
@@ -128,9 +130,7 @@ public class Indexer implements Runnable {
             BufferedOutputStream docsIndexBufferedOutputStream = new BufferedOutputStream(docsIndexFileOutputStream);
             ObjectOutputStream docsIndexObjectOutstream  = new ObjectOutputStream(docsIndexBufferedOutputStream);
 
-            OutputStream cityIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+cityDictionaryName);
-            BufferedOutputStream cityIndexBufferedOutputStream = new BufferedOutputStream(cityIndexFileOutputStream);
-            ObjectOutputStream cityIndexObjectOutstream  = new ObjectOutputStream(cityIndexBufferedOutputStream);
+
 
 
             OutputStream languagesFileOutputStream = new FileOutputStream(finalPath+"\\"+languages);
@@ -140,7 +140,7 @@ public class Indexer implements Runnable {
 
             docsIndexObjectOutstream.writeObject(getDocsMap());
             mainIndexObjectOutputStream.writeObject(getMainMap());
-            cityIndexObjectOutstream.writeObject(getCityMap());
+
 
             languagesObjectOutputStream.writeObject(getLanguages());
 
@@ -161,12 +161,7 @@ public class Indexer implements Runnable {
             docsIndexBufferedOutputStream.close();
             docsIndexObjectOutstream.close();
 
-            cityIndexFileOutputStream.flush();
-            cityIndexBufferedOutputStream.flush();
-            cityIndexObjectOutstream.flush();
-            cityIndexFileOutputStream.close();
-            cityIndexBufferedOutputStream.close();
-            cityIndexObjectOutstream.close();
+
 
             languagesFileOutputStream.flush();
             languagesBufferedOutputStream.flush();
@@ -178,6 +173,33 @@ public class Indexer implements Runnable {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void dumpCityDictionaryToDisk() {
+
+
+        try {
+            OutputStream cityIndexFileOutputStream = new FileOutputStream(finalPath+"\\"+cityDictionaryName);
+            BufferedOutputStream cityIndexBufferedOutputStream = new BufferedOutputStream(cityIndexFileOutputStream);
+            ObjectOutputStream cityIndexObjectOutstream  = null;
+
+            cityIndexObjectOutstream = new ObjectOutputStream(cityIndexBufferedOutputStream);
+
+
+            cityIndexObjectOutstream.writeObject(getCityMap());
+
+            cityIndexFileOutputStream.flush();
+            cityIndexBufferedOutputStream.flush();
+            cityIndexObjectOutstream.flush();
+            cityIndexFileOutputStream.close();
+            cityIndexBufferedOutputStream.close();
+            cityIndexObjectOutstream.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
