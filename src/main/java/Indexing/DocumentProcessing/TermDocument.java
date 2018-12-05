@@ -15,6 +15,22 @@ public class TermDocument implements Serializable {
     private List<Term> date;
     public String language="";
 
+    /**
+     *
+     * @param serialID - serial id of the Document that was parsed to create this object.
+     * @param doc - fields that don't require parsing will be taken from here.
+     * @param fields - a list of fields defined by the order that {@link Document} given in {@link Document#getAllParsableFields()}.
+     */
+    public TermDocument(int serialID, Document doc, List<Term>[] fields) {
+        this.serialID = serialID;
+        this.docId = doc.getDocId();
+        this.language = doc.getLanguage();
+        this.title = fields[0];
+        this.text = fields[1];
+        this.date = fields[2];
+        if(!fields[3].isEmpty()) this.city = fields[3].get(0);
+    }
+
     public TermDocument(int serialID, Document doc) {
         this.serialID = serialID;
         if (null != doc){
@@ -26,16 +42,6 @@ public class TermDocument implements Serializable {
             docId = null;
             language = null;
         }
-    }
-
-    public TermDocument(int serialID, Document doc, List<Term>[] fields) {
-        this.serialID = serialID;
-        this.docId = doc.getDocId();
-        this.language = doc.getLanguage();
-        this.title = fields[0];
-        this.text = fields[1];
-        this.date = fields[2];
-        if(!fields[3].isEmpty()) this.city = fields[3].get(0);
     }
 
     public int getSerialID() {
