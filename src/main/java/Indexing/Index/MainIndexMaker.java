@@ -142,9 +142,7 @@ public class MainIndexMaker extends AIndexMaker {
         try {
             beginning = (int)(text.size()*0.1);
         }catch (NullPointerException e ){
-            System.out.println(numOfDocs);
-            exit();
-
+            beginning=0;
         }
 
         for(Term term : title){
