@@ -359,8 +359,6 @@ public class MainIndexMaker extends AIndexMaker {
                     e.printStackTrace();
                 } catch (Throwable e){
                     e.printStackTrace();
-                } finally {
-                    System.out.println(3);
                 }
 
             }
