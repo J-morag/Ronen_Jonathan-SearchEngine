@@ -4,6 +4,7 @@ import Indexing.DocumentProcessing.Document;
 import Indexing.DocumentProcessing.TermDocument;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
+import Indexing.Index.IO.IntToIntArrayMapInputStream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -11,10 +12,7 @@ import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -53,7 +51,7 @@ public class CityIndexTest {
 
 
 
-                FileOutputStream fileOutputStream = new FileOutputStream("resources\\citiesDictionary");
+                FileOutputStream fileOutputStream = new FileOutputStream("resources\\rec");
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
                 objectOutputStream.writeObject(cityMap);
 
@@ -84,7 +82,7 @@ public class CityIndexTest {
 
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = new FileInputStream("resources\\citiesDictionary");
+            fileInputStream = new FileInputStream("resources\\rec");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
              cityMap= (Map<String, CityIndexEntry>) objectInputStream.readObject();
              
@@ -133,4 +131,76 @@ public class CityIndexTest {
 
 
     }
+
+    @Test
+    public void testForReport(){
+        try {
+            IntToIntArrayMapInputStream intToIntArrayMapInputStream = new IntToIntArrayMapInputStream("C:\\Users\\ronen\\Desktop\\test\\postingWithStemming\\CitiesPosting");
+
+
+            ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream( new FileInputStream("C:\\Users\\ronen\\Desktop\\test\\postingWithStemming\\CityDictionary")));
+
+            Map<String , CityIndexEntry> cityDictionary =(Map<String , CityIndexEntry>) objectInputStream.readObject();
+            ObjectInputStream docsObjectStram = new ObjectInputStream(new BufferedInputStream( new FileInputStream("C:\\Users\\ronen\\Desktop\\test\\postingWithStemming\\DocsIndex")));
+            List<DocIndexEntery> docList = (List<DocIndexEntery>) docsObjectStram.readObject();
+            docsObjectStram.close();
+            int max=0;
+            int [] maxPositions=null;
+            String city="";
+            int docId=0;
+
+            int numOfciteis=0;
+            int numOfCapital=0;
+
+            for (String key : cityDictionary.keySet()) {
+                CityIndexEntry cityIndexEntry= cityDictionary.get(key);
+                numOfciteis++;
+
+                if (cityIndexEntry.getCountryName()!=null){
+                    numOfCapital++;
+                }
+                int pointer = cityIndexEntry.getPointer();
+                Map<Integer , int []> docsMap = intToIntArrayMapInputStream.readIntegerArraysMap(pointer);
+                cityIndexEntry.setDocsMap(docsMap);
+                for (Integer id : docsMap.keySet()) {
+                    int [] positions = docsMap.get(id);
+                    if(positions.length>max){
+                        max=positions.length;
+                        maxPositions=positions;
+                        city=key;
+                        docId=id;
+
+                    }
+                }
+//                System.out.println(key+"->"+cityIndexEntry.getDocsMap().size()+"\n");
+            }
+            intToIntArrayMapInputStream.close();
+            objectInputStream.close();
+
+            System.out.println("NUMBER OF CITIES : "+ numOfciteis);
+            System.out.println("NUMBER OF NON CAPITAL : "+(numOfciteis-numOfCapital));
+            System.out.println("DOC ID : "+ docList.get(docId).getDocID()+"\nCITY : "+city+"\nNUM OF APPEARANCES :  "+max);
+            System.out.print("POSITIONS : [");
+            for (int i = 0; i <maxPositions.length ; i++) {
+                System.out.print(maxPositions[i]+" ");
+            }
+            System.out.println("]");
+
+
+
+
+
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

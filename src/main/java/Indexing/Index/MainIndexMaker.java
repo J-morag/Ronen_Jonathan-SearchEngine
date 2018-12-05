@@ -202,7 +202,7 @@ public class MainIndexMaker extends AIndexMaker {
     {
 
         try {
-            IPostingOutputStream outputStream = new PostingOutputStream(path+"\\temp"+tempFileNumber+".txt");//@todo change to other postingOutPutStream
+            IPostingOutputStream outputStream = new PostingOutputStream(path+"\\temp"+tempFileNumber+".txt");
             TempIndexEntry tmp =null;
             numOfDocs=0;
             for (String term : tempDictionary.keySet()) {
@@ -265,7 +265,8 @@ public class MainIndexMaker extends AIndexMaker {
        try {
            File file = new File(path);
            for (File fi : file.listFiles()) {
-              if (!(fi.getName().equals("Postings"))&& !(fi.getName().equals("CitiesPosting"))) {
+               String name = fi.getName().substring(0,4);
+              if (name.equals("temp")) {
                   fi.delete();
               }
            }

@@ -49,9 +49,15 @@ public class CityIndexEntry implements Serializable {
 
     }
 
+    public void setDocsMap(Map<Integer , int[]> map){
+        this.docsMap=map;
+    }
+
     public Map<Integer , int[]> getDocsMap (){
         return docsMap;
     }
+
+
 
     public String getCountryName() {
         return countryName;
