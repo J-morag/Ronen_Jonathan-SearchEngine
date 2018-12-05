@@ -7,11 +7,6 @@ import java.io.Serializable;
  */
 public class Term implements Comparable, Serializable {
     final String string;
-//    boolean isInHeader = false;
-//    boolean isInTitle = false;
-//    boolean isInBold = false;
-//    boolean isInOpening = false;
-//    boolean isInEnding = false;
 
     public Term(String string) {
         this.string = string;

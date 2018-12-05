@@ -58,6 +58,7 @@ public class Parse implements Runnable{
     }
 
     /**
+     * parsing thread main loop.
      * takes Documents, tokenizes and parses them into terms. does not perform stemming.
      * End of queue will be marked by a "poison" TermDocument with null docID.
      */

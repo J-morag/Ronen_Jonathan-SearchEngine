@@ -40,6 +40,7 @@ public class Model {
         exceptionHandler = new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread th, Throwable ex) {
                 isExceptionThrownDuringGeneration = true;
+                exceptionThrownDuringGeneration = (Exception) ex;
                 threadPool.shutdownNow();
             }
         };

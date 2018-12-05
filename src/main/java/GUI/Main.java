@@ -24,18 +24,12 @@ public class Main extends Application {
 
         model.setController(controller);
         view.setController(controller);
-//        viewC = view;
-//        view.setResizeEvent(scene);
-//        view.setViewModel(viewModel);
-//        viewModel.addObserver(view);
-//        SetStageCloseEvent(primaryStage);
 
         primaryStage.show();
     }
 
     public static void main(String[] args) throws InterruptedException {
         launch(args);
-//        createIndex();
     }
 
 
