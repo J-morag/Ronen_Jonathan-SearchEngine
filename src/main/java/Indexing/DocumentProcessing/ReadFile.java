@@ -25,7 +25,7 @@ import java.util.concurrent.BlockingQueue;
 public class ReadFile implements Runnable {
     private String pathToDocumentsFolder;
     static BlockingQueue<Document> documentBuffer;
-    
+
 
 
     /**
