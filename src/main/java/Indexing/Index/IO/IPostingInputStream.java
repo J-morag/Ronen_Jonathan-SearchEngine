@@ -20,7 +20,7 @@ public interface IPostingInputStream {
     List<Posting> readTermPostings(long pointerToStartOfPostingArray) throws IOException;
 
     /**
-     * reads up to {@param maxNumPostings} postings.
+     * reads up to {@code maxNumPostings} postings.
      * The returned Posting array contains postings related to a single Term.
      * @param pointerToStartOfPostingArray
      * @return

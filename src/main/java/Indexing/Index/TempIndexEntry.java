@@ -104,7 +104,7 @@ public class TempIndexEntry {
     /**
      * simulates a dynamic array of int that only grows.
      * inserts into the given array and returns it if it is large enough.
-     * if it isn't large enough to be inserted to ( {@param index} >= {@param array.length}, will copy arrary contents
+     * if it isn't large enough to be inserted to ( {@code index} >= array.length, will copy array contents
      * into a new array with double the size, insert, and return the new array.
      * @param index index to insert on.
      * @param intToInsert - int to insert.

@@ -281,7 +281,7 @@ public class Parse implements Runnable{
      * @param result - a string builder to add the result onto. may be empty or contain prior information.
      * @param has$ - indicates that the number should be treated as a price, regardless of the next token.
      *                should be set to true if a '$' was encountered before the number. should be set to false if unsure.
-     * @return - the same string builder given in {@param result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
+     * @return - the same string builder given in {@code result}, with parsed number, and any relevant tokens like "Dollars" or 'M'.
      */
     private StringBuilder parseNumber(@NotNull ListIterator<String> iterator,@NotNull StringBuilder result,
                                       boolean has$, List<Term> lTerms){
@@ -431,8 +431,8 @@ public class Parse implements Runnable{
     }
 
     /**
-     * iterates over the iterator once, and sets currString to the String from {@param iterator}. sets {@param currType} to the TokenType for current string.
-     * if iterator doesn't have next, sets {@param currString} to "\n", and sets {@param bIteratorHashNext} to false to stop parseWorker.
+     * iterates over the iterator once, and sets currString to the String from {@code iterator}. sets {@see #currType currType} to the TokenType for current string.
+     * if iterator doesn't have next, sets {@see #currString currString} to "\n", and sets {@see #bIteratorHashNext bIteratorHashNext} to false to stop parseWorker.
      * @param iterator
      */
     private void safeIterateAndCheckType(ListIterator<String> iterator){
@@ -611,7 +611,7 @@ public class Parse implements Runnable{
     }
 
     /**
-     * append number to {@param result}.
+     * append number to {@code result}.
      * Removes decimals if the number is a natural number.
      * @param result - the number will be appended here
      * @param number - the number to append.
@@ -710,8 +710,8 @@ public class Parse implements Runnable{
      * assumnes the firstToken has already been added to result.
      * @param iterator
      * @param result
-     * @param addComponents - whether or not to add the component parts of the compound expression into {@param lTerms}.
-     * @param lTerms - inserts the individual parts of the token chain into here, if {@param addComponents} is true;
+     * @param addComponents - whether or not to add the component parts of the compound expression into {@code lTerms}.
+     * @param lTerms - inserts the individual parts of the token chain into here, if {@code addComponents} is true;
      * @param firstToken - puts the individual words/numbers here, so they can also be
      */
     private void concatTokensSeparatedByDashes(@NotNull ListIterator<String> iterator, @NotNull StringBuilder result, List<Term> lTerms,

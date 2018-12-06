@@ -20,10 +20,10 @@ public interface IPostingOutputStream{
     long getCursor();
 
     /**
-     * writes all the postings in {@param postings} and then ends the line.
+     * writes all the postings in {@code postings} and then ends the line.
      * @param postings  - an array of postings to write.
      * @return - the index where the first byte of the first posting was written.
-     * @throws NullPointerException - if {@param postings} contains a null pointer
+     * @throws NullPointerException - if {@code postings} contains a null pointer
      */
     long write(@NotNull List<Posting> postings) throws NullPointerException, IOException;
 

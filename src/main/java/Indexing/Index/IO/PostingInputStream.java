@@ -74,8 +74,8 @@ public class PostingInputStream implements IPostingInputStream {
     }
 
     /**
-     * reads {@param numberOfPostingsToRead} postings from the array of input bytes.
-     * assumes the array contains enough bytes for {@param numberOfPostingsToRead} postings.
+     * reads {@code numberOfPostingsToRead} postings from the array of input bytes.
+     * assumes the array contains enough bytes for {@code numberOfPostingsToRead} postings.
      * @param input - array of bytes that should be parsed as Postings
      * @param numberOfPostingsToRead - number of postings to read.
      * @return - a list of Postings parsed from the input byte array.
