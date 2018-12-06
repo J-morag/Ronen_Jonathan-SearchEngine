@@ -613,12 +613,11 @@ public class Parse implements Runnable{
     /**
      * append number to {@param result}.
      * Removes decimals if the number is a natural number.
-     * keeps 5 digits past the decimal point.
      * @param result - the number will be appended here
      * @param number - the number to append.
      */
     private void appendWhileTrimmingDecimals(@NotNull StringBuilder result, float number){
-        number -= number%0.00001; //remove anything beyond the 5 digits past the decimal point
+//        number -= number%0.00001; //remove anything beyond the 5 digits past the decimal point
         if( number % 1 == 0 ){
             long numberWithoutDecimals = ((long)number);
             result.append(numberWithoutDecimals);
