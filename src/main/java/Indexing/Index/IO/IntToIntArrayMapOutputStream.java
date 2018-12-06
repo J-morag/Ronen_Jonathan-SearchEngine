@@ -9,7 +9,13 @@ import java.util.Map;
 /**
  * an advanced implementation for writing city information to disk, meant to be efficient and mobile.
  * it writes the city information as binary information, in a compact manner.
- * it uses a bufferedOutputStream to increase efficiency.
+ * it uses a bufferedOutputStream to increase efficiency. <br>
+ * format (per map): <br>
+ * 1 int - size of map<br>
+ * then per entry:<br>
+ * 1 int - key<br>
+ * 1 int - size of value (int array)<br>
+ * int array.
  */
 public class IntToIntArrayMapOutputStream {
 
