@@ -12,12 +12,6 @@ import java.util.List;
  * reads postings from a file. meant to read postings in the format that {@link PostingOutputStream PostingOutputStream} writes.
  * To increase efficiency, reads {@value #prefetchAmount} postings in advance, reducing the amount of reads to 1 when possible.
  * If more there are more than {@value #prefetchAmount} postings to read, will perform 1 more read operation (2 total reads).
- * format per array (term postings):<br>
- * 1 int - number of postings<br>
- * then per posting:<br>
- * all int fields.<br>
- * all short fields.<br>
- * all boolean fields.<br>
  */
 public class PostingInputStream implements IPostingInputStream {
 
