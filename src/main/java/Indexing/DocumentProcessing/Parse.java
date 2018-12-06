@@ -75,10 +75,6 @@ public class Parse implements Runnable{
         TermDocument poison = new TermDocument(-1,null);
         sinkTermDocumentQueue.put(poison);
 
-        //free memory
-        months = null;
-        stopWords = null;
-
     }
 
     /**
