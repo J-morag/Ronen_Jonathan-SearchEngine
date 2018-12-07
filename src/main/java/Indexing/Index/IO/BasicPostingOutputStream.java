@@ -1,12 +1,9 @@
 package Indexing.Index.IO;
 
 import Indexing.Index.Posting;
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.List;
 
 
