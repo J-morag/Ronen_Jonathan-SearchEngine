@@ -22,19 +22,23 @@ import java.util.stream.Stream;
 
 public class SemanticEngine {
 
-    private final String pathToBinaryGloveFolder;
     private GloveRandomAccessReader reader;
     private final KDTree<String> tree;
+    /**
+     * SemanticEngine will get the top kNeighbors neighbors for words.
+     */
+    private final int kNeighbors;
 
     /**
      * constructor
-     * @param pathToBinaryGloveFolder path to the folder where the binary GloVe vector files are stored.
+     * @param kNeighbors SemanticEngine will get the top kNeighbors neighbors for words.
+     * @param pathToGloveFilesFolder path to the folder where the binary GloVe vector files are stored.
      * @throws IOException if an error occurs while trying to get the binary GloVe files.
      */
-    public SemanticEngine(String pathToBinaryGloveFolder) throws IOException {
-        this.pathToBinaryGloveFolder = pathToBinaryGloveFolder;
+    public SemanticEngine(String pathToGloveFilesFolder, int kNeighbors) throws IOException {
+        this.kNeighbors = kNeighbors;
         // load GloVe vectors
-        Path dir = Paths.get(pathToBinaryGloveFolder);
+        Path dir = Paths.get(pathToGloveFilesFolder);
 
         reader = new CachedGloveBinaryRandomAccessReader(
                 new GloveBinaryRandomAccessReader(dir), 100l);
@@ -66,7 +70,7 @@ public class SemanticEngine {
             return null;
         } else {
             List<VectorDistanceTuple<String>> nearestNeighbours = tree
-                    .getNearestNeighbours(v, 6);
+                    .getNearestNeighbours(v, kNeighbors + 1); //+1 because the same word will also be retrieved.
 
             // sort and remove the one that we searched for
             Collections.sort(nearestNeighbours, Collections.reverseOrder());
