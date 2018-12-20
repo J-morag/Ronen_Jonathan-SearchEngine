@@ -93,13 +93,7 @@
             <artifactId>glove</artifactId>
             <version>0.3</version>
         </dependency>
-        <!-- transient dependency for glove -->
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>27.0.1-jre</version>
-        </dependency>
+
 
 
 
