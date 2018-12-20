@@ -105,7 +105,7 @@ public class Parse implements Runnable{
      * @param string - the string to tokenize
      * @return a list of strings (tokens).
      */
-    private List<String> tokenize(String string){
+    public List<String> tokenize(String string){
 //        final String splitterRegex = "[\t-&(-,.-/:-@\\x5B-`{-~]"; //marks chars to split on. with '.' '$'
         List<String> lTokens = new ArrayList<>();
         int from = 0;
@@ -204,7 +204,7 @@ public class Parse implements Runnable{
      * @param lTokens - tokens to parse
      * @return - list of parsed terms
      */
-    private List<Term> parseWorker(List<String> lTokens){
+    public List<Term> parseWorker(List<String> lTokens){
         List<Term> lTerms = new ArrayList<>();
         ListIterator<String> iterator = lTokens.listIterator(0);
 
