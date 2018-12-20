@@ -10,11 +10,109 @@ import de.jungblut.glove.impl.GloveBinaryReader;
 import de.jungblut.glove.util.StringVectorPair;
 import de.jungblut.math.DoubleVector;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 
 public class SemanticEngine {
 
-    public String[] getNearestNeightbors(String word){
-        return null; //TODO
+    private final String pathToBinaryGloveFolder;
+    private GloveRandomAccessReader reader;
+    private final KDTree<String> tree;
+
+    /**
+     * constructor
+     * @param pathToBinaryGloveFolder path to the folder where the binary GloVe vector files are stored.
+     * @throws IOException if an error occurs while trying to get the binary GloVe files.
+     */
+    public SemanticEngine(String pathToBinaryGloveFolder) throws IOException {
+        this.pathToBinaryGloveFolder = pathToBinaryGloveFolder;
+        // load GloVe vectors
+        Path dir = Paths.get(pathToBinaryGloveFolder);
+
+        reader = new CachedGloveBinaryRandomAccessReader(
+                new GloveBinaryRandomAccessReader(dir), 100l);
+        tree = new KDTree<>();
+
+        try (Stream<StringVectorPair> stream = new GloveBinaryReader().stream(dir)) {
+            stream.forEach((pair) -> {
+                tree.add(pair.vector, pair.value);
+            });
+
+        }
+        // Balancing the KD tree...
+        tree.balanceBySort();
+
+    }
+
+    /**
+     * finds the nearest semantic neighbors (synonyms) for the given word.
+     * @param word the word to find neighbors for.
+     * @return the nearest semantic neighbors (synonyms) for the given word. If word is null or if it wasn't found, returns null. If no neighbors were found, returns an empty list.
+     * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
+     */
+    public List<String> getNearestNeighbors(String word) throws IOException {
+        if(word == null) return null;
+
+        DoubleVector v = reader.get(word);
+        if (v == null) {
+            // word does'nt exist in vectors
+            return null;
+        } else {
+            List<VectorDistanceTuple<String>> nearestNeighbours = tree
+                    .getNearestNeighbours(v, 6);
+
+            // sort and remove the one that we searched for
+            Collections.sort(nearestNeighbours, Collections.reverseOrder());
+            // the best hit is usually the same item with distance 0
+            if (nearestNeighbours.get(0).getValue().equals(word)) {
+                nearestNeighbours.remove(0);
+            }
+
+            ArrayList<String> neighborStrings = new ArrayList<>(nearestNeighbours.size());
+            for (VectorDistanceTuple<String> tuple : nearestNeighbours) {
+                neighborStrings.add(tuple.getValue());
+            }
+            return neighborStrings;
+        }
+    }
+
+    /**
+     * finds the nearest semantic neighbors (synonyms) for the given words.
+     * @param words the words to find neighbors for.
+     * @return the nearest semantic neighbors (synonyms) for the given words. If the list is null, returns null. If no neighbors were found, returns an empty list.
+     * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
+     */
+    public List<String> getNearestNeighbors(List<String> words) throws IOException {
+        if (words == null) return null;
+        ArrayList<String> neighborStrings = new ArrayList<>();
+        for (String word: words
+                ) {
+            neighborStrings.addAll(getNearestNeighbors(word));
+        }
+        return neighborStrings;
+    }
+
+    /**
+     * finds the nearest semantic neighbors (synonyms) for the given words.
+     * @param words the words to find neighbors for.
+     * @return the nearest semantic neighbors (synonyms) for the given words. If the set is null, returns null. If no neighbors were found, returns an empty list.
+     * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
+     */
+    public List<String> getNearestNeighbors(Set<String> words) throws IOException {
+        if (words == null) return null;
+        ArrayList<String> neighborStrings = new ArrayList<>();
+        for (String word: words
+                ) {
+            neighborStrings.addAll(getNearestNeighbors(word));
+        }
+        return neighborStrings;
     }
 
 
