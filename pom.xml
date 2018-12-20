@@ -87,11 +87,20 @@
             <version>13.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/de.jungblut.glove/glove -->
         <dependency>
             <groupId>de.jungblut.glove</groupId>
             <artifactId>glove</artifactId>
             <version>0.3</version>
         </dependency>
+        <!-- transient dependency for glove -->
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.0.1-jre</version>
+        </dependency>
+
 
 
 
