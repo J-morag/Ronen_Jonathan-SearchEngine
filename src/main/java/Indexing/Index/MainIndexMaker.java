@@ -246,6 +246,9 @@ public class MainIndexMaker extends AIndexMaker {
                 }
                 List<Posting> postingToWrite = new ArrayList<>();
                String finalTerm = addTermToDictionary(term , postingToWrite);
+               if (finalTerm.equals("")){
+                   continue;
+               }
                 Collections.sort(postingToWrite, (o1, o2) -> {
                     if(o1.getTf()>o2.getTf()){
                         return -1;
@@ -329,7 +332,12 @@ public class MainIndexMaker extends AIndexMaker {
 
             tempDictionary.remove(term);
             IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
-            mainDictionary.put(termToWrite, indexEntry);
+            if(indexEntry.getTotalTF()>1) {
+                mainDictionary.put(termToWrite, indexEntry);
+            }
+            else {
+                return "";
+            }
 
 
         }catch (NullPointerException e){
