@@ -1,7 +1,5 @@
 package Indexing.Index.IO;
 
-import Indexing.Index.Posting;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import java.io.*;
 import java.util.*;

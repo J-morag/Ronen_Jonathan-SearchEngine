@@ -10,10 +10,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Ronen_Jonathan - SearchEngine" />
+        <module name="Ronen_Jonathan-SearchEngine" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Ronen_Jonathan - SearchEngine" target="8" />
+      <module name="Ronen_Jonathan-SearchEngine" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
