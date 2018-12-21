@@ -47,7 +47,8 @@ public abstract class Ranker {
         //sort by rank
         Map.Entry[] docsAsEntries = new Map.Entry[rankedDocs.size()];
         rankedDocs.entrySet().toArray(docsAsEntries);
-        Arrays.sort(docsAsEntries, Comparator.comparingDouble(Map.Entry<Integer, Double>::getValue).reversed());
+//        Arrays.sort(docsAsEntries, Comparator.comparingDouble(Map.Entry<Integer, Double>::getValue));
+        Arrays.sort(docsAsEntries, ((o1, o2) -> Collections.reverseOrder().compare(o1, o2)));
 
         //to int array
         int[] docsAsInts = new int[docsAsEntries.length];
