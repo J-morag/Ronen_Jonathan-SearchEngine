@@ -311,4 +311,12 @@ public class Model {
                 "Number of unique terms = " + numUniqueTerms + "\n" +
                 "Total time (seconds) = " + executionTime ;
     }
+
+    public Set<String> getAllCities(){
+        Set<String> allCites = new HashSet<>();
+        for (String city : cityDictionary.keySet() ) {
+            allCites.add(city);
+        }
+        return allCites;
+    }
 }

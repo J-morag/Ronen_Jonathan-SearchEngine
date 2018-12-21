@@ -9,6 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -38,6 +40,8 @@ public class View {
 
     public CheckBox chkbox_use_stemming;
     public CheckBox chkbox_memory_saver;
+
+    public BorderPane root_pane;
 
     @FXML
     private void initialize(){
@@ -159,6 +163,18 @@ public class View {
             result.show();
             btn_reset.setDisable(false);
             btn_display_dictionary.setDisable(false);
+
+            try{
+                FXMLLoader loader = new FXMLLoader();
+                AnchorPane pane = loader.load(getClass().getResource("SearchView.fxml").openStream());
+                root_pane.getChildren().setAll(pane);
+                SearchView searchView = loader.getController();
+                searchView.setController(controller);
+                searchView.setView();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
