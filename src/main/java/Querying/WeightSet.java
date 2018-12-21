@@ -17,4 +17,14 @@ public class WeightSet {
         this.frequencyWeight = frequencyWeight;
         this.exactTermMatchWeight = exactTermMatchWeight;
     }
+
+    @Override
+    public String toString() {
+        return "WeightSet{" +
+                "titleWeight=" + titleWeight +
+                ", beginningWeight=" + beginningWeight +
+                ", frequencyWeight=" + frequencyWeight +
+                ", exactTermMatchWeight=" + exactTermMatchWeight +
+                '}';
+    }
 }
