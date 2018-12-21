@@ -5,20 +5,20 @@ import Indexing.Index.Posting;
 import java.util.*;
 
 /**
- * ranks documents according to relevance.
- * uses a {@link RankingAlgorithm RankingAlgorithm} for the rank calculation (strategy design pattern).
+ * ranks documents according to relevance in the context of a query.
+ * uses a {@link WeightSet WeightSet} to give weights to the different parameters considered in the algorithm.
  */
-public class Ranker {
+public abstract class Ranker {
 
-    RankingAlgorithm rankingAlgorithm;
+    protected WeightSet weightSet;
 
-    public Ranker(RankingAlgorithm rankingAlgorithm) {
-        this.rankingAlgorithm = rankingAlgorithm;
+    public Ranker(WeightSet weightSet) {
+        this.weightSet = weightSet;
     }
 
     /**
      * Takes a list of postings for terms in the query, and a list of postings for terms derived semantically from the
-     * query. Ranks them according to relevance (determined by {@see #rankingAlgorithm rankingAlgorithm}). Returns
+     * query. Ranks them according to relevance. Returns
      * a list of unique document serialIDs, sorted by rank (first is most relevant).
      * @param postingsExplicit postings for terms mentioned explicitly in the query. may contain duplicates
      *                        internally or from postingsImplicit.
@@ -27,11 +27,15 @@ public class Ranker {
      * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
      */
     public int[] rank(List<Posting> postingsExplicit, List<Posting> postingsImplicit){
-        Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
 
-        rankAndInsertToMap(postingsExplicit, rankedDocs, true);
-        rankAndInsertToMap(postingsImplicit, rankedDocs, false);
+        Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit);
 
+        int[] docsAsInts = getDocsSortedByRank(rankedDocs);
+
+        return docsAsInts;
+    }
+
+    private int[] getDocsSortedByRank(Map<Integer, Double> rankedDocs) {
         //sort by rank
         Map.Entry[] docsAsEntries = new Map.Entry[rankedDocs.size()];
         rankedDocs.entrySet().toArray(docsAsEntries);
@@ -42,18 +46,35 @@ public class Ranker {
         for (int i = 0; i < docsAsEntries.length; i++) {
             docsAsInts[i] = (Integer)docsAsEntries[i].getKey();
         }
-
         return docsAsInts;
     }
 
-    private void rankAndInsertToMap(List<Posting> postings, Map<Integer, Double> rankedDocs, boolean isExplicitTermPostings ) {
-        for (Posting posting: postings
+    protected Map<Integer, Double> rankDocs(List<Posting> postingsExplicit, List<Posting> postingsImplicit ) {
+        Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
+        for (Posting posting: postingsExplicit
              ) {
-            double rank = rankingAlgorithm.rank(posting, isExplicitTermPostings);
+            double rank = calculateRankForExplicitPosting(posting);
             if(rankedDocs.containsKey(posting.getDocSerialID())){
-                rank = rankedDocs.get(posting.getDocSerialID()) + rank;
+                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(posting.getDocSerialID()), rank);
             }
             rankedDocs.put(posting.getDocSerialID(), rank);
         }
+        for (Posting posting: postingsImplicit
+             ) {
+            double rank = calculateRankForImplicitPosting(posting);
+            if(rankedDocs.containsKey(posting.getDocSerialID())){
+                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(posting.getDocSerialID()), rank);
+            }
+            rankedDocs.put(posting.getDocSerialID(), rank);
+        }
+
+        return rankedDocs;
     }
+
+    abstract double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank);
+
+    abstract double calculateRankForExplicitPosting(Posting posting);
+
+    abstract double calculateRankForImplicitPosting(Posting posting);
+
 }
