@@ -4,17 +4,17 @@ import Indexing.Index.Posting;
 
 /**
  * An algorithm to give a document a rank, representing its relevance to a term in the context of a query.
- * uses a {@link WeightSet WeightSet} to give weights to the different parameters considered in the algorithm.
+ * uses a {@link RankingParameters RankingParameters} to give weights to the different parameters considered in the algorithm.
  */
 public abstract class RankingAlgorithm {
 
     /**
      * give weights to the different parameters considered in the algorithm.
      */
-    private WeightSet weightSet;
+    private RankingParameters rankingParameters;
 
-    public RankingAlgorithm(WeightSet weightSet) {
-        this.weightSet = weightSet;
+    public RankingAlgorithm(RankingParameters rankingParameters) {
+        this.rankingParameters = rankingParameters;
     }
 
     /**

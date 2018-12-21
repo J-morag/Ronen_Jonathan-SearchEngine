@@ -1,11 +1,15 @@
 package Querying;
 
+import Indexing.DocumentProcessing.Term;
+import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
+
+import java.util.Map;
 
 public class BM25Ranker extends Ranker {
 
-    public BM25Ranker(WeightSet weightSet) {
-        super(weightSet);
+    public BM25Ranker(RankingParameters rankingParameters, Map<Term, IndexEntry> mainDictionary, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
+        super(rankingParameters, mainDictionary, numDocsInCorpus, averageDocumentLengthInCorpus);
     }
 
     /**

@@ -1,19 +1,27 @@
 package Querying;
 
+import Indexing.DocumentProcessing.Term;
+import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
 
 import java.util.*;
 
 /**
  * ranks documents according to relevance in the context of a query.
- * uses a {@link WeightSet WeightSet} to give weights to the different parameters considered in the algorithm.
+ * uses a {@link RankingParameters RankingParameters} to give weights to the different parameters considered in the algorithm.
  */
 public abstract class Ranker {
 
-    protected WeightSet weightSet;
+    protected RankingParameters rankingParameters;
+    protected Map<Term,IndexEntry> mainDictionary;
+    protected int numDocsInCorpus;
+    protected double averageDocumentLengthInCorpus;
 
-    public Ranker(WeightSet weightSet) {
-        this.weightSet = weightSet;
+    public Ranker(RankingParameters rankingParameters, Map<Term, IndexEntry> mainDictionary, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
+        this.rankingParameters = rankingParameters;
+        this.mainDictionary = mainDictionary;
+        this.numDocsInCorpus = numDocsInCorpus;
+        this.averageDocumentLengthInCorpus = averageDocumentLengthInCorpus;
     }
 
     /**
