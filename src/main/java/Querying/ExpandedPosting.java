@@ -2,6 +2,9 @@ package Querying;
 
 import Indexing.Index.Posting;
 
+/**
+ * adds more information to the {@link Posting Posting} to allow ranking of documents for queries.
+ */
 public class ExpandedPosting {
 
     public final Posting posting;
