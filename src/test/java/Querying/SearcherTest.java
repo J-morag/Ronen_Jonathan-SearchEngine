@@ -45,7 +45,8 @@ class SearcherTest {
         ranker = new ExpandedBM25Ranker(rankingParameters, numDocsInCorpus, averageDocLength);
 
         searcher = new Searcher(useStemming? mainDictionaryWithStemming : mainDictionaryNoStemming, cityDictionary,
-                useStemming? docDictionaryWithStemming : docDictionaryNoStemming, useStemming, pathToPostingsFolder,
+                useStemming? docDictionaryWithStemming : docDictionaryNoStemming, useStemming,
+                pathToPostingsFolder + (useStemming? "/postingWithStemming/Postings" : "/postingWithOutStemming/Postings"),
                 new SemanticEngine(pathToGloVeFilesFolder, kNeighbors), ranker, cityList);
     }
 
