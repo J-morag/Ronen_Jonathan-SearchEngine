@@ -1,9 +1,11 @@
 package Querying;
 
 /**
- * A {@link Ranker Ranker} implementation that uses the BM25 formula to rank documents.
+ * A {@link Ranker Ranker} implementation that uses the BM25+ formula to rank documents.
  */
 public class BM25Ranker extends Ranker {
+
+    private static double delta = 1.0;
 
     public BM25Ranker(RankingParameters rankingParameters, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
         super(rankingParameters, numDocsInCorpus, averageDocumentLengthInCorpus);
@@ -31,7 +33,8 @@ public class BM25Ranker extends Ranker {
         //compute denominator
         double denominator = getMB25Denominator(ePosting);
 
-        return getIDF(ePosting)*(numerator/denominator);
+        //the delta is from BM25+ implementation
+        return getIDF(ePosting)*((numerator/denominator) + delta);
     }
 
     /**

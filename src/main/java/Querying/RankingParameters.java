@@ -22,6 +22,15 @@ public class RankingParameters {
         this.b_BM25 = b_BM25;
     }
 
+    public RankingParameters(double titleWeight, double beginningWeight, double frequencyWeight, double exactTermMatchWeight) {
+        this.titleWeight = titleWeight;
+        this.beginningWeight = beginningWeight;
+        this.frequencyWeight = frequencyWeight;
+        this.exactTermMatchWeight = exactTermMatchWeight;
+        this.k_BM25 = 1.5;
+        this.b_BM25 = 0.75;
+    }
+
     @Override
     public String toString() {
         return "RankingParameters{" +

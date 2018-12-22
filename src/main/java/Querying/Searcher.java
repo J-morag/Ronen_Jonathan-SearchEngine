@@ -34,13 +34,13 @@ public class Searcher {
 
 
     //                                                                                                                                                                        ..\\..\\Postings
-    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, List<DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostings,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
+    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, List<DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostingsDir,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
         this.mainDictionary = mainDictionary;
         this.cityDictionary = cityDictionary;
         this.docsDictionary = docsDictionary;
         this.isUsedStemming = isUsedStemming;
-        this.parser = new Parse(new HashSet<String>(), new ArrayBlockingQueue<Document>(0) , new ArrayBlockingQueue<TermDocument>(0) , isUsedStemming);
-        this.pathToPostings=pathToPostings;
+        this.parser = new Parse(new HashSet<String>(), new ArrayBlockingQueue<Document>(1) , new ArrayBlockingQueue<TermDocument>(1) , isUsedStemming);
+        this.pathToPostings= pathToPostingsDir + (isUsedStemming? "/postingWithStemming/Postings" : "/postingWithOutStemming/Postings");
         this.semanticEngine = semanticEngine;
         this.ranker =ranker;
         this.cityListFilter=cityList;
@@ -231,14 +231,14 @@ public class Searcher {
     /**
      * Prints the results of any number of queries to a file.
      * Prints in the format of TREC_EVAL.
-     * @param l_queryResults the results of any number of queries.
+     * @param l_queryResults the results of any number of queries. Pairs of (query number, returned documents).
      * @param pathToOutputFolder the folder to put the results file in.
      * @throws FileNotFoundException if the pathToOutputFolder is invalid.
      */
-    public static void outputResults(List<Pair<Integer, String[]>> l_queryResults, String pathToOutputFolder) throws FileNotFoundException {
+    public static void outputResults(List<Pair<Integer, List<String>>> l_queryResults, String pathToOutputFolder) throws FileNotFoundException {
         PrintWriter printWriter = new PrintWriter(pathToOutputFolder+"/results.txt");
 
-        for (Pair<Integer, String[]> queryResult: l_queryResults
+        for (Pair<Integer, List<String>> queryResult: l_queryResults
              ) {
             int queryID = queryResult.getKey();
             for (String docID: queryResult.getValue()
