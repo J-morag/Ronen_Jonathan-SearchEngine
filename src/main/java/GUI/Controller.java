@@ -108,4 +108,9 @@ public class Controller {
 
         return alert;
     }
+
+
+    public Set<String> getAllCities(){
+      return  model.getAllCities();
+    }
 }
