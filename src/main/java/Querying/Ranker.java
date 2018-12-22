@@ -56,7 +56,7 @@ public abstract class Ranker {
         return docsAsInts;
     }
 
-    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit ) {
+    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors) {
         Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
         for (ExpandedPosting ePosting: postingsExplicit
              ) {
