@@ -11,9 +11,11 @@ import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
 import com.sun.corba.se.impl.logging.POASystemException;
 import javafx.geometry.Pos;
+import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -208,5 +210,23 @@ public class Searcher {
 
     }
 
+    /**
+     * Prints the results of any number of queries to a file.
+     * Prints in the format of TREC_EVAL.
+     * @param l_queryResults the results of any number of queries.
+     * @param pathToOutputFolder the folder to put the results file in.
+     * @throws FileNotFoundException if the pathToOutputFolder is invalid.
+     */
+    public static void outputResults(List<Pair<Integer, String[]>> l_queryResults, String pathToOutputFolder) throws FileNotFoundException {
+        PrintWriter printWriter = new PrintWriter(pathToOutputFolder+"/results.txt");
 
+        for (Pair<Integer, String[]> queryResult: l_queryResults
+             ) {
+            int queryID = queryResult.getKey();
+            for (String docID: queryResult.getValue()
+                 ) {
+                printWriter.println(queryID + " 0 " + docID + " 0 0 Run_id");
+            }
+        }
+    }
 }
