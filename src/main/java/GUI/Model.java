@@ -8,6 +8,7 @@ import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
+import Querying.*;
 
 import java.io.*;
 import java.util.*;
@@ -34,9 +35,18 @@ public class Model {
     private Thread.UncaughtExceptionHandler exceptionHandler;
     private boolean isExceptionThrownDuringGeneration = false;
     private Exception exceptionThrownDuringGeneration;
+    private double avargeDocSize;
+    private SemanticEngine semanticEngine;
+    private RankingParameters rankingParameters;
 
 
     public Model(){
+        try {
+            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
+            RankingParameters rankingParameters = new RankingParameters(0.1,0.1 ,0.9, 0.5 ,1.5 ,0.75);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         exceptionHandler = new Thread.UncaughtExceptionHandler() {
             public void uncaughtException(Thread th, Throwable ex) {
                 isExceptionThrownDuringGeneration = true;
@@ -44,6 +54,7 @@ public class Model {
                 threadPool.shutdownNow();
             }
         };
+
     }
 
     public void setController(Controller controller) {
@@ -70,10 +81,20 @@ public class Model {
         if(useStemming){
             this.mainDictionaryWithStemming = (Map<String, IndexEntry>) inDictionary.readObject();
             this.docDictionaryWithStemming = (ArrayList)inDocDictionary.readObject();
+            double DocLength = 0.0;
+            for (DocIndexEntery doc: docDictionaryWithStemming) {
+                DocLength += doc.getLength();
+            }
+            avargeDocSize=DocLength/docDictionaryWithStemming.size();
         }
         else{
             this.mainDictionaryNoStemming = (Map<String, IndexEntry>) inDictionary.readObject();
             this.docDictionaryNoStemming = (ArrayList) inDocDictionary.readObject();
+            double DocLength = 0.0;
+            for (DocIndexEntery doc: docDictionaryNoStemming) {
+                DocLength += doc.getLength();
+            }
+            avargeDocSize=DocLength/docDictionaryNoStemming.size();
         }
         this.cityDictionary = (Map<String , CityIndexEntry>) inCityDictionay.readObject();
         this.languages = (Set<String>) inLanguages.readObject();
@@ -295,10 +316,21 @@ public class Model {
         if(useStemming){
             this.mainDictionaryWithStemming = indexer.getMainMap();
             this.docDictionaryWithStemming = indexer.getDocsMap();
+            double DocLength = 0.0;
+            for (DocIndexEntery doc: docDictionaryWithStemming) {
+                DocLength += doc.getLength();
+            }
+            avargeDocSize=DocLength/docDictionaryWithStemming.size();
+
         }
         else{
             this.mainDictionaryNoStemming = indexer.getMainMap();
             this.docDictionaryNoStemming = indexer.getDocsMap();
+            double DocLength = 0.0;
+            for (DocIndexEntery doc: docDictionaryNoStemming) {
+                DocLength += doc.getLength();
+            }
+            avargeDocSize=DocLength/docDictionaryNoStemming.size();
         }
         this.cityDictionary = indexer.getCityMap();
         this.languages = indexer.getLanguages();
@@ -319,4 +351,29 @@ public class Model {
         }
         return allCites;
     }
+
+    public double getAvargeDocSize(){
+        return avargeDocSize;
+    }
+
+    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming){
+        Searcher searcher;
+        List<String> res ;
+        Ranker ranker;
+        if(isUsedStemming){
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
+            searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,Indexer.withStemmingOutputFolderName+"\\Posings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+
+        }
+        else {
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
+            searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,Indexer.noStemmingOutputFolderName+"\\Posings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+        }
+        res=searcher.answerquery(query,useSemantic);
+        return null;
+
+
+
+    }
+
 }

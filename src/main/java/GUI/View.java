@@ -170,7 +170,9 @@ public class View {
                 root_pane.getChildren().setAll(pane);
                 SearchView searchView = loader.getController();
                 searchView.setController(controller);
+                searchView.setUseStemming(chkbox_use_stemming.isSelected());
                 searchView.setView();
+
 
             } catch (IOException e) {
                 e.printStackTrace();

@@ -1,6 +1,7 @@
 package GUI;
 
 import Indexing.Index.IndexEntry;
+import Querying.QueryResult;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -112,5 +113,9 @@ public class Controller {
 
     public Set<String> getAllCities(){
       return  model.getAllCities();
+    }
+
+    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic , boolean isUsedStemming){
+        return model.aswerSingelQuery(query,citiesFilter,useSemantic,isUsedStemming);
     }
 }

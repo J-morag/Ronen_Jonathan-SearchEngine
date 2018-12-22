@@ -1,5 +1,6 @@
 package GUI;
 
+import Querying.QueryResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -8,10 +9,7 @@ import javafx.stage.FileChooser;
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class SearchView  {
 
@@ -25,7 +23,18 @@ public class SearchView  {
     public Button search_run;
     public Button search_clear;
 
- public void setView() {
+    private List<QueryResult> result;
+    private boolean useStemming;
+
+    public void setUseStemming(boolean useStemming) {
+        this.useStemming = useStemming;
+    }
+
+    public boolean isUseStemming() {
+        return useStemming;
+    }
+
+    public void setView() {
      Set<String> citiesSet = myController.getAllCities();
      for (String city : citiesSet) {
          CheckMenuItem checkMenuItem = new CheckMenuItem(city);
@@ -89,12 +98,23 @@ public class SearchView  {
      }
     }
 
+    public void answerSingelQuery(String query ){
 
-//@todo
-//    private List<String> getQueriesFromFile() {
-//     File QuaryFile = new File(search_queryFile.getText());
-//
-//    }
+     result = myController.aswerSingelQuery(query , getCityFilter() , search_semantic.isSelected() ,useStemming);
+
+    }
+
+    private Set<String>  getCityFilter(){
+     Set<String> cityFilterSet = new HashSet<>();
+        for (MenuItem menuItem : search_cityComboBox.getItems() ) {
+            CheckMenuItem checkMenuItem = (CheckMenuItem)menuItem;
+            if (checkMenuItem.isSelected()){
+                cityFilterSet.add(checkMenuItem.getText());
+            }
+        }
+        return cityFilterSet;
+    }
+
 
     private void sendNoQueryAlert() {
      Alert alert = new Alert(Alert.AlertType.ERROR);
