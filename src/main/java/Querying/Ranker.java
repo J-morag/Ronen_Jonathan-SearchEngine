@@ -32,7 +32,7 @@ public abstract class Ranker {
      *                        internally or from postingsExplicit.
      * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
      */
-    public int[] rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit){
+    public int[] rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors){
 
         Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit);
 
@@ -56,7 +56,7 @@ public abstract class Ranker {
         return docsAsInts;
     }
 
-    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors) {
+    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit) {
         Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
         for (ExpandedPosting ePosting: postingsExplicit
              ) {
