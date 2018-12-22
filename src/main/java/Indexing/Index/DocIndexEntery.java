@@ -14,14 +14,16 @@ public class DocIndexEntery implements Serializable {
     private int maxTF;
     private String city;
     private String language;
+    private int length;
 
-    public DocIndexEntery(String  docID, int numOfUniqueWords,int maxTF , String city, String language){
+    public DocIndexEntery(String  docID, int numOfUniqueWords,int maxTF , String city, String language , int length){
 
         this.docID=docID;
         this.numOfUniqueWords=numOfUniqueWords;
         this.maxTF=maxTF;
         this.city=city;
         this.language=language;
+        this.length=length;
     }
 
     public String getDocID() {
@@ -44,6 +46,10 @@ public class DocIndexEntery implements Serializable {
         return language;
     }
 
+    public int getLength(){
+        return length;
+    }
+
     public void setDocID(String docID) {
         this.docID = docID;
     }
@@ -63,6 +69,7 @@ public class DocIndexEntery implements Serializable {
     public void setLanguage(String language) {
         this.language = language;
     }
+
 
 
 }

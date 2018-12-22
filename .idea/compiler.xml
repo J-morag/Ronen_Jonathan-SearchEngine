@@ -3,9 +3,6 @@
   <component name="CompilerConfiguration">
     <excludeFromCompile>
       <file url="file://$PROJECT_DIR$/src/test/java/Indexing/Index/IndexerTest.java" />
-      <file url="file://$PROJECT_DIR$/src/main/java/Querying/Ranker.java" />
-      <directory url="file://$PROJECT_DIR$/src/main/java/Querying" includeSubdirectories="true" />
-      <directory url="file://$PROJECT_DIR$/src/test" includeSubdirectories="true" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile name="Maven default annotation processors profile" enabled="true">
