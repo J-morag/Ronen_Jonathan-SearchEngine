@@ -34,13 +34,13 @@ public class Searcher {
 
 
     //                                                                                                                                                                        ..\\..\\Postings
-    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, List<DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostings,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
+    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, List<DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostingsDir,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
         this.mainDictionary = mainDictionary;
         this.cityDictionary = cityDictionary;
         this.docsDictionary = docsDictionary;
         this.isUsedStemming = isUsedStemming;
         this.parser = new Parse(new HashSet<String>(), new ArrayBlockingQueue<Document>(1) , new ArrayBlockingQueue<TermDocument>(1) , isUsedStemming);
-        this.pathToPostings=pathToPostings;
+        this.pathToPostings= pathToPostingsDir;
         this.semanticEngine = semanticEngine;
         this.ranker =ranker;
         this.cityListFilter=cityList;
@@ -144,7 +144,7 @@ public class Searcher {
             }
             postingInputStream.close();
 
-            String [] queryArr =(String [] )termSet.toArray();
+            String [] queryArr =termSet.toArray(new String[termSet.size()]);
 
             List<Integer>  renkedDocsList= ranker.rank(queryPostingList,synonymPostingList,queryArr ,synonymArr);
             List<Integer> filterdRankedDocs = filterDocsByCity(renkedDocsList);

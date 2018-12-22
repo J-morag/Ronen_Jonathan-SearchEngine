@@ -14,7 +14,7 @@
       <TextField fx:id="search_queryFile" editable="false" layoutX="187.0" layoutY="149.0" prefHeight="41.0" prefWidth="303.0" promptText="Pick a query file" />
       <Button fx:id="search_browse" layoutX="110.0" layoutY="155.0" mnemonicParsing="false" onAction="#onBrowseCliked" prefHeight="31.0" prefWidth="75.0" text="Browse" />
       <CheckBox fx:id="search_semantic" layoutX="237.0" layoutY="205.0" mnemonicParsing="false" text="use semantic" />
-      <Button fx:id="search_run" layoutX="108.0" layoutY="244.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="259.0" text="RUN" />
+      <Button fx:id="search_run" layoutX="108.0" layoutY="244.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="259.0" text="RUN" onAction="#onRunCliked" />
       <Label alignment="CENTER" layoutX="245.0" layoutY="14.0" prefHeight="35.0" prefWidth="132.0" text="¬GOOGLE">
          <font>
             <Font size="24.0" />

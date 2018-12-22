@@ -4,15 +4,15 @@ import java.util.List;
 
 public class QueryResult {
 
-    private int queryNum;
+    private String queryNum;
     private List<String> relevantDocs;
 
-    public QueryResult(int queryNum, List<String> relevantDocs) {
+    public QueryResult(String queryNum, List<String> relevantDocs) {
         this.queryNum = queryNum;
         this.relevantDocs = relevantDocs;
     }
 
-    public int getQueryNum() {
+    public String getQueryNum() {
         return queryNum;
     }
 
@@ -20,7 +20,7 @@ public class QueryResult {
         return relevantDocs;
     }
 
-    public void setQueryNum(int queryNum) {
+    public void setQueryNum(String  queryNum) {
         this.queryNum = queryNum;
     }
 

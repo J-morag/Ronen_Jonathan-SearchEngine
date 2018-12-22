@@ -171,6 +171,7 @@ public class View {
                 SearchView searchView = loader.getController();
                 searchView.setController(controller);
                 searchView.setUseStemming(chkbox_use_stemming.isSelected());
+                searchView.setpathToOutpotFolder(txtfld_output_location.getText());
                 searchView.setView();
 
 

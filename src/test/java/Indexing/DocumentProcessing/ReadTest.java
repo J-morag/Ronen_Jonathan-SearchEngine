@@ -2,6 +2,7 @@ package Indexing.DocumentProcessing;
 
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 
@@ -326,7 +327,33 @@ void toUpperCaseTest()
     void generalTest() throws IOException {
 
 
-        System.out.println(System.getProperty("user.dir"));
+        File file = new File("C:\\Users\\ronen\\Desktop\\queries.txt");
+        FileInputStream fi ;
+        Elements elements=null;
+        try {
+            fi = new FileInputStream(file);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fi, StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            line = br.readLine();
+            while (line != null) {
+                sb.append(line+"\n");
+                line = br.readLine();
+            }
+            org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());
+            elements = doc.select("top");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (Element element : elements) {
+            org.jsoup.nodes.Document titleDoc =Jsoup.parse(element.toString());
+            //int startIDX = element.toString().indexOf("<num>",0) ;
+            String string = element.toString().substring(element.toString().indexOf(":" ,0),element.toString().indexOf("\n" ,element.toString().indexOf(":" ,0)));
+            System.out.println(string.replace(": ","").trim());
+            System.out.println(titleDoc.select("title").text().trim());
+        }
 
     }
 

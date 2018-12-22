@@ -25,9 +25,13 @@ public class SearchView  {
 
     private List<QueryResult> result;
     private boolean useStemming;
+    private String pathToOutpotFolder;
 
     public void setUseStemming(boolean useStemming) {
         this.useStemming = useStemming;
+    }
+    public void setpathToOutpotFolder(String pathToOutpotFolder){
+        this.pathToOutpotFolder=pathToOutpotFolder;
     }
 
     public boolean isUseStemming() {
@@ -82,7 +86,7 @@ public class SearchView  {
               sendNoQueryAlert();
               onClearCliked();
          } else { // if only the fileQuery filed is not empty  - good (multiple queries)
-//             List<String> queryList = getQueriesFromFile();
+             answerMultipleQueries(search_queryFile.getText());
 
          }
      }
@@ -92,16 +96,20 @@ public class SearchView  {
              onClearCliked();
          }
          else { // only the queryText field is full- good (only one query)
-
-
+             answerSingelQuery(search_queryText.getText());
          }
      }
     }
 
     public void answerSingelQuery(String query ){
 
-     result = myController.aswerSingelQuery(query , getCityFilter() , search_semantic.isSelected() ,useStemming);
+     result = myController.aswerSingelQuery(query , getCityFilter() , search_semantic.isSelected() ,useStemming ,pathToOutpotFolder);
 
+    }
+
+
+    public void answerMultipleQueries(String pathToQueryFile){
+        result = myController.answerMultipleQueries(pathToQueryFile , getCityFilter() , search_semantic.isSelected() ,useStemming,pathToOutpotFolder);
     }
 
     private Set<String>  getCityFilter(){

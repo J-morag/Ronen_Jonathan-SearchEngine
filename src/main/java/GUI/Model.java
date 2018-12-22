@@ -9,8 +9,15 @@ import Indexing.Index.Indexer;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
 import Querying.*;
+import javafx.util.Pair;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import javax.swing.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -43,7 +50,7 @@ public class Model {
     public Model(){
         try {
             semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
-            RankingParameters rankingParameters = new RankingParameters(0.1,0.1 ,0.9, 0.5 ,1.5 ,0.75);
+            rankingParameters = new RankingParameters(0.1,0.1 ,0.9, 0.5 ,1.5 ,0.75);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -356,22 +363,89 @@ public class Model {
         return avargeDocSize;
     }
 
-    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming){
+    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming , String pathToOutpotFolder){
         Searcher searcher;
+        List<QueryResult> results = new ArrayList<>();
         List<String> res ;
         Ranker ranker;
         if(isUsedStemming){
             ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
-            searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,Indexer.withStemmingOutputFolderName+"\\Posings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+            searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,pathToOutpotFolder+"\\"+Indexer.withStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
 
         }
         else {
             ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
-            searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,Indexer.noStemmingOutputFolderName+"\\Posings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+            searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
         }
         res=searcher.answerquery(query,useSemantic);
-        return null;
+        results.add(new QueryResult("001",res));
+        return results;
 
+    }
+
+    public List<QueryResult> answerMultipleQueries (String pathToQureyFile , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming,String pathToOutpotFolder){
+        Searcher searcher;
+        List<QueryResult> results = new ArrayList<>();
+        List<String> res ;
+        Ranker ranker;
+        if(isUsedStemming){
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
+            searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,pathToOutpotFolder+"\\"+Indexer.withStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+
+        }
+        else {
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
+            searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
+        }
+
+        List<Pair<String,String>> allQuerys = parstQuerysFromQueryFile(pathToQureyFile);
+
+        for (Pair<String,String> pair : allQuerys ) {
+            QueryResult tmp = new QueryResult(pair.getKey(),searcher.answerquery(pair.getValue(),useSemantic));
+            results.add(tmp);
+        }
+
+        return results;
+    }
+
+
+
+
+
+    private List<Pair<String,String>> parstQuerysFromQueryFile(String pathToQureyFile) {
+        File file = new File(pathToQureyFile);
+        FileInputStream fi ;
+        Elements elements=null;
+        List<Pair<String,String>> parsResult= new ArrayList<>();
+        try {
+            fi = new FileInputStream(file);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fi, StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            line = br.readLine();
+            while (line != null) {
+                sb.append(line+"\n");
+                line = br.readLine();
+            }
+            org.jsoup.nodes.Document doc = Jsoup.parse(sb.toString());
+            elements = doc.select("top");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (Element element : elements) {
+
+            org.jsoup.nodes.Document titleDoc =Jsoup.parse(element.toString());
+            //int startIDX = element.toString().indexOf("<num>",0) ;
+            String QueryNum = element.toString().substring(element.toString().indexOf(":" ,0),element.toString().indexOf("\n" ,element.toString().indexOf(":" ,0)));
+            QueryNum=QueryNum.replace(": ","").trim();
+            String Query =titleDoc.select("title").text().trim();
+            parsResult.add(new Pair<>(QueryNum,Query));
+
+    }
+
+    return parsResult;
 
 
     }

@@ -115,7 +115,11 @@ public class Controller {
       return  model.getAllCities();
     }
 
-    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic , boolean isUsedStemming){
-        return model.aswerSingelQuery(query,citiesFilter,useSemantic,isUsedStemming);
+    public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic , boolean isUsedStemming , String pathToOutpotFolder){
+        return model.aswerSingelQuery(query,citiesFilter,useSemantic,isUsedStemming ,pathToOutpotFolder);
+    }
+
+    public List<QueryResult> answerMultipleQueries(String pathToQueryFile , Set<String> citiesFilter , boolean useSemantic , boolean isUsedStemming, String pathToOutpotFolder){
+        return model.answerMultipleQueries(pathToQueryFile,citiesFilter,useSemantic,isUsedStemming,pathToOutpotFolder);
     }
 }
