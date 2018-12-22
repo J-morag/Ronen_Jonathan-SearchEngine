@@ -6,14 +6,14 @@ package Querying;
  */
 public class RankingParameters {
 
-    final int titleWeight;
-    final int beginningWeight;
-    final int frequencyWeight;
-    final int exactTermMatchWeight;
-    final int k_BM25;
-    final int b_BM25;
+    final double titleWeight;
+    final double beginningWeight;
+    final double frequencyWeight;
+    final double exactTermMatchWeight;
+    final double k_BM25;
+    final double b_BM25;
 
-    public RankingParameters(int titleWeight, int beginningWeight, int frequencyWeight, int exactTermMatchWeight, int k_BM25, int b_BM25) {
+    public RankingParameters(double titleWeight, double beginningWeight, double frequencyWeight, double exactTermMatchWeight, double k_BM25, double b_BM25) {
         this.titleWeight = titleWeight;
         this.beginningWeight = beginningWeight;
         this.frequencyWeight = frequencyWeight;

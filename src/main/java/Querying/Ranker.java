@@ -78,6 +78,15 @@ public abstract class Ranker {
         return rankedDocs;
     }
 
+    protected double getIDF(ExpandedPosting p){
+        //compute numerator
+        double numerator = (double)numDocsInCorpus - (double)p.df_term + 0.5;
+        //compute denominator
+        double denominator = (double)p.df_term + 0.5;
+
+        return numerator/denominator;
+    }
+
     abstract double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank);
 
     abstract double calculateRankForExplicitPosting(ExpandedPosting ePosting);

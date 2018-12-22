@@ -1,11 +1,5 @@
 package Querying;
 
-import Indexing.DocumentProcessing.Term;
-import Indexing.Index.IndexEntry;
-import Indexing.Index.Posting;
-
-import java.util.Map;
-
 public class BM25Ranker extends Ranker {
 
     public BM25Ranker(RankingParameters rankingParameters, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
@@ -30,12 +24,21 @@ public class BM25Ranker extends Ranker {
      */
     double calculateRankForPosting(ExpandedPosting ePosting){
         //compute numerator
-        double numerator = (double)ePosting.posting.getTf() * (rankingParameters.k_BM25 +1);
+        double numerator = getBM25Numerator(ePosting);
         //compute denominator
-        double denominator = (double)ePosting.posting.getTf() + (double)rankingParameters.k_BM25 * ((double)1 - (double)rankingParameters.b_BM25 + (double)rankingParameters.b_BM25*((double)ePosting.numOfUniqueWords_doc / averageDocumentLengthInCorpus));
+        double denominator = getMB25Denominator(ePosting);
 
         return getIDF(ePosting)*(numerator/denominator);
     }
+
+    protected double getMB25Denominator(ExpandedPosting ePosting) {
+        return (double)ePosting.posting.getTf() + rankingParameters.k_BM25 * ((double)1 - rankingParameters.b_BM25 + rankingParameters.b_BM25*((double)ePosting.numOfUniqueWords_doc / averageDocumentLengthInCorpus));
+    }
+
+    protected double getBM25Numerator(ExpandedPosting ePosting) {
+        return (double)ePosting.posting.getTf() * (rankingParameters.k_BM25 +1);
+    }
+
 
     @Override
     double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
@@ -46,15 +49,5 @@ public class BM25Ranker extends Ranker {
     double calculateRankForImplicitPosting(ExpandedPosting ePosting) {
         return calculateRankForPosting(ePosting);
     }
-
-    protected double getIDF(ExpandedPosting p){
-        //compute numerator
-        double numerator = (double)numDocsInCorpus - (double)p.df_term + 0.5;
-        //compute denominator
-        double denominator = (double)p.df_term + 0.5;
-
-        return numerator/denominator;
-    }
-
 
 }
