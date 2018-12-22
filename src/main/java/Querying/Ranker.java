@@ -1,9 +1,5 @@
 package Querying;
 
-import Indexing.DocumentProcessing.Term;
-import Indexing.Index.IndexEntry;
-import Indexing.Index.Posting;
-
 import java.util.*;
 
 /**
@@ -24,28 +20,27 @@ public abstract class Ranker {
 
     /**
      * Takes a list of postings for terms in the query, and a list of postings for terms derived semantically from the
-     * query. Ranks them according to relevance. Returns
-     * a list of unique document serialIDs, sorted by rank (first is most relevant).
+     * query. Ranks them according to relevance.
+     * Returns an array of unique document serialIDs, sorted by rank (first is most relevant).
      * @param postingsExplicit postings for terms mentioned explicitly in the query. may contain duplicates
      *                        internally or from postingsImplicit.
      * @param postingsImplicit postings for terms derived semantically from the query. may contain duplicates
      *                        internally or from postingsExplicit.
-     * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
+     * @param query a vector of words appearing in the query. should not contain duplicates.
+     * @param queryNeighbors a vector of words that are semantically similar to words appearing in the query. should not contain duplicates.
+     * @return an array of unique ints, each being the serialID of a document, sorted most to least relevant.
      */
     public int[] rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors){
 
-        Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit);
+        Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit, query, queryNeighbors);
 
-        int[] docsAsInts = getDocsSortedByRank(rankedDocs);
-
-        return docsAsInts;
+        return sortDocsByRank(rankedDocs);
     }
 
-    private int[] getDocsSortedByRank(Map<Integer, Double> rankedDocs) {
+    private int[] sortDocsByRank(Map<Integer, Double> rankedDocs) {
         //sort by rank
         Map.Entry[] docsAsEntries = new Map.Entry[rankedDocs.size()];
         rankedDocs.entrySet().toArray(docsAsEntries);
-//        Arrays.sort(docsAsEntries, Comparator.comparingDouble(Map.Entry<Integer, Double>::getValue));
         Arrays.sort(docsAsEntries, ((o1, o2) -> Collections.reverseOrder().compare(o1, o2)));
 
         //to int array
@@ -56,7 +51,17 @@ public abstract class Ranker {
         return docsAsInts;
     }
 
-    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit) {
+    /**
+     * give every document in the given postings a rank that represents it's relevance to the query.
+     * @param postingsExplicit postings for terms mentioned explicitly in the query. may contain duplicates
+     *                        internally or from postingsImplicit.
+     * @param postingsImplicit postings for terms derived semantically from the query. may contain duplicates
+     *                        internally or from postingsExplicit.
+     * @param query a vector of words appearing in the query. should not contain duplicates.
+     * @param queryNeighbors a vector of words that are semantically similar to words appearing in the query. should not contain duplicates.
+     * @return a mapping of document IDs (Integer) to document ranks (Double).
+     */
+    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors) {
         Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
         for (ExpandedPosting ePosting: postingsExplicit
              ) {
@@ -78,6 +83,11 @@ public abstract class Ranker {
         return rankedDocs;
     }
 
+    /**
+     * get the IDF for a term.
+     * @param p information about the term and the document it appears in. Document information is irrelevant of IDF.
+     * @return the IDF of a term.
+     */
     protected double getIDF(ExpandedPosting p){
         //compute numerator
         double numerator = (double)numDocsInCorpus - (double)p.df_term + 0.5;
@@ -87,10 +97,28 @@ public abstract class Ranker {
         return numerator/denominator;
     }
 
-    abstract double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank);
+    /**
+     * After a rank was calculated for a term appearing in a document, it is necessary to to add that rank to the
+     * current rank assigned to the document. A basic implementation would simply return the sum of both ranks.
+     * @param existingRank the rank currently assigned to the document. Should be same document as newPostingRank.
+     * @param newPostingRank the rank assigned to the term appearing in the document. Should be same document as existingRank.
+     * @return the new rank for the document.
+     */
+    protected abstract double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank);
 
-    abstract double calculateRankForExplicitPosting(ExpandedPosting ePosting);
+    /**
+     * calculates the rank contribution of a term appearing in a document, that also appeared in the query.
+     * @param ePosting information about the term and the document it appears in.
+     * @return the rank contribution of the term appearing in a document, according to relevance.
+     */
+    protected abstract double calculateRankForExplicitPosting(ExpandedPosting ePosting);
 
-    abstract double calculateRankForImplicitPosting(ExpandedPosting ePosting);
+    /**
+     * calculates the rank contribution of a term appearing in a document, that did not necessarily appear explicitly
+     * in the query.
+     * @param ePosting information about the term and the document it appears in.
+     * @return the rank contribution of the term appearing in a document, according to relevance.
+     */
+    protected abstract double calculateRankForImplicitPosting(ExpandedPosting ePosting);
 
 }

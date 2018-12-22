@@ -1,5 +1,8 @@
 package Querying;
 
+/**
+ * A {@link Ranker Ranker} implementation that uses the BM25 formula to rank documents.
+ */
 public class BM25Ranker extends Ranker {
 
     public BM25Ranker(RankingParameters rankingParameters, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
@@ -13,7 +16,7 @@ public class BM25Ranker extends Ranker {
      * @return the new rank that should be assigned to the document.
      */
     @Override
-    double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank) {
+    protected double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank) {
         return existingRank + newPostingRank;
     }
 
@@ -31,22 +34,33 @@ public class BM25Ranker extends Ranker {
         return getIDF(ePosting)*(numerator/denominator);
     }
 
+    /**
+     * calculate the denominator part of the BM25 formula.
+     * @param ePosting - the posting to calculate for.
+     * @return The denominator part of the BM25 formula
+     */
     protected double getMB25Denominator(ExpandedPosting ePosting) {
         return (double)ePosting.posting.getTf() + rankingParameters.k_BM25 * ((double)1 - rankingParameters.b_BM25 + rankingParameters.b_BM25*((double)ePosting.numOfUniqueWords_doc / averageDocumentLengthInCorpus));
     }
 
+    /**
+     * calculate the numerator part of the BM25 formula.
+     * @param ePosting - the posting to calculate for.
+     * @return The numerator part of the BM25 formula
+     */
     protected double getBM25Numerator(ExpandedPosting ePosting) {
         return (double)ePosting.posting.getTf() * (rankingParameters.k_BM25 +1);
     }
 
 
     @Override
-    double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
+    protected double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
         return calculateRankForPosting(ePosting);
     }
 
+
     @Override
-    double calculateRankForImplicitPosting(ExpandedPosting ePosting) {
+    protected double calculateRankForImplicitPosting(ExpandedPosting ePosting) {
         return calculateRankForPosting(ePosting);
     }
 
