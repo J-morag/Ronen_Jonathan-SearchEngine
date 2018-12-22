@@ -55,6 +55,7 @@ public class Searcher {
 
         List<String> releventDocumants=null;
         Set<String> noStemmingTermSet=null;
+        String [] synonymArr= new String[0];
         if(withSemantics) {
             // list to send to Semantic Engine if needed
             parser.useStemming = false;
@@ -113,6 +114,7 @@ public class Searcher {
             }
             if(withSemantics){
                 List<String> synonymList= semanticEngine.getNearestNeighbors(noStemmingTermSet);
+                synonymArr =(String [] ) synonymList.toArray();
                 for (String synonym : synonymList ) {
                     List<Posting> tempPosting = new ArrayList<>();
                     String stringTerm = synonym;
@@ -140,7 +142,9 @@ public class Searcher {
             }
             postingInputStream.close();
 
-            List<Integer>  renkedDocsList=null; //@TODO: 12/20/2018 send to Ranker
+            String [] queryArr =(String [] )termSet.toArray();
+
+            List<Integer>  renkedDocsList= ranker.rank(queryPostingList,synonymPostingList,queryArr ,synonymArr);
             List<Integer> filterdRankedDocs = filterDocsByCity(renkedDocsList);
 
             for (Integer docSerialKye : filterdRankedDocs ) {
