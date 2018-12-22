@@ -79,8 +79,8 @@ public class Searcher {
         listOfTerms.clear();
         listOfTerms=null;
 
-        List<Posting> queryPostingList = new ArrayList<>();
-        List<Posting> synonymPostingList = new ArrayList<>();
+        List<ExpandedPosting> queryPostingList = new ArrayList<>();
+        List<ExpandedPosting> synonymPostingList = new ArrayList<>();
 
         try {
             PostingInputStream postingInputStream = new PostingInputStream(pathToPostings);
@@ -100,7 +100,14 @@ public class Searcher {
                 }
                 int pointer= mainDictionary.get(stringTerm).getPostingPointer();
                 tempPosting = postingInputStream.readTermPostings(pointer);
-                queryPostingList.addAll(tempPosting);
+                for (Posting posting : tempPosting ) {
+                    int totalTF = mainDictionary.get(term).getTotalTF();
+                    int df = mainDictionary.get(term).getDf();
+                    int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
+                    int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
+                    int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
+                    queryPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,term));
+                }
 
 
             }
@@ -120,13 +127,20 @@ public class Searcher {
                     }
                     int pointer= mainDictionary.get(stringTerm).getPostingPointer();
                     tempPosting = postingInputStream.readTermPostings(pointer);
-                    synonymPostingList.addAll(tempPosting);
+                    for (Posting posting : tempPosting ) {
+                        int totalTF = mainDictionary.get(synonym).getTotalTF();
+                        int df = mainDictionary.get(synonym).getDf();
+                        int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
+                        int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
+                        int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
+                        synonymPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,synonym));
+                    }
                 }
 
             }
             postingInputStream.close();
 
-            List<Integer> renkedDocsList=null; //@TODO: 12/20/2018 send to Ranker
+            List<Integer>  renkedDocsList=null; //@TODO: 12/20/2018 send to Ranker
             List<Integer> filterdRankedDocs = filterDocsByCity(renkedDocsList);
 
             for (Integer docSerialKye : filterdRankedDocs ) {
@@ -140,7 +154,7 @@ public class Searcher {
         }
 
 
-        return releventDocumants ;
+        return releventDocumants.size()>50 ? releventDocumants.subList(0,50) : releventDocumants ;
     }
 
     /**

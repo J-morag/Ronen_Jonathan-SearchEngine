@@ -51,6 +51,7 @@ public class MainIndexMaker extends AIndexMaker {
             Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
+            int docLength = text.size();
             int maxTf = getMaxTf(uniqueWords,tfMap,title,text);
             int numOfUniqueWords = uniqueWords.size();
             String docId = doc.getDocId();
@@ -68,7 +69,7 @@ public class MainIndexMaker extends AIndexMaker {
             }
 
 // add a document to the DocIndex
-            DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language);
+            DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language,docLength);
             docsDictionary.add(docIndexEntery);
             docIndexEntery=null;
 
