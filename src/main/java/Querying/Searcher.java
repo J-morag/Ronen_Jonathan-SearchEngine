@@ -22,7 +22,7 @@ public class Searcher {
 
     private Map<String , IndexEntry> mainDictionary;
     private Map<String , CityIndexEntry> cityDictionary;
-    private Map<Integer , DocIndexEntery> docsDictionary;
+    private List<DocIndexEntery> docsDictionary;
     private Parse parser;
     private boolean isUsedStemming;
     private String pathToPostings;
@@ -32,7 +32,7 @@ public class Searcher {
 
 
     //                                                                                                                                                                        ..\\..\\Postings
-    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, Map<Integer, DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostings,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
+    public Searcher(Map<String, IndexEntry> mainDictionary, Map<String, CityIndexEntry> cityDictionary, List<DocIndexEntery> docsDictionary , boolean isUsedStemming, String pathToPostings,SemanticEngine semanticEngine , Ranker ranker , HashSet<String> cityList) {
         this.mainDictionary = mainDictionary;
         this.cityDictionary = cityDictionary;
         this.docsDictionary = docsDictionary;
