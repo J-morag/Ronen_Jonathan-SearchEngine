@@ -21,32 +21,32 @@ public abstract class Ranker {
     /**
      * Takes a list of postings for terms in the query, and a list of postings for terms derived semantically from the
      * query. Ranks them according to relevance.
-     * Returns an array of unique document serialIDs, sorted by rank (first is most relevant).
+     * Returns a list of unique document serialIDs, sorted by rank (first is most relevant).
      * @param postingsExplicit postings for terms mentioned explicitly in the query. may contain duplicates
      *                        internally or from postingsImplicit.
      * @param postingsImplicit postings for terms derived semantically from the query. may contain duplicates
      *                        internally or from postingsExplicit.
      * @param query a vector of words appearing in the query. should not contain duplicates.
      * @param queryNeighbors a vector of words that are semantically similar to words appearing in the query. should not contain duplicates.
-     * @return an array of unique ints, each being the serialID of a document, sorted most to least relevant.
+     * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
      */
-    public int[] rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors){
+    public List<Integer> rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors){
 
         Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit, query, queryNeighbors);
 
         return sortDocsByRank(rankedDocs);
     }
 
-    private int[] sortDocsByRank(Map<Integer, Double> rankedDocs) {
+    private List<Integer> sortDocsByRank(Map<Integer, Double> rankedDocs) {
         //sort by rank
         Map.Entry[] docsAsEntries = new Map.Entry[rankedDocs.size()];
         rankedDocs.entrySet().toArray(docsAsEntries);
         Arrays.sort(docsAsEntries, ((o1, o2) -> Collections.reverseOrder().compare(o1, o2)));
 
-        //to int array
-        int[] docsAsInts = new int[docsAsEntries.length];
+        //to Integer list
+        List<Integer> docsAsInts = new ArrayList<>(docsAsEntries.length);
         for (int i = 0; i < docsAsEntries.length; i++) {
-            docsAsInts[i] = (Integer)docsAsEntries[i].getKey();
+            docsAsInts.add((Integer)docsAsEntries[i].getKey());
         }
         return docsAsInts;
     }
