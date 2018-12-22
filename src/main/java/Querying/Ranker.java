@@ -13,13 +13,11 @@ import java.util.*;
 public abstract class Ranker {
 
     protected RankingParameters rankingParameters;
-    protected Map<Term,IndexEntry> mainDictionary;
     protected int numDocsInCorpus;
     protected double averageDocumentLengthInCorpus;
 
-    public Ranker(RankingParameters rankingParameters, Map<Term, IndexEntry> mainDictionary, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
+    public Ranker(RankingParameters rankingParameters, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
         this.rankingParameters = rankingParameters;
-        this.mainDictionary = mainDictionary;
         this.numDocsInCorpus = numDocsInCorpus;
         this.averageDocumentLengthInCorpus = averageDocumentLengthInCorpus;
     }
@@ -34,7 +32,7 @@ public abstract class Ranker {
      *                        internally or from postingsExplicit.
      * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
      */
-    public int[] rank(List<Posting> postingsExplicit, List<Posting> postingsImplicit){
+    public int[] rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit){
 
         Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit);
 
@@ -58,23 +56,23 @@ public abstract class Ranker {
         return docsAsInts;
     }
 
-    protected Map<Integer, Double> rankDocs(List<Posting> postingsExplicit, List<Posting> postingsImplicit ) {
+    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit ) {
         Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
-        for (Posting posting: postingsExplicit
+        for (ExpandedPosting ePosting: postingsExplicit
              ) {
-            double rank = calculateRankForExplicitPosting(posting);
-            if(rankedDocs.containsKey(posting.getDocSerialID())){
-                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(posting.getDocSerialID()), rank);
+            double rank = calculateRankForExplicitPosting(ePosting);
+            if(rankedDocs.containsKey(ePosting.posting.getDocSerialID())){
+                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(ePosting.posting.getDocSerialID()), rank);
             }
-            rankedDocs.put(posting.getDocSerialID(), rank);
+            rankedDocs.put(ePosting.posting.getDocSerialID(), rank);
         }
-        for (Posting posting: postingsImplicit
+        for (ExpandedPosting ePosting: postingsImplicit
              ) {
-            double rank = calculateRankForImplicitPosting(posting);
-            if(rankedDocs.containsKey(posting.getDocSerialID())){
-                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(posting.getDocSerialID()), rank);
+            double rank = calculateRankForImplicitPosting(ePosting);
+            if(rankedDocs.containsKey(ePosting.posting.getDocSerialID())){
+                rank = addNewPostingRankToExistingDocRank(rankedDocs.get(ePosting.posting.getDocSerialID()), rank);
             }
-            rankedDocs.put(posting.getDocSerialID(), rank);
+            rankedDocs.put(ePosting.posting.getDocSerialID(), rank);
         }
 
         return rankedDocs;
@@ -82,8 +80,8 @@ public abstract class Ranker {
 
     abstract double addNewPostingRankToExistingDocRank(double existingRank, double newPostingRank);
 
-    abstract double calculateRankForExplicitPosting(Posting posting);
+    abstract double calculateRankForExplicitPosting(ExpandedPosting ePosting);
 
-    abstract double calculateRankForImplicitPosting(Posting posting);
+    abstract double calculateRankForImplicitPosting(ExpandedPosting ePosting);
 
 }
