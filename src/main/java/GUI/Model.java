@@ -356,6 +356,7 @@ public class Model {
         for (String city : cityDictionary.keySet() ) {
             allCites.add(city);
         }
+
         return allCites;
     }
 

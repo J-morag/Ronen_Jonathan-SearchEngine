@@ -116,7 +116,7 @@ public class Searcher {
             }
             if(withSemantics){
                 List<String> synonymList= semanticEngine.getNearestNeighbors(noStemmingTermSet);
-                synonymArr =(String [] ) synonymList.toArray();
+                synonymArr = synonymList.toArray(new String[synonymList.size()]);
                 for (String synonym : synonymList ) {
                     List<Posting> tempPosting = new ArrayList<>();
                     String stringTerm = synonym;
