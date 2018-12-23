@@ -58,7 +58,7 @@ public class SemanticEngine {
     /**
      * finds the nearest semantic neighbors (synonyms) for the given word.
      * @param word the word to find neighbors for.
-     * @return the nearest semantic neighbors (synonyms) for the given word. If word is null or if it wasn't found, returns null. If no neighbors were found, returns an empty list.
+     * @return the nearest semantic neighbors (synonyms) for the given word. If word is null, returns null. If no neighbors were found or word wasn't found, returns an empty list.
      * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
      */
     public List<String> getNearestNeighbors(String word) throws IOException {
@@ -67,7 +67,7 @@ public class SemanticEngine {
         DoubleVector v = reader.get(word);
         if (v == null) {
             // word does'nt exist in vectors
-            return null;
+            return new ArrayList<String>();
         } else {
             List<VectorDistanceTuple<String>> nearestNeighbours = tree
                     .getNearestNeighbours(v, kNeighbors + 1); //+1 because the same word will also be retrieved.

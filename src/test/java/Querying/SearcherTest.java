@@ -56,6 +56,9 @@ class SearcherTest {
 
         List<Pair<Integer, List<String>>> qRes = new ArrayList<>();
         qRes.add(new Pair<>(1, searcher.answerquery("Communist Party", false)));
+        qRes.add(new Pair<>(1, searcher.answerquery("Communist Party", true)));
+        qRes.add(new Pair<>(1, searcher.answerquery("Flor", false)));
+        qRes.add(new Pair<>(1, searcher.answerquery("Flor", true)));
 
         Searcher.outputResults(qRes, pathToResultsOutputFolder);
     }
