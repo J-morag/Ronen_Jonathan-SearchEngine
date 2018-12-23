@@ -55,7 +55,7 @@ public class Searcher {
      */
     public List<String> answerquery(String query , Boolean withSemantics){
 
-        List<String> releventDocumants=null;
+        List<String> relevantDocuments=new ArrayList<>();
         Set<String> noStemmingTermSet=null;
         String [] synonymArr= new String[0];
         if(withSemantics) {
@@ -145,13 +145,23 @@ public class Searcher {
             postingInputStream.close();
 
             String [] queryArr =termSet.toArray(new String[termSet.size()]);
+            List<Integer> filterdRankedDocs =null;
 
             List<Integer>  renkedDocsList= ranker.rank(queryPostingList,synonymPostingList,queryArr ,synonymArr);
-            List<Integer> filterdRankedDocs = filterDocsByCity(renkedDocsList);
-
-            for (Integer docSerialKye : filterdRankedDocs ) {
-                releventDocumants.add(docsDictionary.get(docSerialKye).getDocID());
+            if(cityListFilter.size()>0){
+                 filterdRankedDocs = filterDocsByCity(renkedDocsList);
+                for (Integer docSerialKye : filterdRankedDocs ) {
+                    relevantDocuments.add(docsDictionary.get(docSerialKye).getDocID());
+                }
             }
+            else
+            {
+                for (Integer docSerialKye : renkedDocsList ) {
+                    relevantDocuments.add(docsDictionary.get(docSerialKye).getDocID());
+                }
+            }
+
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -160,7 +170,7 @@ public class Searcher {
         }
 
 
-        return releventDocumants.size()>50 ? releventDocumants.subList(0,50) : releventDocumants ;
+        return relevantDocuments.size()>50 ? relevantDocuments.subList(0,50) : relevantDocuments ;
     }
 
     /**
