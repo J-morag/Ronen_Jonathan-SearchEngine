@@ -104,12 +104,12 @@ public class Searcher {
                 int pointer= mainDictionary.get(stringTerm).getPostingPointer();
                 tempPosting = postingInputStream.readTermPostings(pointer);
                 for (Posting posting : tempPosting ) {
-                    int totalTF = mainDictionary.get(term).getTotalTF();
-                    int df = mainDictionary.get(term).getDf();
+                    int totalTF = mainDictionary.get(stringTerm).getTotalTF();
+                    int df = mainDictionary.get(stringTerm).getDf();
                     int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
                     int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
                     int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
-                    queryPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,term));
+                    queryPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm));
                 }
 
 
@@ -132,12 +132,12 @@ public class Searcher {
                     int pointer= mainDictionary.get(stringTerm).getPostingPointer();
                     tempPosting = postingInputStream.readTermPostings(pointer);
                     for (Posting posting : tempPosting ) {
-                        int totalTF = mainDictionary.get(synonym).getTotalTF();
-                        int df = mainDictionary.get(synonym).getDf();
+                        int totalTF = mainDictionary.get(stringTerm).getTotalTF();
+                        int df = mainDictionary.get(stringTerm).getDf();
                         int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
                         int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
                         int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
-                        synonymPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,synonym));
+                        synonymPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm));
                     }
                 }
 
