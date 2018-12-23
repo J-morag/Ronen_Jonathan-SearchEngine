@@ -451,5 +451,14 @@ public class Model {
 
     }
 
+    public void saveQueryResults(String resultOutputPath , List<QueryResult> results){
+
+        try {
+            Searcher.outputResults(results,resultOutputPath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

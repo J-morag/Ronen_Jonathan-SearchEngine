@@ -122,4 +122,8 @@ public class Controller {
     public List<QueryResult> answerMultipleQueries(String pathToQueryFile , Set<String> citiesFilter , boolean useSemantic , boolean isUsedStemming, String pathToOutpotFolder){
         return model.answerMultipleQueries(pathToQueryFile,citiesFilter,useSemantic,isUsedStemming,pathToOutpotFolder);
     }
+
+    public void saveQueryResults(String resultOutputPath , List<QueryResult> results){
+        model.saveQueryResults(resultOutputPath , results);
+    }
 }

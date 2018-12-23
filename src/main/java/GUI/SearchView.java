@@ -4,9 +4,11 @@ import Querying.QueryResult;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.swing.*;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
@@ -22,6 +24,9 @@ public class SearchView  {
     public CheckBox search_semantic;
     public Button search_run;
     public Button search_clear;
+    public Button search_saveButton;
+    public Button search_saveBrowse;
+    public TextField search_saveText;
 
     private List<QueryResult> result;
     private boolean useStemming;
@@ -44,6 +49,7 @@ public class SearchView  {
          CheckMenuItem checkMenuItem = new CheckMenuItem(city);
          search_cityComboBox.getItems().add(checkMenuItem);
      }
+     search_saveButton.setDisable(true);
  }
 
     public void setController(Controller controller){
@@ -69,11 +75,50 @@ public class SearchView  {
     }
 
 
+    public void onSaveBrowseCliked(ActionEvent actionEvent) {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("result File");
+        dirChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        File resultPath = dirChooser.showDialog( null);
+        if(null != resultPath) { //directory chosen
+                search_saveText.textProperty().setValue(resultPath.getAbsolutePath());
+            }
+        }
+
+        public void onSaveButtonCliked()
+        {
+            if(result==null || result.size()==0){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("No Results Error");
+                alert.setContentText("There are NO result to save, you have to run a Query first");
+                alert.showAndWait();
+            } else if(search_saveText.getText().equals("")){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("No Output Path Error");
+                alert.setContentText("you didn't specify an output location!!");
+                alert.showAndWait();
+            }else {
+                myController.saveQueryResults(search_saveText.getText(), result);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setHeaderText("Results saved");
+                alert.setContentText("you'r results were saved at:" +search_saveText.getText());
+                alert.show();
+                onClearCliked();
+            }
+
+
+        }
+
+
+
 
     public void onClearCliked(){
      search_semantic.setSelected(false);
      search_queryText.clear();
      search_queryFile.clear();
+     search_saveText.clear();
+     result=null;
+     search_saveButton.setDisable(true);
         for (MenuItem menuItem : search_cityComboBox.getItems() ) {
             CheckMenuItem checkMenuItem = (CheckMenuItem)menuItem;
             checkMenuItem.setSelected(false);
@@ -87,6 +132,7 @@ public class SearchView  {
               onClearCliked();
          } else { // if only the fileQuery filed is not empty  - good (multiple queries)
              answerMultipleQueries(search_queryFile.getText());
+             search_saveButton.setDisable(false);
 
          }
      }
@@ -97,8 +143,10 @@ public class SearchView  {
          }
          else { // only the queryText field is full- good (only one query)
              answerSingelQuery(search_queryText.getText());
+             search_saveButton.setDisable(false);
          }
      }
+
     }
 
     public void answerSingelQuery(String query ){
