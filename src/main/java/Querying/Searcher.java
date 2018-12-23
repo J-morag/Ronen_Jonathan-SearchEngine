@@ -256,5 +256,7 @@ public class Searcher {
                 printWriter.println(queryID + " 0 " + docID + " 0 0 Run_id");
             }
         }
+        printWriter.flush();
+        printWriter.close();
     }
 }
