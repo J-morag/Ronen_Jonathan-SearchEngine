@@ -245,14 +245,13 @@ public class Searcher {
      * @param pathToOutputFolder the folder to put the results file in.
      * @throws FileNotFoundException if the pathToOutputFolder is invalid.
      */
-    public static void outputResults(List<Pair<Integer, List<String>>> l_queryResults, String pathToOutputFolder) throws FileNotFoundException {
+    public static void outputResults(List<QueryResult> l_queryResults, String pathToOutputFolder) throws FileNotFoundException {
         PrintWriter printWriter = new PrintWriter(pathToOutputFolder+"/results.txt");
 
-        for (Pair<Integer, List<String>> queryResult: l_queryResults
+        for (QueryResult queryResult: l_queryResults
              ) {
-            int queryID = queryResult.getKey();
-            for (String docID: queryResult.getValue()
-                 ) {
+            String queryID = queryResult.getQueryNum();
+            for (String docID: queryResult.getRelevantDocs()) {
                 printWriter.println(queryID + " 0 " + docID + " 0 0 Run_id");
             }
         }
