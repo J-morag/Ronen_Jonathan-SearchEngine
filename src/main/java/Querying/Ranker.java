@@ -94,7 +94,7 @@ public abstract class Ranker {
         //compute denominator
         double denominator = (double)p.df_term + 0.5;
 
-        return numerator/denominator;
+        return Math.log10(numerator/denominator);
     }
 
     /**
