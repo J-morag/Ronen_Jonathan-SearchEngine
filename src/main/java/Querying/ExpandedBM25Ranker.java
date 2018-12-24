@@ -13,8 +13,8 @@ public class ExpandedBM25Ranker extends BM25Ranker{
 
     @Override
     protected double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
-        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight)
-                + rankingParameters.exactTermMatchWeight + getMetadataBonuses(ePosting);
+        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight)* rankingParameters.exactTermMatchWeight
+                + getMetadataBonuses(ePosting);
     }
 
     @Override
