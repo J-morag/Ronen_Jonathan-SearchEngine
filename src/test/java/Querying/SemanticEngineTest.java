@@ -1,5 +1,6 @@
 package Querying;
 
+import Querying.Semantics.SemanticEngine;
 import de.jungblut.glove.impl.GloveBinaryWriter;
 import de.jungblut.glove.impl.GloveTextReader;
 import de.jungblut.glove.util.StringVectorPair;
@@ -9,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SemanticEngineTest {
 

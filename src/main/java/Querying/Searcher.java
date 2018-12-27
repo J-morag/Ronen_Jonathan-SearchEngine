@@ -9,16 +9,13 @@ import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IO.PostingInputStream;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
-import com.sun.corba.se.impl.logging.POASystemException;
-import javafx.geometry.Pos;
-import javafx.util.Pair;
+import Querying.Semantics.SemanticEngine;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class Searcher {
 

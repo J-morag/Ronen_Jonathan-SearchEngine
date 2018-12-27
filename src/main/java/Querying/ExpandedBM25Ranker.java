@@ -13,8 +13,7 @@ public class ExpandedBM25Ranker extends BM25Ranker{
 
     @Override
     protected double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
-        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight)* rankingParameters.exactTermMatchWeight
-                + getMetadataBonuses(ePosting);
+        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight + getMetadataBonuses(ePosting))* rankingParameters.exactTermMatchWeight;
     }
 
     @Override
@@ -23,15 +22,4 @@ public class ExpandedBM25Ranker extends BM25Ranker{
                 + getMetadataBonuses(ePosting);
     }
 
-    /**
-     * calculate additional bonuses to a posting's relevance by whether a posting appeared in the title of a document,
-     * or in the document's beginning.
-     * @param ePosting information about a term's appearance in a document.
-     * @return bonuses to a posting's relevance ranking.
-     */
-    protected double getMetadataBonuses(ExpandedPosting ePosting){
-        Posting p = ePosting.posting;
-        return rankingParameters.titleWeight * (p.isInTitle() ? 1 : 0) +
-                rankingParameters.beginningWeight * (p.isInBeginning() ? 1 : 0);
-    }
 }

@@ -4,7 +4,7 @@ import Indexing.Index.CityIndexEntry;
 import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
-import javafx.util.Pair;
+import Querying.Semantics.SemanticEngine;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -30,7 +30,7 @@ class SearcherTest {
     Set<String> languages;
 
     void initialize(boolean useStemming, int kNeighbors, HashSet<String> cityList) throws IOException, ClassNotFoundException {
-        RankingParameters rankingParameters = new RankingParameters(0, 0, 1, 3.5, 2, 0.75);
+        RankingParameters rankingParameters = new RankingParameters(0.5, 0, 1, 3.5, 2, 0.75);
 
         loadDictionaries(useStemming, pathToPostingsFolder);
         int numDocsInCorpus = useStemming? docDictionaryWithStemming.size() : docDictionaryNoStemming.size();
@@ -51,7 +51,7 @@ class SearcherTest {
     }
 
     @Test
-    void printResultsToFile() throws IOException, ClassNotFoundException {
+    void EBM25Test() throws IOException, ClassNotFoundException {
         initialize(true, 2, new HashSet<>());
         boolean withSemantics = true;
 

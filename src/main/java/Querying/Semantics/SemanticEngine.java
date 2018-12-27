@@ -1,4 +1,4 @@
-package Querying;
+package Querying.Semantics;
 
 
 import de.jungblut.datastructure.KDTree;
