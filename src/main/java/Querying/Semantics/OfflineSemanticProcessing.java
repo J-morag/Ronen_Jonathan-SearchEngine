@@ -9,6 +9,7 @@ import de.jungblut.glove.impl.GloveTextReader;
 import de.jungblut.glove.util.StringVectorPair;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -28,8 +29,9 @@ public class OfflineSemanticProcessing {
 
     public static void main(String[] args) {
         try {
-//            textGloVeToBinaryGloVe();
-            corpusToParsedWordVectors();
+            textGloVeToBinaryGloVe();
+//            corpusToParsedWordVectors(false);
+//            corpusToParsedWordVector(false);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -63,7 +65,7 @@ public class OfflineSemanticProcessing {
      * parses the corpus. Creates a vector of words (terms) out of each field of each document.
      * Outputs all the vectors as lines in a single file.
      */
-    private static void corpusToParsedWordVectors() throws IOException, ClassNotFoundException, InterruptedException {
+    private static void corpusToParsedWordVectors(boolean includeTitles) throws IOException, ClassNotFoundException, InterruptedException {
         //get paths
         Scanner sc = new Scanner(System.in);
         String input;
@@ -112,11 +114,78 @@ public class OfflineSemanticProcessing {
 
         //read parsed documents and append them to output file
         int docCounter = 1;
-        PrintWriter printWriter = new PrintWriter(pathToOutputParsedWordVectors);
+        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(pathToOutputParsedWordVectors), StandardCharsets.UTF_8), true);
         TermDocument currDoc = termDocs.take();
         while(currDoc.getText() != null){
-            if(!currDoc.getTitle().isEmpty()) printWriter.println(termListToString(filterTerms(currDoc.getTitle(), dictionary)));
+            if(!currDoc.getTitle().isEmpty() && includeTitles) printWriter.println(termListToString(filterTerms(currDoc.getTitle(), dictionary)));
             if(!currDoc.getText().isEmpty()) printWriter.println(termListToString(filterTerms(currDoc.getText(), dictionary)));
+            if(docCounter%10000 == 0) System.out.println("Processed " + docCounter + " docs");
+            currDoc = termDocs.take();
+            docCounter++;
+        }
+        System.out.println("Processed " + docCounter + " docs");
+        System.out.println("done");
+    }
+
+
+    /**
+     * parses the corpus. Creates a vector of words (terms) out of all the documents.
+     * Outputs all the vectors as lines in a single file.
+     */
+    private static void corpusToParsedWordVector(boolean includeTitles) throws IOException, ClassNotFoundException, InterruptedException {
+        //get paths
+        Scanner sc = new Scanner(System.in);
+        String input;
+        System.out.println("Enter pathToCorpus, or press enter to use default path (not recommended)");
+        input = sc.nextLine();
+        if(!input.isEmpty()) pathToCorpus = input;
+        System.out.println("Enter pathToOutputParsedWordVectors, or press enter to use default path (not recommended)");
+        input = sc.nextLine();
+        if(!input.isEmpty()) pathToOutputParsedWordVectors = input;
+        System.out.println("Enter pathToStopwords, or press enter to use default path (not recommended)");
+        input = sc.nextLine();
+        if(!input.isEmpty()) pathToStopwords = input;
+        System.out.println("Enter pathToDictionary, or press enter to use default path (not recommended)");
+        input = sc.nextLine();
+        if(!input.isEmpty()) pathToDictionary = input;
+        boolean isStemming = false;
+        input = "";
+        while(!(input.equals("Y") || input.equals("N"))) {
+            System.out.println("is dictionary with stemming? (Y/N)");
+            input = sc.nextLine();
+            if(input.equals("Y")) isStemming = true;
+            else if(input.equals("N")) isStemming = false;
+        }
+
+        System.out.println("Running");
+
+        //load dictionary
+
+        ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(pathToDictionary)));
+        Map<String, IndexEntry> dictionary = (Map<String, IndexEntry>) inDictionary.readObject();
+
+        //start parsing
+
+        ArrayBlockingQueue<Document> docs = new ArrayBlockingQueue<Document>(10);
+        ArrayBlockingQueue<TermDocument> termDocs = new ArrayBlockingQueue<TermDocument>(10);
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs, isStemming);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        ReadFile rf = new ReadFile(pathToCorpus, docs);
+        Thread reader = new Thread(rf);
+
+        reader.start();
+        parser1.start();
+
+        //read parsed documents and append them to output file
+        int docCounter = 1;
+        PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(pathToOutputParsedWordVectors), StandardCharsets.UTF_8), true);
+        TermDocument currDoc = termDocs.take();
+        while(currDoc.getText() != null){
+            if(!currDoc.getTitle().isEmpty() && includeTitles) printWriter.print(termListToString(filterTerms(currDoc.getTitle(), dictionary)));
+            if(!currDoc.getText().isEmpty()) printWriter.print(termListToString(filterTerms(currDoc.getText(), dictionary)));
             if(docCounter%10000 == 0) System.out.println("Processed " + docCounter + " docs");
             currDoc = termDocs.take();
             docCounter++;
@@ -132,10 +201,11 @@ public class OfflineSemanticProcessing {
      */
     private static String termListToString(List<Term> terms){
         StringBuilder sb = new StringBuilder();
+        sb.append(' ');
         for (Term t: terms
              ) {
             sb.append(t.toString());
-            sb.append(" ");
+            sb.append(' ');
         }
         return sb.toString();
     }
