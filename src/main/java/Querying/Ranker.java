@@ -1,5 +1,7 @@
 package Querying;
 
+import Indexing.Index.Posting;
+
 import java.util.*;
 
 /**
@@ -95,6 +97,18 @@ public abstract class Ranker {
         double denominator = (double)p.df_term + 0.5;
 
         return Math.log10(numerator/denominator);
+    }
+
+    /**
+     * calculate additional bonuses to a posting's relevance by whether a posting appeared in the title of a document,
+     * or in the document's beginning.
+     * @param ePosting information about a term's appearance in a document.
+     * @return bonuses to a posting's relevance ranking.
+     */
+    protected double getMetadataBonuses(ExpandedPosting ePosting){
+        Posting p = ePosting.posting;
+        return rankingParameters.titleWeight * (p.isInTitle() ? 1 : 0) +
+                rankingParameters.beginningWeight * (p.isInBeginning() ? 1 : 0);
     }
 
     /**

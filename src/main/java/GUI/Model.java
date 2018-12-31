@@ -9,15 +9,14 @@ import Indexing.Index.Indexer;
 import Indexing.DocumentProcessing.Parse;
 import Indexing.DocumentProcessing.ReadFile;
 import Querying.*;
+import Querying.Semantics.SemanticEngine;
 import javafx.util.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -49,8 +48,8 @@ public class Model {
 
     public Model(){
         try {
-            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",2);
-            rankingParameters = new RankingParameters(0, 0, 1, 3.5, 2, 0.75);
+            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
+            rankingParameters = new RankingParameters(1.2, 0.2, 1, 3.5, 1.6, 0.75);
         } catch (IOException e) {
             e.printStackTrace();
         }

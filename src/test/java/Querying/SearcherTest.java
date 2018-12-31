@@ -4,7 +4,7 @@ import Indexing.Index.CityIndexEntry;
 import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
-import javafx.util.Pair;
+import Querying.Semantics.SemanticEngine;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -17,7 +17,7 @@ class SearcherTest {
 
     private final String pathToPostingsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
     private final String pathToResultsOutputFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults";
-    private final String pathToGloVeFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe";
+    private final String pathToGloVeFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors";
 
 
     Ranker ranker;
@@ -30,7 +30,7 @@ class SearcherTest {
     Set<String> languages;
 
     void initialize(boolean useStemming, int kNeighbors, HashSet<String> cityList) throws IOException, ClassNotFoundException {
-        RankingParameters rankingParameters = new RankingParameters(0, 0, 1, 3.5, 2, 0.75);
+        RankingParameters rankingParameters = new RankingParameters(1.2, 0.2, 1, 3.5, 1.6, 0.75);
 
         loadDictionaries(useStemming, pathToPostingsFolder);
         int numDocsInCorpus = useStemming? docDictionaryWithStemming.size() : docDictionaryNoStemming.size();
@@ -51,8 +51,8 @@ class SearcherTest {
     }
 
     @Test
-    void printResultsToFile() throws IOException, ClassNotFoundException {
-        initialize(true, 2, new HashSet<>());
+    void EBM25Test() throws IOException, ClassNotFoundException {
+        initialize(true, 5, new HashSet<>());
         boolean withSemantics = true;
 
         List<QueryResult> qRes = new ArrayList<>();
