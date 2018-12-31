@@ -30,7 +30,7 @@ class SearcherTest {
     Set<String> languages;
 
     void initialize(boolean useStemming, int kNeighbors, HashSet<String> cityList) throws IOException, ClassNotFoundException {
-        RankingParameters rankingParameters = new RankingParameters(0.1, 0.1, 0.9, 0.5, 1.5, 0.75);
+        RankingParameters rankingParameters = new RankingParameters(0, 0, 1, 3.5, 2, 0.75);
 
         loadDictionaries(useStemming, pathToPostingsFolder);
         int numDocsInCorpus = useStemming? docDictionaryWithStemming.size() : docDictionaryNoStemming.size();
@@ -52,13 +52,25 @@ class SearcherTest {
 
     @Test
     void printResultsToFile() throws IOException, ClassNotFoundException {
-        initialize(true, 5, new HashSet<>());
+        initialize(true, 2, new HashSet<>());
+        boolean withSemantics = true;
 
-        List<Pair<Integer, List<String>>> qRes = new ArrayList<>();
-        qRes.add(new Pair<>(1, searcher.answerquery("Communist Party", false)));
-        qRes.add(new Pair<>(1, searcher.answerquery("Communist Party", true)));
-        qRes.add(new Pair<>(1, searcher.answerquery("Flor", false)));
-        qRes.add(new Pair<>(1, searcher.answerquery("Flor", true)));
+        List<QueryResult> qRes = new ArrayList<>();
+        qRes.add(new QueryResult("351", searcher.answerquery("Falkland petroleum exploration", withSemantics)));
+        qRes.add(new QueryResult("352" , searcher.answerquery("British Chunnel impact", withSemantics)));
+        qRes.add(new QueryResult("358" , searcher.answerquery("blood-alcohol fatalities", withSemantics)));
+        qRes.add(new QueryResult("359" , searcher.answerquery("mutual fund predictors ", withSemantics)));
+        qRes.add(new QueryResult("362" , searcher.answerquery("human smuggling ", withSemantics)));
+        qRes.add(new QueryResult("367" , searcher.answerquery("piracy ", withSemantics)));
+        qRes.add(new QueryResult("373" , searcher.answerquery("encryption equipment export ", withSemantics)));
+        qRes.add(new QueryResult("374" , searcher.answerquery("Nobel prize winners ", withSemantics)));
+        qRes.add(new QueryResult("377" , searcher.answerquery("cigar smoking ", withSemantics)));
+        qRes.add(new QueryResult("380" , searcher.answerquery("obesity medical treatment ", withSemantics)));
+        qRes.add(new QueryResult("384" , searcher.answerquery("space station moon ", withSemantics)));
+        qRes.add(new QueryResult("385" , searcher.answerquery("hybrid fuel cars ", withSemantics)));
+        qRes.add(new QueryResult("387" , searcher.answerquery("radioactive waste ", withSemantics)));
+        qRes.add(new QueryResult("388" , searcher.answerquery("organic soil enhancement ", withSemantics)));
+        qRes.add(new QueryResult("390" , searcher.answerquery("orphan drugs ", withSemantics)));
 
         Searcher.outputResults(qRes, pathToResultsOutputFolder);
     }

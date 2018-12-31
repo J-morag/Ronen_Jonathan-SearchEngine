@@ -101,7 +101,7 @@ public class SearchView  {
                 myController.saveQueryResults(search_saveText.getText(), result);
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setHeaderText("Results saved");
-                alert.setContentText("you'r results were saved at: " +search_saveText.getText());
+                alert.setContentText("your results were saved at: " +search_saveText.getText());
                 alert.show();
                 onClearCliked();
             }

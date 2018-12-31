@@ -49,8 +49,8 @@ public class Model {
 
     public Model(){
         try {
-            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
-            rankingParameters = new RankingParameters(0.1,0.1 ,0.9, 0.5 ,1.5 ,0.75);
+            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",2);
+            rankingParameters = new RankingParameters(0, 0, 1, 3.5, 2, 0.75);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -370,12 +370,12 @@ public class Model {
         List<String> res ;
         Ranker ranker;
         if(isUsedStemming){
-            ranker = new BM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,pathToOutpotFolder+"\\"+Indexer.withStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
 
         }
         else {
-            ranker = new BM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
+            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
         }
         res=searcher.answerquery(query,useSemantic);
