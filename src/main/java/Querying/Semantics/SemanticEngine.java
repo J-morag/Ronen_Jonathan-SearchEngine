@@ -9,6 +9,7 @@ import de.jungblut.glove.impl.GloveBinaryRandomAccessReader;
 import de.jungblut.glove.impl.GloveBinaryReader;
 import de.jungblut.glove.util.StringVectorPair;
 import de.jungblut.math.DoubleVector;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -61,13 +62,13 @@ public class SemanticEngine {
      * @return the nearest semantic neighbors (synonyms) for the given word. If word is null, returns null. If no neighbors were found or word wasn't found, returns an empty list.
      * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
      */
-    public List<String> getNearestNeighbors(String word) throws IOException {
+    public List<Pair<String, Double>> getNearestNeighbors(String word) throws IOException {
         if(word == null) return null;
 
         DoubleVector v = reader.get(word);
         if (v == null) {
             // word does'nt exist in vectors
-            return new ArrayList<String>();
+            return new ArrayList<Pair<String, Double>>();
         } else {
             List<VectorDistanceTuple<String>> nearestNeighbours = tree
                     .getNearestNeighbours(v, kNeighbors + 1); //+1 because the same word will also be retrieved.
@@ -79,9 +80,9 @@ public class SemanticEngine {
                 nearestNeighbours.remove(0);
             }
 
-            ArrayList<String> neighborStrings = new ArrayList<>(nearestNeighbours.size());
+            ArrayList<Pair<String, Double>> neighborStrings = new ArrayList<>(nearestNeighbours.size());
             for (VectorDistanceTuple<String> tuple : nearestNeighbours) {
-                neighborStrings.add(tuple.getValue());
+                neighborStrings.add(new Pair<String, Double>(tuple.getValue(), tuple.getDistance()));
             }
             return neighborStrings;
         }
@@ -93,9 +94,9 @@ public class SemanticEngine {
      * @return the nearest semantic neighbors (synonyms) for the given words. If the list is null, returns null. If no neighbors were found, returns an empty list.
      * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
      */
-    public List<String> getNearestNeighbors(List<String> words) throws IOException {
+    public List<Pair<String, Double>> getNearestNeighbors(List<String> words) throws IOException {
         if (words == null) return null;
-        ArrayList<String> neighborStrings = new ArrayList<>();
+        ArrayList<Pair<String, Double>> neighborStrings = new ArrayList<>();
         for (String word: words
                 ) {
             neighborStrings.addAll(getNearestNeighbors(word));
@@ -109,9 +110,9 @@ public class SemanticEngine {
      * @return the nearest semantic neighbors (synonyms) for the given words. If the set is null, returns null. If no neighbors were found, returns an empty list.
      * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
      */
-    public List<String> getNearestNeighbors(Set<String> words) throws IOException {
+    public List<Pair<String, Double>> getNearestNeighbors(Set<String> words) throws IOException {
         if (words == null) return null;
-        ArrayList<String> neighborStrings = new ArrayList<>();
+        ArrayList<Pair<String, Double>> neighborStrings = new ArrayList<>();
         for (String word: words
                 ) {
             neighborStrings.addAll(getNearestNeighbors(word));

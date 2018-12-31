@@ -1,6 +1,7 @@
 package Querying;
 
 import Indexing.Index.Posting;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -10,11 +11,14 @@ import java.util.*;
  */
 public abstract class Ranker {
 
+    Map<String, Double> queryNeighbors;
+
     protected RankingParameters rankingParameters;
     protected int numDocsInCorpus;
     protected double averageDocumentLengthInCorpus;
 
     public Ranker(RankingParameters rankingParameters, int numDocsInCorpus, double averageDocumentLengthInCorpus) {
+        this.queryNeighbors = new HashMap<>();
         this.rankingParameters = rankingParameters;
         this.numDocsInCorpus = numDocsInCorpus;
         this.averageDocumentLengthInCorpus = averageDocumentLengthInCorpus;
@@ -32,9 +36,13 @@ public abstract class Ranker {
      * @param queryNeighbors a vector of words that are semantically similar to words appearing in the query. should not contain duplicates.
      * @return a list of unique Integers, each being the serialID of a document, sorted most to least relevant.
      */
-    public List<Integer> rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors){
-
-        Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit, query, queryNeighbors);
+    public List<Integer> rank(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, Pair<String, Double>[] queryNeighbors){
+        this.queryNeighbors.clear();
+        for (Pair<String, Double> synonym: queryNeighbors
+             ) {
+            this.queryNeighbors.put(synonym.getKey(), synonym.getValue());
+        }
+        Map<Integer, Double> rankedDocs = rankDocs(postingsExplicit, postingsImplicit, query);
 
         return sortDocsByRank(rankedDocs);
     }
@@ -60,10 +68,9 @@ public abstract class Ranker {
      * @param postingsImplicit postings for terms derived semantically from the query. may contain duplicates
      *                        internally or from postingsExplicit.
      * @param query a vector of words appearing in the query. should not contain duplicates.
-     * @param queryNeighbors a vector of words that are semantically similar to words appearing in the query. should not contain duplicates.
      * @return a mapping of document IDs (Integer) to document ranks (Double).
      */
-    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query, String[] queryNeighbors) {
+    protected Map<Integer, Double> rankDocs(List<ExpandedPosting> postingsExplicit, List<ExpandedPosting> postingsImplicit, String[] query) {
         Map<Integer, Double> rankedDocs = new HashMap<>(postingsExplicit.size());
         for (ExpandedPosting ePosting: postingsExplicit
              ) {

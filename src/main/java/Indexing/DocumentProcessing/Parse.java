@@ -514,9 +514,9 @@ public class Parse implements Runnable{
      * after all the information regarding the number being parsed has been collected, finalize it into a properly formatted number.
      * may lose some rightmost digits if a number is both a fraction and very large (trillions)
      * @param unformattedNumber
-     * @param result - formatting result will be appended onto here. will not override existing content.
+     * @param result formatting result will be appended onto here. will not override existing content.
      * @param kmbtMultiplier >= 1
-     * @param decimals - if null, will be treated as no decimals exist.
+     * @param decimals if null, will be treated as no decimals exist.
      * @param isPrice
      * @param isPercent
      * @param isFractional
@@ -623,10 +623,10 @@ public class Parse implements Runnable{
 
     /**
      * parses a term that starts with a word.
-     * @param iterator - iterator over the list of tokens.
-     * @param word - the word to start parsing from.
-     * @param result - the result will be appended here.
-     * @param lTerms - if more than one term is parsed, it will be added here.
+     * @param iterator iterator over the list of tokens.
+     * @param word the word to start parsing from.
+     * @param result the result will be appended here.
+     * @param lTerms if more than one term is parsed, it will be added here.
      * @return - if it was just an ordinary word (or stopword) result contains that word. else it contains the parsed expression.
      */
     private StringBuilder parseWord(@NotNull ListIterator<String> iterator,@NotNull String word,@NotNull StringBuilder result, List<Term> lTerms){
