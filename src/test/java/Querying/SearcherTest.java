@@ -30,7 +30,7 @@ class SearcherTest {
     Set<String> languages;
 
     void initialize(boolean useStemming, int kNeighbors, HashSet<String> cityList) throws IOException, ClassNotFoundException {
-        RankingParameters rankingParameters = new RankingParameters(1.2, 0.2, 1, 3.5, 1.6, 0.75);
+        RankingParameters rankingParameters = new RankingParameters(1.2, 0.2, 1, 0.35, 1.6, 0.75);
 
         loadDictionaries(useStemming, pathToPostingsFolder);
         int numDocsInCorpus = useStemming? docDictionaryWithStemming.size() : docDictionaryNoStemming.size();

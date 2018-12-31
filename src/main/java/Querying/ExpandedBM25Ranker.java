@@ -13,13 +13,15 @@ public class ExpandedBM25Ranker extends BM25Ranker{
 
     @Override
     protected double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
-        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight + getMetadataBonuses(ePosting))* rankingParameters.exactTermMatchWeight;
+        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight + getMetadataBonuses(ePosting));
     }
 
     @Override
     protected double calculateRankForImplicitPosting(ExpandedPosting ePosting) {
-        return (super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight)
-                + getMetadataBonuses(ePosting);
+        return ((super.calculateRankForImplicitPosting(ePosting) * rankingParameters.frequencyWeight)
+                + getMetadataBonuses(ePosting) ) *
+                /* slightly higher weight for closer neighbors*/
+                (rankingParameters.exactTermMatchWeight + 0.1*((double)1-Math.abs(queryNeighbors.get(ePosting.term.toLowerCase()))));
     }
 
 }

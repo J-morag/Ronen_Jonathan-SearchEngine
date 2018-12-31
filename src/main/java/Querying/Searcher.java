@@ -10,6 +10,7 @@ import Indexing.Index.IO.PostingInputStream;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
 import Querying.Semantics.SemanticEngine;
+import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class Searcher {
 
         List<String> relevantDocuments=new ArrayList<>();
         Set<String> noStemmingTermSet=null;
-        String [] synonymArr= new String[0];
+        Pair<String, Double>[] synonymArr = new Pair[0];
         if(withSemantics) {
             // list to send to Semantic Engine if needed
             parser.useStemming = false;
@@ -112,8 +113,13 @@ public class Searcher {
 
             }
             if(withSemantics){
-                List<String> synonymList= semanticEngine.getNearestNeighbors(noStemmingTermSet);
-                synonymArr = synonymList.toArray(new String[synonymList.size()]);
+                List<Pair<String, Double>> synonymAndDistance = semanticEngine.getNearestNeighbors(noStemmingTermSet);
+                synonymArr = synonymAndDistance.toArray(new Pair[synonymAndDistance.size()]);
+                List<String> synonymList= new ArrayList<>();
+                for (Pair<String, Double> stringDistancePair: synonymAndDistance
+                     ) {
+                    synonymList.add(stringDistancePair.getKey());
+                }
                 for (String synonym : synonymList ) {
                     List<Posting> tempPosting = new ArrayList<>();
                     String stringTerm = synonym;
