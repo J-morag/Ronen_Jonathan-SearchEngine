@@ -6,6 +6,8 @@ public class QueryResult {
 
     private String queryNum;
     private List<String> relevantDocs;
+    private List<String[]> entities;
+    private List<float[]> entRanking ;
 
     public QueryResult(String queryNum, List<String> relevantDocs) {
         this.queryNum = queryNum;
@@ -26,5 +28,21 @@ public class QueryResult {
 
     public void setRelevantDocs(List<String> relevantDocs) {
         this.relevantDocs = relevantDocs;
+    }
+
+    public List<String[]> getEntities() {
+        return entities;
+    }
+
+    public List<float[]> getEntRanking() {
+        return entRanking;
+    }
+
+    public void setEntities(List<String[]> entities) {
+        this.entities = entities;
+    }
+
+    public void setEntRanking(List<float[]> entRanking) {
+        this.entRanking = entRanking;
     }
 }

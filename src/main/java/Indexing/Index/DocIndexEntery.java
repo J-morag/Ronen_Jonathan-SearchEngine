@@ -15,8 +15,12 @@ public class DocIndexEntery implements Serializable {
     private String city;
     private String language;
     private int length;
+    private String [] entities;
+    private float[] ranking;
 
-    public DocIndexEntery(String  docID, int numOfUniqueWords,int maxTF , String city, String language , int length){
+
+
+    public DocIndexEntery(String  docID, int numOfUniqueWords, int maxTF , String city, String language , int length){
 
         this.docID=docID;
         this.numOfUniqueWords=numOfUniqueWords;
@@ -24,6 +28,15 @@ public class DocIndexEntery implements Serializable {
         this.city=city;
         this.language=language;
         this.length=length;
+    }
+
+
+    public String[] getEntities() {
+        return entities;
+    }
+
+    public float[] getRanking() {
+        return ranking;
     }
 
     public String getDocID() {
@@ -68,6 +81,14 @@ public class DocIndexEntery implements Serializable {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public void setEntities(String[] entities) {
+        this.entities = entities;
+    }
+
+    public void setRanking(float[] ranking) {
+        this.ranking = ranking;
     }
 
 

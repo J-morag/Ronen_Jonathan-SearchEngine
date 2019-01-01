@@ -49,6 +49,8 @@ public class MainIndexMaker extends AIndexMaker {
 
             Set<String> uniqueWords=new HashSet<>();// set of all unique words in a doc
             Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
+            // Map<String , Integer> entities = new HashMap<>();//***************************************************************************
+            Set<String>entities =new HashSet<>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
             int docLength = text.size();
@@ -109,10 +111,34 @@ public class MainIndexMaker extends AIndexMaker {
                     TempIndexEntry tmp = tempDictionary.get(term);
                     tmp.increaseTfByN(tfMap.get(term).shortValue());
                     tmp.addPosting(posting);
-                    posting=null;
+                    posting = null;
                 }
+
+                if(tfMap.containsKey(term.toUpperCase())){
+                    if (!tfMap.containsKey((term.toLowerCase()))){
+                        entities.add(term);
+                    }
+                }
+
             }
             numOfDocs++;
+
+            if(entities.size()>0) {
+                String[] top5 = getTopEntities(tfMap, entities);
+                float[] ranking = new float[top5.length];
+                for (int i = 0; i < top5.length; i++) {
+                    int a =tfMap.get(top5[i]);
+                    float b = (float)a/maxTf;
+                    ranking[i] = (b);
+                }
+                docsDictionary.get(doc.getSerialID()).setEntities(top5);
+                docsDictionary.get(doc.getSerialID()).setRanking(ranking);
+            }
+            else {
+                docsDictionary.get(doc.getSerialID()).setEntities(new String[0]);
+                docsDictionary.get(doc.getSerialID()).setRanking(new float[0]);
+            }
+
             if(numOfDocs==partialGroupSize){
                 dumpToDisk();
             }
@@ -125,7 +151,42 @@ public class MainIndexMaker extends AIndexMaker {
 
     }
 
+    /**
+     * this method return the top 5 entities in the doc
+     * @param tfMap - map of terms and their total frequency in the document
+     * @param entities - a list of all the entities in the document
+     * @return array of at most 5 entities in order of their relevance
+     */
+    private String[] getTopEntities(Map<String, Integer> tfMap,  Set<String> entities) {
+        String [] toReturn =null;
+        List<String> ent=new ArrayList<>();
+        for (String term:entities) {
+            ent.add(term);
+        }
+        Collections.sort(ent, (o1, o2) -> {
+            int a= tfMap.get(o1),b =tfMap.get(o2);
+            if(a>b){
+                return -1;
+            }
+            else if (a<b){
+                return 1;
+            }else {
+                return 0;
+            }
+        });
+        if (ent.size()>=5){
+            toReturn=new String[5];
+        }
+        else {
+            toReturn= new String[ent.size()];
+        }
 
+        for (int i = 0; i <toReturn.length ; i++) {
+            toReturn[i]=ent.get(i);
+        }
+        return toReturn;
+
+    }
 
 
     /**
@@ -246,10 +307,10 @@ public class MainIndexMaker extends AIndexMaker {
                     continue;
                 }
                 List<Posting> postingToWrite = new ArrayList<>();
-               String finalTerm = addTermToDictionary(term , postingToWrite);
-               if (finalTerm.equals("")){
-                   continue;
-               }
+                String finalTerm = addTermToDictionary(term , postingToWrite);
+                if (finalTerm.equals("")){
+                    continue;
+                }
                 Collections.sort(postingToWrite, (o1, o2) -> {
                     if(o1.getTf()>o2.getTf()){
                         return -1;
@@ -274,18 +335,18 @@ public class MainIndexMaker extends AIndexMaker {
 
 
 
-       try {
-           File file = new File(path);
-           for (File fi : file.listFiles()) {
-               String name = fi.getName().substring(0,4);
-              if (name.equals("temp")) {
-                  fi.delete();
-              }
-           }
-       }catch (NullPointerException e){
-           e.printStackTrace();
+        try {
+            File file = new File(path);
+            for (File fi : file.listFiles()) {
+                String name = fi.getName().substring(0,4);
+                if (name.equals("temp")) {
+                    fi.delete();
+                }
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
 
-       }
+        }
 
 
     }

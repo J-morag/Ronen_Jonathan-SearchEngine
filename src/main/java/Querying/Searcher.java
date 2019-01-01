@@ -154,13 +154,13 @@ public class Searcher {
             if(cityListFilter.size()>0){
                  filterdRankedDocs = filterDocsByCity(renkedDocsList);
                 for (Integer docSerialKye : filterdRankedDocs ) {
-                    relevantDocuments.add(docsDictionary.get(docSerialKye).getDocID());
+                    relevantDocuments.add(docSerialKye.toString());
                 }
             }
             else
             {
                 for (Integer docSerialKye : renkedDocsList ) {
-                    relevantDocuments.add(docsDictionary.get(docSerialKye).getDocID());
+                    relevantDocuments.add(docSerialKye.toString());
                 }
             }
 

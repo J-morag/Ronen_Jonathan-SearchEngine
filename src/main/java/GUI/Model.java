@@ -378,7 +378,31 @@ public class Model {
             searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
         }
         res=searcher.answerquery(query,useSemantic);
-        results.add(new QueryResult("001",res));
+        QueryResult result = new QueryResult("001",res);
+        List<String> docsID = new ArrayList<>();
+        List<String[]> entities =new ArrayList<>();
+        List<float[]>  rankedEnt = new ArrayList<>();
+        for (String doc : result.getRelevantDocs()) {
+            String docID="";
+            String [] ent ;
+            float [] rank ;
+            if(isUsedStemming){
+                docID=docDictionaryWithStemming.get(Integer.parseInt(doc)).getDocID();
+                ent=(docDictionaryWithStemming.get(Integer.parseInt(doc)).getEntities());
+                rank=(docDictionaryWithStemming.get(Integer.parseInt(doc)).getRanking());
+            }else {
+                docID=docDictionaryNoStemming.get(Integer.parseInt(doc)).getDocID();
+                ent=(docDictionaryNoStemming.get(Integer.parseInt(doc)).getEntities());
+                rank=(docDictionaryNoStemming.get(Integer.parseInt(doc)).getRanking());
+            }
+            docsID.add(docID);
+            entities.add(ent);
+            rankedEnt.add(rank);
+        }
+
+        result.setEntities(entities);
+        result.setRelevantDocs(docsID);
+        result.setEntRanking(rankedEnt);
         return results;
 
     }
@@ -402,6 +426,30 @@ public class Model {
 
         for (Pair<String,String> pair : allQuerys ) {
             QueryResult tmp = new QueryResult(pair.getKey(),searcher.answerquery(pair.getValue(),useSemantic));
+            List<String> docsID = new ArrayList<>();
+            List<String[]> entities =new ArrayList<>();
+            List<float[]>  rankedEnt = new ArrayList<>();
+            for (String doc : tmp.getRelevantDocs()) {
+                String docID="";
+                String [] ent ;
+                float [] rank ;
+                if(isUsedStemming){
+                    docID=docDictionaryWithStemming.get(Integer.parseInt(doc)).getDocID();
+                    ent=(docDictionaryWithStemming.get(Integer.parseInt(doc)).getEntities());
+                    rank=(docDictionaryWithStemming.get(Integer.parseInt(doc)).getRanking());
+                }else {
+                    docID=docDictionaryNoStemming.get(Integer.parseInt(doc)).getDocID();
+                    ent=(docDictionaryNoStemming.get(Integer.parseInt(doc)).getEntities());
+                    rank=(docDictionaryNoStemming.get(Integer.parseInt(doc)).getRanking());
+                }
+                docsID.add(docID);
+                entities.add(ent);
+                rankedEnt.add(rank);
+            }
+
+            tmp.setEntities(entities);
+            tmp.setRelevantDocs(docsID);
+            tmp.setEntRanking(rankedEnt);
             results.add(tmp);
         }
 

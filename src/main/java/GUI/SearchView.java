@@ -106,8 +106,8 @@ public class SearchView  {
                 onClearCliked();
             }
 
-
         }
+
 
 
 
@@ -158,6 +158,27 @@ public class SearchView  {
 
     public void answerMultipleQueries(String pathToQueryFile){
         result = myController.answerMultipleQueries(pathToQueryFile , getCityFilter() , search_semantic.isSelected() ,useStemming,pathToOutpotFolder);
+        printResult();
+    }
+
+    private void printResult(){
+        for (QueryResult res : result) {
+            List<String>docs = res.getRelevantDocs();
+            List<String[]> ent = res.getEntities();
+            List<float[]> ranking = res.getEntRanking();
+            System.out.println("============================================================================");
+            for (int i = 0; i <docs.size() ; i++) {
+                String [] a = ent.get(i);
+                float [] f = ranking.get(i);
+                if(a.length==0){
+                    continue;
+                }
+                for (int j = 0; j <a.length ; j++) {
+                    System.out.println(docs.get(i)+"->"+a[j]+"="+f[j]+";");
+                }
+            }
+            System.out.println("============================================================================");
+        }
     }
 
     private Set<String>  getCityFilter(){
