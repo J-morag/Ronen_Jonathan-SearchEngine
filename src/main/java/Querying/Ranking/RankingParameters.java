@@ -1,4 +1,4 @@
-package Querying;
+package Querying.Ranking;
 
 /**
  * A set of weights for the {@link Ranker Ranker} class.
@@ -6,12 +6,12 @@ package Querying;
  */
 public class RankingParameters {
 
-    final double titleWeight;
-    final double beginningWeight;
-    final double frequencyWeight;
-    final double exactTermMatchWeight;
-    final double k_BM25;
-    final double b_BM25;
+    public final double titleWeight;
+    public final double beginningWeight;
+    public final double frequencyWeight;
+    public final double exactTermMatchWeight;
+    public final double k_BM25;
+    public final double b_BM25;
 
     public RankingParameters(double titleWeight, double beginningWeight, double frequencyWeight, double exactTermMatchWeight, double k_BM25, double b_BM25) {
         this.titleWeight = titleWeight;

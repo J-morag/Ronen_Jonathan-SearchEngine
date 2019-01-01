@@ -9,6 +9,8 @@ import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IO.PostingInputStream;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Posting;
+import Querying.Ranking.ExpandedPosting;
+import Querying.Ranking.Ranker;
 import Querying.Semantics.SemanticEngine;
 import javafx.util.Pair;
 
