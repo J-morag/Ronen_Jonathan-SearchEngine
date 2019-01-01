@@ -49,7 +49,6 @@ public class MainIndexMaker extends AIndexMaker {
 
             Set<String> uniqueWords=new HashSet<>();// set of all unique words in a doc
             Map<String,Integer> tfMap=new HashMap<>(); // map  term to his tf value in this doc
-            // Map<String , Integer> entities = new HashMap<>();//***************************************************************************
             Set<String>entities =new HashSet<>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
