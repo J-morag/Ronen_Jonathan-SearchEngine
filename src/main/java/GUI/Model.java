@@ -51,7 +51,7 @@ public class Model {
 
     public Model(){
         try {
-            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
+            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\Word2Vec",5);
             rankingParameters = new RankingParameters(1.2, 0.2, 1, 3.5, 1.6, 0.75);
         } catch (IOException e) {
             e.printStackTrace();

@@ -180,8 +180,6 @@ public class Searcher {
                 }
             }
 
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
