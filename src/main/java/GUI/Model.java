@@ -51,8 +51,8 @@ public class Model {
 
     public Model(){
         try {
-            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\GloVe",5);
-            rankingParameters = new RankingParameters(1.2, 0.2, 1, 3.5, 1.6, 0.75);
+            semanticEngine=new SemanticEngine(System.getProperty("user.dir")+"\\resources\\Word2Vec",5);
+            rankingParameters = new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class Model {
         docDictionaryNoStemming  = null;
         cityDictionary = null;
         languages = null;
-        
+
         cleanOutputFiles(outputFolder);
     }
 
@@ -494,9 +494,9 @@ public class Model {
             String Query =titleDoc.select("title").text().trim();
             parsResult.add(new Pair<>(QueryNum,Query));
 
-    }
+        }
 
-    return parsResult;
+        return parsResult;
 
 
     }

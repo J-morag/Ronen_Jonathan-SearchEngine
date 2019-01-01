@@ -19,7 +19,7 @@ public class ExpandedPosting {
     public Date date;
 
 
-    public ExpandedPosting(Posting posting, int totalTF_term, int df_term, int numOfUniqueWords_doc, int maxTF_doc,int doc_length, String term) {
+    public ExpandedPosting(Posting posting, int totalTF_term, int df_term, int numOfUniqueWords_doc, int maxTF_doc,int doc_length, String term , Date date) {
         this.posting = posting;
         this.totalTF_term = totalTF_term;
         this.df_term = df_term;
@@ -27,5 +27,6 @@ public class ExpandedPosting {
         this.maxTF_doc = maxTF_doc;
         this.doc_length = doc_length;
         this.term = term;
+        this.date=date;
     }
 }
