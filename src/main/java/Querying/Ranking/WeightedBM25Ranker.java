@@ -29,8 +29,8 @@ public class WeightedBM25Ranker extends BM25Ranker{
                 + getMetadataBonuses(ePosting) + getDateBonus(ePosting)) *
                 /* weight of 1 for explicit, calculated weight (<=1) for implicit*/
                 (isExplicit ? 1 :
-                        /* slightly higher weight for closer neighbors*/
-                        (rankingParameters.implicitTermMatchWeight + 0.1*((double)1-Math.abs(queryNeighbors.get(ePosting.term.toLowerCase())))));
+                /* slightly higher weight for closer neighbors*/
+                (rankingParameters.implicitTermMatchWeight + 0.1*((double)1-Math.abs(queryNeighbors.get(ePosting.term.toLowerCase())))));
     }
 
     /**

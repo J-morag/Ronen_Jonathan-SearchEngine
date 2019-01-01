@@ -342,6 +342,23 @@ void toUpperCaseTest()
         }
 
         System.out.println(Integer.parseInt(year+month+day));
+        int i=Integer.parseInt(year+month+day);
+
+        String dateAsString = String.valueOf(i);
+        String y =dateAsString.substring(0,4);
+        String m = dateAsString.substring(4,6);
+        String dy = dateAsString.substring(6,8);
+
+        System.out.println(dy+"/"+m+"/"+y);
+
+        Date newD= new Date();
+        newD.setDate(Integer.valueOf(dy));
+        newD.setMonth(Integer.valueOf(m)-1);
+        newD.setYear(Integer.valueOf(y)-1900);
+
+        System.out.println(d.getYear()+";"+newD.getYear());
+        System.out.println(d.getMonth()+";"+newD.getMonth());
+        System.out.println(d.getDate()+";"+newD.getDate());
 
 
     }
