@@ -42,7 +42,7 @@ class SearcherTest {
         }
         averageDocLength /= numDocsInCorpus;
 
-        ranker = new ExpandedBM25Ranker(rankingParameters, numDocsInCorpus, averageDocLength);
+        ranker = new WeightedBM25Ranker(rankingParameters, numDocsInCorpus, averageDocLength);
 
         searcher = new Searcher(useStemming? mainDictionaryWithStemming : mainDictionaryNoStemming, cityDictionary,
                 useStemming? docDictionaryWithStemming : docDictionaryNoStemming, useStemming,

@@ -369,12 +369,12 @@ public class Model {
         List<String> res ;
         Ranker ranker;
         if(isUsedStemming){
-            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
+            ranker = new WeightedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,pathToOutpotFolder+"\\"+Indexer.withStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
 
         }
         else {
-            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
+            ranker = new WeightedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
         }
         res=searcher.answerquery(query,useSemantic);
@@ -389,12 +389,12 @@ public class Model {
         List<String> res ;
         Ranker ranker;
         if(isUsedStemming){
-            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
+            ranker = new WeightedBM25Ranker(rankingParameters,docDictionaryWithStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryWithStemming,cityDictionary,docDictionaryWithStemming,true,pathToOutpotFolder+"\\"+Indexer.withStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
 
         }
         else {
-            ranker = new ExpandedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
+            ranker = new WeightedBM25Ranker(rankingParameters,docDictionaryNoStemming.size(),getAvargeDocSize());
             searcher= new Searcher(mainDictionaryNoStemming,cityDictionary,docDictionaryNoStemming,false,pathToOutpotFolder+"\\"+Indexer.noStemmingOutputFolderName+"\\Postings",semanticEngine,ranker,(HashSet<String>)citiesFilter);
         }
 

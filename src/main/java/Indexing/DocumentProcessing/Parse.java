@@ -948,7 +948,13 @@ public class Parse implements Runnable{
         if(dateString == null || dateString.isEmpty()) return null; //no date
         dateString = dateString.trim(); //clean trailing or leading whitespaces
         String dateFormat = determineDateFormat(dateString);
-        if(dateFormat == null) return null; //unrecognized date format
+        if(dateFormat == null){ //not a standard date format
+            dateString = tryConvertCustomDateFormatToStandard(dateString); //try to convert date from yyMMdd to yyyyMMdd
+            if(dateString == null) return null; //unrecognized date format
+            else{
+                dateFormat = "yyyyMMdd";
+            }
+        }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
         simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
         Date date = null;
@@ -956,7 +962,7 @@ public class Parse implements Runnable{
             date = simpleDateFormat.parse(dateString);
         }
         //shouldn't happen, because the string has already been checked to verify validity.
-        //regardless return null if a parse exception does happen.
+        //regardless, return null if a parse exception does happen.
         catch (ParseException e){
             return null;
         }
@@ -976,6 +982,21 @@ public class Parse implements Runnable{
             }
         }
         return null; // Unknown format.
+    }
+
+    /**
+     * if the string is in the yyMMdd format present in the corpus, will convert to yyyyMMdd that is parseable.
+     * @param dateString string representing a date in format yyyyMMdd
+     * @return the date in yyyyMMdd, or null if dateString is not a string in format yyMMdd.
+     */
+    private static String tryConvertCustomDateFormatToStandard(String dateString){
+        if(dateString == null || dateString.length() != 6 || TokenType.classify(dateString) != TokenType.NUMBER)
+            return null;
+        else{ //is 6 digits
+            String yearTwoFirstDigits = (dateString.charAt(0) == '9' || dateString.charAt(0) == '8' )? "19" : "20";
+            return yearTwoFirstDigits + dateString;
+        }
+
     }
 
     /**
