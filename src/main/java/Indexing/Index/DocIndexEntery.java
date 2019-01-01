@@ -17,10 +17,11 @@ public class DocIndexEntery implements Serializable {
     private int length;
     private String [] entities;
     private float[] ranking;
+    private int date;
 
 
 
-    public DocIndexEntery(String  docID, int numOfUniqueWords, int maxTF , String city, String language , int length){
+    public DocIndexEntery(String  docID, int numOfUniqueWords, int maxTF , String city, String language , int length , int date){
 
         this.docID=docID;
         this.numOfUniqueWords=numOfUniqueWords;
@@ -28,6 +29,7 @@ public class DocIndexEntery implements Serializable {
         this.city=city;
         this.language=language;
         this.length=length;
+        this.date=date;
     }
 
 
@@ -89,6 +91,14 @@ public class DocIndexEntery implements Serializable {
 
     public void setRanking(float[] ranking) {
         this.ranking = ranking;
+    }
+
+    public int getDate() {
+        return date;
+    }
+
+    public void setDate(int date) {
+        this.date = date;
     }
 
 

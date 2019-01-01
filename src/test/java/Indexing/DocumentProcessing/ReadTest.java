@@ -3,6 +3,7 @@ package Indexing.DocumentProcessing;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.concurrent.*;
 
 
@@ -327,9 +328,21 @@ void toUpperCaseTest()
     void generalTest() throws IOException {
 
 
-    float a = 1;
+        Date d = new Date();
+        String year = String.valueOf(1900+d.getYear());
+        String month = String.valueOf(d.getMonth()+1);
+        String day = String.valueOf(d.getDate());
 
-        System.out.println(a/700);
+        while (month.length()<2){
+            month="0"+month;
+
+        }
+        while (day.length()<2){
+            day="0"+day;
+        }
+
+        System.out.println(Integer.parseInt(year+month+day));
+
 
     }
 

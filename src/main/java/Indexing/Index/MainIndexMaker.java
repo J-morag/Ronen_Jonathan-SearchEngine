@@ -52,6 +52,12 @@ public class MainIndexMaker extends AIndexMaker {
             Set<String>entities =new HashSet<>();
             List<Term> title = doc.getTitle();
             List<Term> text = doc.getText();
+            int docDateAsInt=0;
+            if(doc.date!=null) {
+                Date docDate = doc.date;
+                docDateAsInt = convertDateToInt(docDate);
+            }
+
             int docLength = text.size();
             int maxTf = getMaxTf(uniqueWords,tfMap,title,text);
             int numOfUniqueWords = uniqueWords.size();
@@ -70,7 +76,7 @@ public class MainIndexMaker extends AIndexMaker {
             }
 
 // add a document to the DocIndex
-            DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language,docLength);
+            DocIndexEntery docIndexEntery = new DocIndexEntery(docId,numOfUniqueWords,maxTf,city,language,docLength,docDateAsInt);
             docsDictionary.add(docIndexEntery);
             docIndexEntery=null;
 
@@ -148,6 +154,23 @@ public class MainIndexMaker extends AIndexMaker {
         }
 
 
+    }
+
+    private int convertDateToInt(Date docDate) {
+
+        String year = String.valueOf(1900+docDate.getYear());
+        String month = String.valueOf(docDate.getMonth()+1);
+        String day = String.valueOf(docDate.getDate());
+
+    while (month.length()<2){
+        month="0"+month;
+
+    }
+    while (day.length()<2){
+        day="0"+day;
+    }
+
+    return Integer.valueOf(year+month+day);
     }
 
     /**
