@@ -4,6 +4,9 @@ import Indexing.Index.CityIndexEntry;
 import Indexing.Index.DocIndexEntery;
 import Indexing.Index.IndexEntry;
 import Indexing.Index.Indexer;
+import Querying.Ranking.Ranker;
+import Querying.Ranking.RankingParameters;
+import Querying.Ranking.WeightedBM25Ranker;
 import Querying.Semantics.SemanticEngine;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package Querying;
+package Querying.Ranking;
 
 import Indexing.Index.Posting;
 

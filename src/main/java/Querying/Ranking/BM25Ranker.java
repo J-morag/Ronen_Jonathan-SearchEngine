@@ -1,4 +1,4 @@
-package Querying;
+package Querying.Ranking;
 
 /**
  * A {@link Ranker Ranker} implementation that uses the BM25+ formula to rank documents.

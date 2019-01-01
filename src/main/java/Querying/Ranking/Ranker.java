@@ -1,6 +1,5 @@
-package Querying;
+package Querying.Ranking;
 
-import Indexing.Index.Posting;
 import javafx.util.Pair;
 
 import java.util.*;
