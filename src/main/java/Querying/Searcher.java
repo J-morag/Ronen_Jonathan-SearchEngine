@@ -56,6 +56,7 @@ public class Searcher {
     public List<String> answerquery(String query , Boolean withSemantics){
 
         List<String> relevantDocuments=new ArrayList<>();
+        Set<String> termSet = new HashSet<>();
         Set<String> noStemmingTermSet=null;
         Pair<String, Double>[] synonymArr = new Pair[0];
         if(withSemantics) {
@@ -73,14 +74,25 @@ public class Searcher {
             //
         }
 
-        List<String> listOfStrings =parser.tokenize(query);
-        List<Term> listOfTerms = parser.parseWorker(listOfStrings);
-        Set<String> termSet = new HashSet<>();
-        for (int i = 0; i <listOfTerms.size() ; i++) {
-            termSet.add(listOfTerms.get(i).toString());
+        if (isUsedStemming) {
+            List<String> listOfStrings = parser.tokenize(query);
+            List<Term> listOfTerms = parser.parseWorker(listOfStrings);
+            for (int i = 0; i < listOfTerms.size(); i++) {
+                termSet.add(listOfTerms.get(i).toString());
+            }
+            listOfTerms.clear();
+            listOfTerms = null;
+        }else{
+            parser.useStemming = false;
+            List<String> notStemmedListOfStrings = parser.tokenize(query);
+            List<Term> notStemmedListOfTerms = parser.parseWorker(notStemmedListOfStrings);
+            for (int i = 0; i < notStemmedListOfTerms.size(); i++) {
+                termSet.add(notStemmedListOfTerms.get(i).toString());
+            }
+            parser.useStemming = isUsedStemming;
         }
-        listOfTerms.clear();
-        listOfTerms=null;
+
+
 
         List<ExpandedPosting> queryPostingList = new ArrayList<>();
         List<ExpandedPosting> synonymPostingList = new ArrayList<>();
@@ -109,7 +121,8 @@ public class Searcher {
                     int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
                     int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
                     int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
-                    queryPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm));
+                    Date date = convertToDateFromInt(docsDictionary.get(posting.getDocSerialID()).getDate());
+                    queryPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm,date));
                 }
 
 
@@ -142,7 +155,8 @@ public class Searcher {
                         int numOfUniqueWords = docsDictionary.get(posting.getDocSerialID()).getNumOfUniqueWords();
                         int maxTFdoc = docsDictionary.get(posting.getDocSerialID()).getMaxTF();
                         int docLength = docsDictionary.get(posting.getDocSerialID()).getLength();
-                        synonymPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm));
+                        Date date = convertToDateFromInt(docsDictionary.get(posting.getDocSerialID()).getDate());
+                        synonymPostingList.add(new ExpandedPosting(posting,totalTF,df,numOfUniqueWords,maxTFdoc,docLength,stringTerm,date));
                     }
                 }
 
@@ -176,6 +190,22 @@ public class Searcher {
 
 
         return relevantDocuments.size()>50 ? relevantDocuments.subList(0,50) : relevantDocuments ;
+    }
+
+    private Date convertToDateFromInt(int date) {
+        if (date>0) {
+            String dateAsString = String.valueOf(date);
+            String year =dateAsString.substring(0,4);
+            String month = dateAsString.substring(4,6);
+            String day = dateAsString.substring(6,8);
+            Date Ndate = new Date();
+            Ndate.setDate(Integer.valueOf(year));
+            Ndate.setMonth(Integer.valueOf(month)-1);
+            Ndate.setYear(Integer.valueOf(day)-1900);
+            return Ndate;
+        }else {
+            return null;
+        }
     }
 
     /**
