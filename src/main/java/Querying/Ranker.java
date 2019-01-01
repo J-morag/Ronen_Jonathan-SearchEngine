@@ -106,17 +106,7 @@ public abstract class Ranker {
         return Math.log10(numerator/denominator);
     }
 
-    /**
-     * calculate additional bonuses to a posting's relevance by whether a posting appeared in the title of a document,
-     * or in the document's beginning.
-     * @param ePosting information about a term's appearance in a document.
-     * @return bonuses to a posting's relevance ranking.
-     */
-    protected double getMetadataBonuses(ExpandedPosting ePosting){
-        Posting p = ePosting.posting;
-        return rankingParameters.titleWeight * (p.isInTitle() ? 1 : 0) +
-                rankingParameters.beginningWeight * (p.isInBeginning() ? 1 : 0);
-    }
+
 
     /**
      * After a rank was calculated for a term appearing in a document, it is necessary to to add that rank to the
