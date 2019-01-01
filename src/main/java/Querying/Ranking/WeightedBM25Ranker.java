@@ -52,15 +52,16 @@ public class WeightedBM25Ranker extends BM25Ranker{
      * Gives a 0 bonus for documents happening in the future.
      * Gives a negative bonus for documents more than 40 years old.
      * @param expandedPosting information about a term's appearance in a document.
-     * @return bonuses to a posting's relevance ranking, based on recency.
+     * @return bonuses to a posting's relevance ranking, based on recency. 0 if expandedPosting.date is null.
      */
     protected double getDateBonus(ExpandedPosting expandedPosting){
+        if(expandedPosting.date == null) return 0;
         Date currDate = Calendar.getInstance().getTime();
         int monthDelta = currDate.getMonth() - expandedPosting.date.getMonth();
         int yearDelta = currDate.getYear() - expandedPosting.date.getYear();
         int totalMonthDelta = yearDelta*12 + monthDelta;
         double normalizedTimeDelta = (double)totalMonthDelta/480.0; //normalize to the number of months in 40 years
         return normalizedTimeDelta < 0 ? 0 /*a negative value indicates an invalid, future date*/ :
-                1 - normalizedTimeDelta /*better bonuses for documents with a smaller delta*/;
+                1 - normalizedTimeDelta /*better bonuses for documents with a smaller delta (newer)*/;
     }
 }
