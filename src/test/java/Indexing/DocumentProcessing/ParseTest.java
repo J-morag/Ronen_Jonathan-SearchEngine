@@ -69,7 +69,7 @@ class ParseTest {
         Parse p = new Parse(Parse.getStopWords(pathToStopwords),
                 docs, termDocs, false);
         Parse.debug = false;
-        final boolean saveToDisk = false;
+        final boolean saveToDisk = true;
         Thread parser1 = new Thread(p);
 
         SortedSet<Term> terms = new TreeSet<>();
@@ -292,6 +292,41 @@ class ParseTest {
         DecimalFormat formatter = new DecimalFormat("#,###");
         System.out.println("Total number of unique number/price/percent terms: " + formatter.format(termsNumberOrPriceOrPercent.size()));
         System.out.println("Total number of unique pure number terms: " + formatter.format(numUniquePureNumberTerms.get()));
+    }
+
+    @Test
+    void countDocsWithDate() throws Exception {
+        Parse p = new Parse(Parse.getStopWords(pathToStopwords),
+                docs, termDocs, true);
+        Parse.debug = false;
+        Thread parser1 = new Thread(p);
+
+        ReadFile rf = new ReadFile(pathToDocumentsFolder, docs);
+        Thread reader = new Thread(rf);
+
+        reader.start();
+        parser1.start();
+
+        int docsWithDate = 0;
+        int docsWithoutDate = 0;
+        while(true){
+            TermDocument doc  = termDocs.take();
+            if(doc.getText() == null) {
+                break;
+            }
+            else if(doc.date != null) docsWithDate++;
+            else docsWithoutDate++;
+        }
+
+        try {
+            parser1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        System.out.println("total number of parsed dates: " + formatter.format(docsWithDate));
+        System.out.println("Total number of documents where date was missing or unparsable: " + formatter.format(docsWithoutDate));
     }
 
     @Test

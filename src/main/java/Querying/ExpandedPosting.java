@@ -2,6 +2,8 @@ package Querying;
 
 import Indexing.Index.Posting;
 
+import java.util.Date;
+
 /**
  * adds more information to the {@link Posting Posting} to allow ranking of documents for queries.
  */
@@ -14,6 +16,7 @@ public class ExpandedPosting {
     public final int maxTF_doc;
     public final int doc_length;
     public final String term;
+    public Date date;
 
 
     public ExpandedPosting(Posting posting, int totalTF_term, int df_term, int numOfUniqueWords_doc, int maxTF_doc,int doc_length, String term) {

@@ -88,6 +88,8 @@ public class SemanticEngine {
         }
     }
 
+
+
     /**
      * finds the nearest semantic neighbors (synonyms) for the given words.
      * @param words the words to find neighbors for.
@@ -118,6 +120,39 @@ public class SemanticEngine {
             neighborStrings.addAll(getNearestNeighbors(word));
         }
         return neighborStrings;
+    }
+
+
+    /**
+     * finds the nearest semantic neighbors (synonyms) for the given word.
+     * @param word the word to find neighbors for.
+     * @return the nearest semantic neighbors (synonyms) for the given word. If word is null, returns null. If no neighbors were found or word wasn't found, returns an empty list.
+     * @throws IOException if an error occurs while retrieving the vector for word from the GloVe files.
+     */
+    public List<String> getNearestNeighborsStrings(String word) throws IOException {
+        if(word == null) return null;
+
+        DoubleVector v = reader.get(word);
+        if (v == null) {
+            // word does'nt exist in vectors
+            return new ArrayList<String>();
+        } else {
+            List<VectorDistanceTuple<String>> nearestNeighbours = tree
+                    .getNearestNeighbours(v, kNeighbors + 1); //+1 because the same word will also be retrieved.
+
+            // sort and remove the one that we searched for
+            Collections.sort(nearestNeighbours, Collections.reverseOrder());
+            // the best hit is usually the same item with distance 0
+            if (nearestNeighbours.get(0).getValue().equals(word)) {
+                nearestNeighbours.remove(0);
+            }
+
+            ArrayList<String> neighborStrings = new ArrayList<>(nearestNeighbours.size());
+            for (VectorDistanceTuple<String> tuple : nearestNeighbours) {
+                neighborStrings.add(tuple.getValue());
+            }
+            return neighborStrings;
+        }
     }
 
 

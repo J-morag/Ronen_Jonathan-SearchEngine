@@ -1,6 +1,7 @@
 package Indexing.DocumentProcessing;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public class TermDocument implements Serializable {
     private Term city;
     private List<Term> title;
     private List<Term> text;
-    private List<Term> date;
+    public final Date date;
     public String language="";
 
     /**
@@ -21,26 +22,27 @@ public class TermDocument implements Serializable {
      * @param doc - fields that don't require parsing will be taken from here.
      * @param fields - a list of fields defined by the order that {@link Document} given in {@link Document#getAllParsableFields()}.
      */
-    public TermDocument(int serialID, Document doc, List<Term>[] fields) {
+    public TermDocument(int serialID, Document doc, Date date, List<Term>[] fields) {
         this.serialID = serialID;
         this.docId = doc.getDocId();
         this.language = doc.getLanguage();
         this.title = fields[0];
         this.text = fields[1];
-        this.date = fields[2];
-        if(!fields[3].isEmpty()) this.city = fields[3].get(0);
+        this.date = date;
+        if(!fields[2].isEmpty()) this.city = fields[2].get(0);
     }
 
-    public TermDocument(int serialID, Document doc) {
+    public TermDocument(int serialID, Document doc, Date date) {
         this.serialID = serialID;
         if (null != doc){
             this.docId = doc.getDocId();
             this.language = doc.getLanguage();
-
+            this.date = date;
         }
         else{
-            docId = null;
-            language = null;
+            this.docId = null;
+            this.language = null;
+            this.date = null;
         }
     }
 

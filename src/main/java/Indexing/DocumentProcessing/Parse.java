@@ -1,8 +1,11 @@
 package Indexing.DocumentProcessing;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +27,31 @@ public class Parse implements Runnable{
     private HashMap<String, String> months;
     private TokenType currType;
     private boolean bIteratorHasNext = true;
+    private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{
+        put("^\\d{8}$", "yyyyMMdd");
+        put("^\\d{1,2}-\\d{1,2}-\\d{4}$", "dd-MM-yyyy");
+        put("^\\d{4}-\\d{1,2}-\\d{1,2}$", "yyyy-MM-dd");
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}$", "MM/dd/yyyy");
+        put("^\\d{4}/\\d{1,2}/\\d{1,2}$", "yyyy/MM/dd");
+        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}$", "dd MMM yyyy");
+        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}$", "dd MMMM yyyy");
+        put("^\\d{12}$", "yyyyMMddHHmm");
+        put("^\\d{8}\\s\\d{4}$", "yyyyMMdd HHmm");
+        put("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}$", "dd-MM-yyyy HH:mm");
+        put("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}$", "yyyy-MM-dd HH:mm");
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}$", "MM/dd/yyyy HH:mm");
+        put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}$", "yyyy/MM/dd HH:mm");
+        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}$", "dd MMM yyyy HH:mm");
+        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}$", "dd MMMM yyyy HH:mm");
+        put("^\\d{14}$", "yyyyMMddHHmmss");
+        put("^\\d{8}\\s\\d{6}$", "yyyyMMdd HHmmss");
+        put("^\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd-MM-yyyy HH:mm:ss");
+        put("^\\d{4}-\\d{1,2}-\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy-MM-dd HH:mm:ss");
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "MM/dd/yyyy HH:mm:ss");
+        put("^\\d{4}/\\d{1,2}/\\d{1,2}\\s\\d{1,2}:\\d{2}:\\d{2}$", "yyyy/MM/dd HH:mm:ss");
+        put("^\\d{1,2}\\s[a-z]{3}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMM yyyy HH:mm:ss");
+        put("^\\d{1,2}\\s[a-z]{4,}\\s\\d{4}\\s\\d{1,2}:\\d{2}:\\d{2}$", "dd MMMM yyyy HH:mm:ss");
+    }};
 
     private AtomicInteger docSerialId;
 
@@ -72,7 +100,7 @@ public class Parse implements Runnable{
                 sinkTermDocumentQueue.put(parseOneDocument(currDoc));
             }
         }
-        TermDocument poison = new TermDocument(-1,null);
+        TermDocument poison = new TermDocument(-1, null, null);
         sinkTermDocumentQueue.put(poison);
 
     }
@@ -95,7 +123,9 @@ public class Parse implements Runnable{
             parsedFields[i] = parseWorker(tokenize(originalFields[i]));
         }
 
-        return new TermDocument(docSerialId.getAndIncrement(), doc, parsedFields);
+        Date docDate = parseDocDate(doc.getDate());
+
+        return new TermDocument(docSerialId.getAndIncrement(), doc, docDate, parsedFields);
     }
 
     //          Tokenizing
@@ -907,6 +937,45 @@ public class Parse implements Runnable{
         if (iter.hasPrevious())
             currString = iter.previous();
         safeIterateAndCheckType(iter);
+    }
+
+    /**
+     * parses a document's date string to a Date object.
+     * @param dateString a string representing the date of the document.
+     * @return a Date object, or null if the string is empty or null or if the date format is unrecognized or unparsable.
+     */
+    private static Date parseDocDate(@Nullable String dateString){
+        if(dateString == null || dateString.isEmpty()) return null; //no date
+        dateString = dateString.trim(); //clean trailing or leading whitespaces
+        String dateFormat = determineDateFormat(dateString);
+        if(dateFormat == null) return null; //unrecognized date format
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        simpleDateFormat.setLenient(false); // Don't automatically convert invalid date.
+        Date date = null;
+        try{
+            date = simpleDateFormat.parse(dateString);
+        }
+        //shouldn't happen, because the string has already been checked to verify validity.
+        //regardless return null if a parse exception does happen.
+        catch (ParseException e){
+            return null;
+        }
+        return date;
+    }
+
+    /**
+     * Determine SimpleDateFormat pattern matching with the given date string. Returns null if
+     * format is unknown. You can simply extend DateUtil with more formats if needed.
+     * @param dateString The date string to determine the SimpleDateFormat pattern for.
+     * @return The matching SimpleDateFormat pattern, or null if format is unknown.
+     */
+    private static String determineDateFormat(String dateString) {
+        for (String regexp : DATE_FORMAT_REGEXPS.keySet()) {
+            if (dateString.toLowerCase().matches(regexp)) {
+                return DATE_FORMAT_REGEXPS.get(regexp);
+            }
+        }
+        return null; // Unknown format.
     }
 
     /**

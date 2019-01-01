@@ -261,7 +261,7 @@ public class Model {
                     }
                 }
                 // poison element at end
-                TermDocument poison = new TermDocument(-1,null);
+                TermDocument poison = new TermDocument(-1,null, null);
                 termDocumentsBuffer.put(poison);
                 in.close();
             } catch (IOException e) {

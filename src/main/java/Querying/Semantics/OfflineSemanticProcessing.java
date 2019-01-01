@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  */
 public class OfflineSemanticProcessing {
 
-    private static String textFilePath = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\glove.6B.50d.txt";
+    private static String textFilePath = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors\\customVectors.txt";
     private static String pathToGloveFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe";
     private static String pathToCorpus = "C:\\Users\\John\\Downloads\\infoRetrieval\\corpus";
     private static String pathToOutputParsedWordVectors = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\corpus_as_word_vectors.txt";
