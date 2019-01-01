@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class OfflineSemanticProcessing {
 
     private static String textFilePath = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors\\customVectors.txt";
-    private static String pathToGloveFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe";
+    private static String pathToGloveFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors";
     private static String pathToCorpus = "C:\\Users\\John\\Downloads\\infoRetrieval\\corpus";
     private static String pathToOutputParsedWordVectors = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\corpus_as_word_vectors.txt";
     private static String pathToStopwords = "C:/Users/John/Google Drive/Documents/1Uni/Semester E/information retrieval 37214406/Assignements/Ass1/stop_words.txt";
@@ -29,8 +29,8 @@ public class OfflineSemanticProcessing {
 
     public static void main(String[] args) {
         try {
-            textGloVeToBinaryGloVe();
-//            corpusToParsedWordVectors(false);
+//            textGloVeToBinaryGloVe();
+            corpusToParsedWordVectors(true);
 //            corpusToParsedWordVector(false);
         } catch (Exception e) {
             e.printStackTrace();
