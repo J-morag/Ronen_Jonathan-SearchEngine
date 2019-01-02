@@ -50,6 +50,11 @@ public abstract class Ranker {
         return sortDocsByRank(rankedDocs);
     }
 
+    /**
+     * sorts the documents by their rank
+     * @param rankedDocs documents with their rank
+     * @return a list of documents, sorted by their rank (without their rank)
+     */
     private List<Integer> sortDocsByRank(Map<Integer, Double> rankedDocs) {
         //sort by rank
         Map.Entry[] docsAsEntries = new Map.Entry[rankedDocs.size()];

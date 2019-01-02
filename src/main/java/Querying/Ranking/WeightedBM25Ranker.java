@@ -24,6 +24,12 @@ public class WeightedBM25Ranker extends BM25Ranker{
         return calculateRankForPosting(ePosting, false);
     }
 
+    /**
+     * calculates a rank with the BM25 algorithm's step (the inside of the sum loop)
+     * @param ePosting the posting to calculate for
+     * @param isExplicit whether or not a term was explicitly in a query
+     * @return a rank score for one posting, according to the BM25 algorithm.
+     */
     double calculateRankForPosting(ExpandedPosting ePosting, boolean isExplicit) {
         return ((super.calculateRankForPosting(ePosting) /*BM25*/ * rankingParameters.frequencyWeight)
                 + getMetadataBonuses(ePosting) + getRecencyBonus(ePosting)) *
@@ -62,6 +68,12 @@ public class WeightedBM25Ranker extends BM25Ranker{
                 1 - normalizedTimeDelta /*better bonuses for documents with a smaller delta (newer)*/) * rankingParameters.recencyWeight;
     }
 
+    /**
+     * returns a ranking for how close a term is to being explicitly in the query
+     * @param ePosting information about a term's appearance in a document.
+     * @param isExplicit whether or not a term was explicitly in a query
+     * @return 1 if the term is in the query, 0<=value<1 if the term was derived semantically from the query
+     */
     protected double getExplicitness(ExpandedPosting ePosting, boolean isExplicit){
         return
         /* weight of 1 for explicit, calculated weight (<=1) for implicit*/

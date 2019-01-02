@@ -14,6 +14,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * contains a static function for optimizing the ranking parameters, using a hill climbing algorithm.
+ */
 public class HillClimbingOptimizer {
 
     private static String pathToPostingsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
@@ -42,6 +45,15 @@ public class HillClimbingOptimizer {
         }
     }
 
+    /**
+     * initializes fields in preparation of optimization
+     * @param useStemming
+     * @param kNeighbors
+     * @param cityList
+     * @param rankingParameters
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     static void initialize(boolean useStemming, int kNeighbors, HashSet<String> cityList, RankingParameters rankingParameters) throws IOException, ClassNotFoundException {
         loadDictionaries(useStemming, pathToPostingsFolder);
         int numDocsInCorpus = useStemming? docDictionaryWithStemming.size() : docDictionaryNoStemming.size();
@@ -70,6 +82,12 @@ public class HillClimbingOptimizer {
         return toReturn;
     }
 
+    /**
+     * starts the hill climbing optimization
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws InterruptedException
+     */
     static void hillClimbing() throws IOException, ClassNotFoundException, InterruptedException {
         Scanner sc = new Scanner(System.in);
         String input;
@@ -90,8 +108,6 @@ public class HillClimbingOptimizer {
         String formattedDate=dateFormat.format(date);
         String outputPath = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\paramOptimization " + formattedDate + ".txt";
 
-//        double[] inputVector =  {1, 1, 1, 1, 1, 1, 1};
-//        double[] inputVector = {1, 0.1, 1, 0.3, 0, 1.5, 1};
         double[] inputVector = {1.3, 0.1, 1, 0.3, 0, 1.5, 0.6};
 //        double[] inputVector = {1.2, 0.2, 1, 0.35, 0, 1.6, 0.75};
         int numParameters = inputVector.length;
@@ -196,9 +212,16 @@ public class HillClimbingOptimizer {
             }
         }
 
-//        return result.toString();
     }
 
+    /**
+     * run the ranker on a set of queries and returns the RPrecision value
+     * @param withSemantics
+     * @return the RPrecision value
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws InterruptedException
+     */
     static double BM25Run(boolean withSemantics) throws IOException, ClassNotFoundException, InterruptedException {
         List<QueryResult> qRes = new ArrayList<>();
 
@@ -252,6 +275,14 @@ public class HillClimbingOptimizer {
         return RPrecision;
     }
 
+    /**
+     * loads the dictionaries
+     * @param useStemming
+     * @param outputFolder
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws ClassCastException
+     */
     public static void loadDictionaries(boolean useStemming, String outputFolder) throws IOException, ClassNotFoundException, ClassCastException {
         ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' + (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
         ObjectInputStream inDocDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +

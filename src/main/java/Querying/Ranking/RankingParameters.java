@@ -10,7 +10,6 @@ public class RankingParameters {
     public final double beginningWeight;
     public final double frequencyWeight;
     public final double implicitTermMatchWeight;
-//    public final double semanticSimilarityWeight;
     public final double recencyWeight;
     public final double k_BM25;
     public final double b_BM25;

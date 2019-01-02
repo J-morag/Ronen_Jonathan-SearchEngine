@@ -56,12 +56,21 @@ public class BM25Ranker extends Ranker {
     }
 
 
+    /**
+     * see parent class
+     * @param ePosting information about the term and the document it appears in.
+     * @return
+     */
     @Override
     protected double calculateRankForExplicitPosting(ExpandedPosting ePosting) {
         return calculateRankForPosting(ePosting);
     }
 
-
+    /**
+     * see parent class
+     * @param ePosting information about the term and the document it appears in.
+     * @return
+     */
     @Override
     protected double calculateRankForImplicitPosting(ExpandedPosting ePosting) {
         return calculateRankForPosting(ePosting);
