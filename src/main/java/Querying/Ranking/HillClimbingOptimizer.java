@@ -99,18 +99,19 @@ public class HillClimbingOptimizer {
         initialize(true, 5, new HashSet<>(),
                 new RankingParameters(paramVector[0], paramVector[1], paramVector[2], paramVector[3], paramVector[4], paramVector[5], paramVector[6]));
         boolean useSemantics = true;
-        int numIterations = 3;
+        int numIterations = 4;
         double initialStepSize = 0.1;
-        int maxNoGrowthSteps = 3;
+        int maxNoGrowthSteps = 2;
         double stepSize = initialStepSize;
         Random rnd = new Random();
 
         double originalFitness = BM25Run(useSemantics);
         System.out.println("starting hill climbing with " + numIterations + " iterations, with initial step size of " + initialStepSize);
         System.out.println("starting fitness is: " + originalFitness + "\n");
+        initialStepSize *= 2;
         for (int i = 0; i < numIterations; i++) {
             System.out.println("starting iteration " + i);
-            stepSize = initialStepSize/(i+1);
+            stepSize = initialStepSize/2;
             System.out.println("step size is: " + stepSize);
             boolean[] paramAlreadyOptimized = new boolean[numParameters];
             //for each optimization parameter
@@ -142,9 +143,9 @@ public class HillClimbingOptimizer {
 
                 //reset for down phase
                 //revert to original vector if no improvement was registered
-                paramVector = (newFitness <= originalFitness ? Arrays.copyOf(originalParamVector , numParameters) : paramVector);
+                paramVector = (currFitness <= originalFitness ? Arrays.copyOf(originalParamVector , numParameters) : paramVector);
                 //set original to self if no improvement, or to the new vector, if it resulted in an improvement.
-                originalParamVector = (newFitness <= originalFitness ? originalParamVector : Arrays.copyOf(paramVector , numParameters));
+                originalParamVector = (currFitness <= originalFitness ? originalParamVector : Arrays.copyOf(paramVector , numParameters));
                 //set original to self if no improvement, or to the new fitness, if it was an improvement.
                 originalFitness = Math.max(originalFitness, currFitness);
 
@@ -161,7 +162,7 @@ public class HillClimbingOptimizer {
                 //revert the step that caused fitness to decrease or stagnate
                 paramVector[paramIndex] = paramVector[paramIndex]+stepSize;
                 //revert to original vector if no improvement was registered
-                paramVector = (newFitness <= originalFitness ? Arrays.copyOf(originalParamVector , numParameters) : paramVector);
+                paramVector = (currFitness <= originalFitness ? Arrays.copyOf(originalParamVector , numParameters) : paramVector);
                 //set original to self if no improvement, or to the new fitness, if it was an improvement.
                 originalFitness = Math.max(originalFitness, currFitness);
             }
@@ -177,7 +178,7 @@ public class HillClimbingOptimizer {
         result.append("Finished " + numIterations + " iterations, initial step size: " + initialStepSize + ", final step size: " + stepSize + "\r\n");
         result.append("original vector: [");
         for (int i = 0; i < paramVector.length ; i++) {
-            result.append(paramVector[i] + ((i < numParameters -1) ? ", " : "]\r\n"));
+            result.append(inputVector[i] + ((i < numParameters -1) ? ", " : "]\r\n"));
         }
         result.append("Fittest vector : [");
         for (int i = 0; i < paramVector.length ; i++) {
