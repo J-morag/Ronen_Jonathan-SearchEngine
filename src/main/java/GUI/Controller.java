@@ -65,7 +65,7 @@ public class Controller {
 
     public List<View.ObservableTuple> getDictionary() {
         Map<String, IndexEntry> dictionary = model.getDictionary(view.isUseStemming());
-        List<View.ObservableTuple> res = new LinkedList<>();
+        List<View.ObservableTuple> res = new ArrayList<>();
         if(null == dictionary){
            return res;
         }
