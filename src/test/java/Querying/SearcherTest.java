@@ -17,11 +17,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 class SearcherTest {
-
+/*
     private final String pathToPostingsFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\indexing";
     private final String pathToResultsOutputFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults";
     private final String pathToGloVeFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors";
-
+*/
+    private final String pathToPostingsFolder = "C:\\Users\\ronen\\Desktop\\test";
+    private final String pathToResultsOutputFolder = "C:\\Users\\ronen\\Desktop\\New folder (2)";
+    private final String pathToGloVeFilesFolder = "C:\\Users\\ronen\\IdeaProjects\\Ronen_Jonathan-SearchEngine\\resources\\Word2Vec";
 
     Ranker ranker;
     Searcher searcher;
@@ -56,24 +59,26 @@ class SearcherTest {
         initialize(true, 5, new HashSet<>(),
                 new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75));
         boolean withSemantics = true;
+        boolean useStemming=true;
+
 
         List<QueryResult> qRes = new ArrayList<>();
 
-        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics))));
-        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics))));
-        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics))));
-        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics))));
-        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics))));
-        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics))));
-        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics))));
-        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics))));
-        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics))));
-        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics))));
-        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics))));
-        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics))));
-        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics))));
-        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics))));
-        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics))));
+        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics),useStemming)));
+        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics),useStemming)));
+        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics),useStemming)));
+        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics),useStemming)));
         Searcher.outputResults(qRes, pathToResultsOutputFolder);
 
         Runtime rt = Runtime.getRuntime();
@@ -112,21 +117,21 @@ class SearcherTest {
 
         List<QueryResult> qRes = new ArrayList<>();
 
-        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics))));
-        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics))));
-        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics))));
-        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics))));
-        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics))));
-        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics))));
-        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics))));
-        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics))));
-        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics))));
-        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics))));
-        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics))));
-        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics))));
-        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics))));
-        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics))));
-        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics))));
+        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics),useStemming)));
+        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics),useStemming)));
+        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics),useStemming)));
+        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics),useStemming)));
+        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics),useStemming)));
 
         for (QueryResult queryResult: qRes
              ) {
@@ -136,9 +141,9 @@ class SearcherTest {
 
             Runtime rt = Runtime.getRuntime();
 //        rt.exec("cd C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\");
-            String[] commands = {"C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\treceval.exe",
-                    "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\qrels",
-                    "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\results.txt"};
+            String[] commands = {"C:\\Users\\ronen\\Desktop\\New folder (2)\\treceval.exe",
+                    "C:\\Users\\ronen\\Desktop\\New folder (2)\\qrel.txt",
+                    "C:\\Users\\ronen\\Desktop\\New folder (2\\results.txt"};
             Process proc = rt.exec(commands);
 
             BufferedReader stdInput = new BufferedReader(new
@@ -148,7 +153,7 @@ class SearcherTest {
                     InputStreamReader(proc.getErrorStream()));
 
             // read the output from the command
-            PrintWriter out = new PrintWriter("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\statisticForReport"
+            PrintWriter out = new PrintWriter("C:\\Users\\ronen\\Desktop\\New folder (2)\\statisticForReport"
                     + (useStemming? "withStemming" : "") + (withSemantics? "withSemantics" : "") + ".txt");
             String s = null;
             while ((s = stdInput.readLine()) != null) {
@@ -165,10 +170,14 @@ class SearcherTest {
 
     }
 
-    private List<String> convertFromSerialIDtoDocID(List<String> docsSerialID){
+    private List<String> convertFromSerialIDtoDocID(List<String> docsSerialID ,boolean useStemming ){
         List<String> toReturn = new ArrayList<>();
         for (String st: docsSerialID) {
-            toReturn.add(docDictionaryWithStemming.get(Integer.parseInt(st)).getDocID());
+            if (useStemming) {
+                toReturn.add(docDictionaryWithStemming.get(Integer.parseInt(st)).getDocID());
+            }else {
+                toReturn.add(docDictionaryNoStemming.get(Integer.parseInt(st)).getDocID());
+            }
         }
         return toReturn;
     }
