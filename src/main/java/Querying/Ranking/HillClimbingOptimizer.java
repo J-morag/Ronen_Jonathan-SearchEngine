@@ -92,14 +92,14 @@ public class HillClimbingOptimizer {
 
 //        double[] inputVector =  {1, 1, 1, 1, 1, 1, 1};
 //        double[] inputVector = {1, 0.1, 1, 0.3, 0, 1.5, 1};
-        double[] inputVector = {1.3, 0.1, 1, 0.25, 0, 1.5, 0.6};
+        double[] inputVector = {1.3, 0.1, 1, 0.3, 0, 1.5, 0.6};
 //        double[] inputVector = {1.2, 0.2, 1, 0.35, 0, 1.6, 0.75};
         int numParameters = inputVector.length;
         double[] paramVector = Arrays.copyOf(inputVector, numParameters);
         initialize(true, 5, new HashSet<>(),
                 new RankingParameters(paramVector[0], paramVector[1], paramVector[2], paramVector[3], paramVector[4], paramVector[5], paramVector[6]));
         boolean useSemantics = true;
-        int numIterations = 4;
+        int numIterations = 5;
         double initialStepSize = 0.1;
         int maxNoGrowthSteps = 2;
         double stepSize = initialStepSize;
@@ -108,10 +108,10 @@ public class HillClimbingOptimizer {
         double originalFitness = BM25Run(useSemantics);
         System.out.println("starting hill climbing with " + numIterations + " iterations, with initial step size of " + initialStepSize);
         System.out.println("starting fitness is: " + originalFitness + "\n");
-        initialStepSize *= 2;
+        initialStepSize /= 0.75;
         for (int i = 0; i < numIterations; i++) {
             System.out.println("starting iteration " + i);
-            stepSize = initialStepSize/2;
+            stepSize = initialStepSize*0.75;
             System.out.println("step size is: " + stepSize);
             boolean[] paramAlreadyOptimized = new boolean[numParameters];
             //for each optimization parameter
