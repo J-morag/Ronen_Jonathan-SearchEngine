@@ -407,6 +407,7 @@ public class Model {
         result.setEntities(entities);
         result.setRelevantDocs(docsID);
         result.setEntRanking(rankedEnt);
+        results.add(result);
         return results;
 
     }

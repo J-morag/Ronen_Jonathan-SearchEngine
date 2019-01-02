@@ -24,9 +24,11 @@ import java.io.IOException;
 public class View {
 
     private Controller controller;
-
+    @FXML
     public TextField txtfld_corpus_location;
+    @FXML
     public TextField txtfld_stopwords_location;
+    @FXML
     public TextField txtfld_output_location;
 
     public Button btn_corpus_browse;
@@ -51,6 +53,8 @@ public class View {
         tooltip.setText("Checking this will prioritize using less system memory, but greatly increase runtime");
         chkbox_memory_saver.setTooltip(tooltip);
         view_search.setDisable(true);
+        //txtfld_output_location.
+
     }
 
     public CharSequence getOutputLocation(){
@@ -167,7 +171,6 @@ public class View {
             btn_reset.setDisable(false);
             btn_display_dictionary.setDisable(false);
             view_search.setDisable(false);
-
         }
     }
 

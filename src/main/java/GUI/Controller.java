@@ -91,7 +91,7 @@ public class Controller {
     }
 
     public Alert loadDictionary() {
-        String outputLocation = view.getOutputLocation().toString();
+        String outputLocation = view.getOutputLocation();
 
         if(outputLocation.isEmpty() ) return new Alert(Alert.AlertType.ERROR, "Please specify output folder location.");
         try {

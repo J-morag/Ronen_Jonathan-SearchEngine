@@ -173,7 +173,6 @@ public class SearchView  {
 
     public void answerMultipleQueries(String pathToQueryFile){
         result = myController.answerMultipleQueries(pathToQueryFile , getCityFilter() , search_semantic.isSelected() ,useStemming,pathToOutpotFolder);
-        printResult();
     }
 
     public void onBackCliked(){
