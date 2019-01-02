@@ -156,6 +156,11 @@ public class MainIndexMaker extends AIndexMaker {
 
     }
 
+    /**
+     * this method converts a Date object to int that represent the same date
+     * @param docDate
+     * @return
+     */
     private int convertDateToInt(Date docDate) {
 
         String year = String.valueOf(1900+docDate.getYear());

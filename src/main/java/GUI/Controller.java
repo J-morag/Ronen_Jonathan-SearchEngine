@@ -110,7 +110,10 @@ public class Controller {
         return alert;
     }
 
-
+    /**
+     * this method runs a function on the model that retrieve  a set with all of the cites in the corpus
+     * @return
+     */
     public Set<String> getAllCities(){
       return  model.getAllCities();
     }

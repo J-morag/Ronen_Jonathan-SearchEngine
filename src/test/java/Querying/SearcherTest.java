@@ -141,9 +141,9 @@ class SearcherTest {
 
             Runtime rt = Runtime.getRuntime();
 //        rt.exec("cd C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\");
-            String[] commands = {"C:\\Users\\ronen\\Desktop\\New folder (2)\\treceval.exe",
-                    "C:\\Users\\ronen\\Desktop\\New folder (2)\\qrel.txt",
-                    "C:\\Users\\ronen\\Desktop\\New folder (2\\results.txt"};
+            String[] commands = {"\"C:\\Users\\ronen\\Desktop\\New folder (2)\\treceval.exe\"",
+                    "\"C:\\Users\\ronen\\Desktop\\New folder (2)\\qrel.txt\"",
+                    "\"C:\\Users\\ronen\\Desktop\\New folder (2)\\results.txt\""};
             Process proc = rt.exec(commands);
 
             BufferedReader stdInput = new BufferedReader(new
