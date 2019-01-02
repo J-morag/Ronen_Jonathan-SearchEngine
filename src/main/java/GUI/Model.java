@@ -354,6 +354,10 @@ public class Model {
                 "Total time (seconds) = " + executionTime ;
     }
 
+    /**
+     * creat a set of all of the cities in the corpus
+     * @return
+     */
     public Set<String> getAllCities(){
         Set<String> allCites = new HashSet<>();
         for (String city : cityDictionary.keySet() ) {
@@ -363,6 +367,10 @@ public class Model {
         return allCites;
     }
 
+    /**
+     * this method returns the average doc size
+     * @return
+     */
     public double getAvargeDocSize(){
         return avargeDocSize;
     }

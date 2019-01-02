@@ -38,7 +38,7 @@ public class SearchView  {
     public Button search_saveBrowse;
     public TextField search_saveText;
     public Button search_viewResultButton;
-    public Label search_backLable;
+    //public Label search_backLable;
 
     private List<QueryResult> result;
     private boolean useStemming;
@@ -126,6 +126,7 @@ public class SearchView  {
 
 
     public void onClearCliked(){
+
      search_semantic.setSelected(false);
      search_queryText.clear();
      search_queryFile.clear();
@@ -176,17 +177,28 @@ public class SearchView  {
         result = myController.answerMultipleQueries(pathToQueryFile , getCityFilter() , search_semantic.isSelected() ,useStemming,pathToOutpotFolder);
     }
 
-    public void onBackCliked(){
-        try{
-            FXMLLoader loader = new FXMLLoader();
-            BorderPane pane = loader.load(getClass().getResource("View.fxml").openStream());
-            root_pane.getChildren().setAll(pane);
-            View view = loader.getController();
-            view.setController(myController);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void onBackCliked(){
+//        try{
+////            FXMLLoader loader = new FXMLLoader();
+////            BorderPane pane = loader.load(getClass().getResource("View.fxml").openStream());
+////            root_pane.getChildren().setAll(pane);
+////            View view = loader.getController();
+////            view.setController(myController);
+//
+//
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("View.fxml"));
+//            Stage stage = new Stage();
+//            stage.setScene(new Scene((Pane) loader.load()));
+//            View view = loader.<View>getController();
+//            view.setController(myController);
+//
+//            stage.show();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void printResult(){
         for (QueryResult res : result) {
             List<String>docs = res.getRelevantDocs();

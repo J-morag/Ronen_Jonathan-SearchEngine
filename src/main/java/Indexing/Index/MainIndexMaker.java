@@ -156,6 +156,11 @@ public class MainIndexMaker extends AIndexMaker {
 
     }
 
+    /**
+     * this method converts a Date object to int that represent the same date
+     * @param docDate
+     * @return
+     */
     private int convertDateToInt(Date docDate) {
 
         String year = String.valueOf(1900+docDate.getYear());
@@ -416,12 +421,14 @@ public class MainIndexMaker extends AIndexMaker {
 
             tempDictionary.remove(term);
             IndexEntry indexEntry = new IndexEntry(totalTF, finalPosting.size());
-            if(indexEntry.getTotalTF()>1) {
-                mainDictionary.put(termToWrite, indexEntry);
-            }
-            else {
-                return "";
-            }
+//            if(indexEntry.getTotalTF()>1) {
+//                mainDictionary.put(termToWrite, indexEntry);
+//            }
+//            else {
+//                return "";
+//            }
+
+            mainDictionary.put(termToWrite, indexEntry);
 
 
         }catch (NullPointerException e){

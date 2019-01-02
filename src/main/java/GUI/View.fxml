@@ -46,7 +46,7 @@
             <TextField fx:id="txtfld_output_location" promptText="Output Folder Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Button fx:id="btn_corpus_browse" mnemonicParsing="false" onAction="#browseCorpusLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <Button fx:id="btn_output_browse" mnemonicParsing="false" onAction="#browseOutputLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="TOP">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                <children>
                   <Label alignment="CENTER" text="Language" />
                   <Label text="(generate index to select)">
@@ -64,7 +64,7 @@
       </GridPane>
    </center>
    <bottom>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="57.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER" prefHeight="33.0" prefWidth="600.0">
                <children>
@@ -90,7 +90,7 @@
                   </Button>
                </children>
             </HBox>
-            <Button fx:id="view_search" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Go to Search Window" textAlignment="CENTER" onAction="#onSearchButtonClicked" />
+            <Button fx:id="view_search" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onSearchButtonClicked" text="Go to Search Window" textAlignment="CENTER" />
          </children>
          <opaqueInsets>
             <Insets />
