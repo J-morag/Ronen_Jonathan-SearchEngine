@@ -24,9 +24,11 @@ import java.io.IOException;
 public class View {
 
     private Controller controller;
-
+    @FXML
     public TextField txtfld_corpus_location;
+    @FXML
     public TextField txtfld_stopwords_location;
+    @FXML
     public TextField txtfld_output_location;
 
     public Button btn_corpus_browse;
@@ -35,8 +37,10 @@ public class View {
     public Button btn_reset;
     public Button btn_load_dictionary;
     public Button btn_display_dictionary;
+    public Button view_search;
 
     public ChoiceBox choiceBox_languages;
+
 
     public CheckBox chkbox_use_stemming;
     public CheckBox chkbox_memory_saver;
@@ -48,6 +52,9 @@ public class View {
         Tooltip tooltip = new Tooltip();
         tooltip.setText("Checking this will prioritize using less system memory, but greatly increase runtime");
         chkbox_memory_saver.setTooltip(tooltip);
+        view_search.setDisable(true);
+        //txtfld_output_location.
+
     }
 
     public CharSequence getOutputLocation(){
@@ -163,25 +170,30 @@ public class View {
             result.show();
             btn_reset.setDisable(false);
             btn_display_dictionary.setDisable(false);
-
-            try{
-                FXMLLoader loader = new FXMLLoader();
-                AnchorPane pane = loader.load(getClass().getResource("SearchView.fxml").openStream());
-                root_pane.getChildren().setAll(pane);
-                SearchView searchView = loader.getController();
-                searchView.setController(controller);
-                searchView.setUseStemming(chkbox_use_stemming.isSelected());
-                searchView.setpathToOutpotFolder(txtfld_output_location.getText());
-                searchView.setView();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            view_search.setDisable(false);
         }
     }
 
     public void setController(Controller controller) {
         this.controller = controller;
     }
+
+
+    public void onSearchButtonClicked(){
+        try{
+
+            FXMLLoader loader = new FXMLLoader();
+            AnchorPane pane = loader.load(getClass().getResource("SearchView.fxml").openStream());
+            root_pane.getChildren().setAll(pane);
+            SearchView searchView = loader.getController();
+            searchView.setController(controller);
+            searchView.setUseStemming(chkbox_use_stemming.isSelected());
+            searchView.setpathToOutpotFolder(txtfld_output_location.getText());
+            searchView.setView();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

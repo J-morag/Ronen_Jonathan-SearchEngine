@@ -1,15 +1,25 @@
 package GUI;
 
 import Querying.QueryResult;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -27,11 +37,13 @@ public class SearchView  {
     public Button search_saveButton;
     public Button search_saveBrowse;
     public TextField search_saveText;
+    public Button search_viewResultButton;
+    public Label search_backLable;
 
     private List<QueryResult> result;
     private boolean useStemming;
     private String pathToOutpotFolder;
-
+    public AnchorPane root_pane;
     public void setUseStemming(boolean useStemming) {
         this.useStemming = useStemming;
     }
@@ -50,6 +62,7 @@ public class SearchView  {
          search_cityComboBox.getItems().add(checkMenuItem);
      }
      search_saveButton.setDisable(true);
+     search_viewResultButton.setDisable(true);
  }
 
     public void setController(Controller controller){
@@ -133,6 +146,7 @@ public class SearchView  {
          } else { // if only the fileQuery filed is not empty  - good (multiple queries)
              answerMultipleQueries(search_queryFile.getText());
              search_saveButton.setDisable(false);
+             search_viewResultButton.setDisable(false);
 
          }
      }
@@ -144,6 +158,7 @@ public class SearchView  {
          else { // only the queryText field is full- good (only one query)
              answerSingelQuery(search_queryText.getText());
              search_saveButton.setDisable(false);
+             search_viewResultButton.setDisable(false);
          }
      }
 
@@ -158,9 +173,19 @@ public class SearchView  {
 
     public void answerMultipleQueries(String pathToQueryFile){
         result = myController.answerMultipleQueries(pathToQueryFile , getCityFilter() , search_semantic.isSelected() ,useStemming,pathToOutpotFolder);
-        printResult();
     }
 
+    public void onBackCliked(){
+        try{
+            FXMLLoader loader = new FXMLLoader();
+            BorderPane pane = loader.load(getClass().getResource("View.fxml").openStream());
+            root_pane.getChildren().setAll(pane);
+            View view = loader.getController();
+            view.setController(myController);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void printResult(){
         for (QueryResult res : result) {
             List<String>docs = res.getRelevantDocs();
@@ -216,5 +241,49 @@ public class SearchView  {
         alert.showAndWait();
     }
 
+    public void onViewResultsCliked() {
+
+        if (result != null && result.size() > 0) {
+            List<ObservableCell> listOfQeries = new ArrayList<>();
+
+            for (QueryResult res : result) {
+                listOfQeries.add(new ObservableCell(new SimpleStringProperty(res.getQueryNum())));
+            }
+
+
+            Stage stage = new Stage();
+            stage.setTitle("Results");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            Parent root = null;
+            try {
+                root = fxmlLoader.load(getClass().getResource("ResultsView.fxml").openStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Scene scene = new Scene(root, 320, 439);
+            stage.setScene(scene);
+
+            ResultView resultView = fxmlLoader.getController();
+            resultView.setResult(result);
+            resultView.setTableData(listOfQeries);
+
+
+            stage.show();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("No Results Error");
+            alert.setContentText("There are NO result to show, you have to run a Query first");
+            alert.showAndWait();
+        }
+    }
+
+
+
+    static class ObservableCell{
+        StringProperty data;
+        public ObservableCell(StringProperty data) {
+            this.data = data;
+        }
+    }
 
 }

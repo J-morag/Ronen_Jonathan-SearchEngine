@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.View">
+<BorderPane fx:id="root_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.View">
    <top>
       <Label text="¬GOOGLE" textAlignment="CENTER" BorderPane.alignment="CENTER">
          <font>
@@ -42,14 +42,17 @@
             <Label text="Corpus Folder Location" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
             <Label text="Output Folder Location" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
             <CheckBox fx:id="chkbox_use_stemming" mnemonicParsing="false" selected="true" text="Use Stemming" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-            <TextField fx:id="txtfld_corpus_location" promptText="Corpus Folder Location" GridPane.columnIndex="1"  />
+            <TextField fx:id="txtfld_corpus_location" promptText="Corpus Folder Location" GridPane.columnIndex="1" />
             <TextField fx:id="txtfld_output_location" promptText="Output Folder Location" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Button fx:id="btn_corpus_browse" mnemonicParsing="false" onAction="#browseCorpusLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <Button fx:id="btn_output_browse" mnemonicParsing="false" onAction="#browseOutputLocation" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="TOP">
                <children>
                   <Label alignment="CENTER" text="Language" />
-                  <Label text="(generate index to select)" />
+                  <Label text="(generate index to select)">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></Label>
                   <ChoiceBox fx:id="choiceBox_languages" disable="true" prefWidth="150.0" />
                </children>
             </VBox>
@@ -61,29 +64,37 @@
       </GridPane>
    </center>
    <bottom>
-      <HBox alignment="CENTER" prefHeight="33.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btn_reset" disable="true" mnemonicParsing="false" onAction="#reset" text="Reset">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="btn_genereate_index" mnemonicParsing="false" onAction="#generateIndex" text="Generate Index">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="btn_display_dictionary" disable="true" mnemonicParsing="false" onAction="#displayDictionary" text="Display Dictionary">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="btn_load_dictionary" mnemonicParsing="false" onAction="#loadDictionary" text="Load Dictionary">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
+            <HBox alignment="CENTER" prefHeight="33.0" prefWidth="600.0">
+               <children>
+                  <Button fx:id="btn_reset" disable="true" mnemonicParsing="false" onAction="#reset" text="Reset">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btn_genereate_index" mnemonicParsing="false" onAction="#generateIndex" text="Generate Index">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btn_display_dictionary" disable="true" mnemonicParsing="false" onAction="#displayDictionary" text="Display Dictionary">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btn_load_dictionary" mnemonicParsing="false" onAction="#loadDictionary" text="Load Dictionary">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <Button fx:id="view_search" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Go to Search Window" textAlignment="CENTER" onAction="#onSearchButtonClicked" />
          </children>
-      </HBox>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </VBox>
    </bottom>
 </BorderPane>

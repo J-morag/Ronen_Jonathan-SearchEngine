@@ -75,6 +75,7 @@ public class Searcher {
         }
 
         if (isUsedStemming) {
+            parser.useStemming=true;
             List<String> listOfStrings = parser.tokenize(query);
             List<Term> listOfTerms = parser.parseWorker(listOfStrings);
             for (int i = 0; i < listOfTerms.size(); i++) {

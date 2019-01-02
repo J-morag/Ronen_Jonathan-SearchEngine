@@ -111,6 +111,14 @@ class SearcherTest {
         return toReturn;
     }
 
+    private List<String> convertFromSerialIDtoDocID(List<String> docsSerialID){
+        List<String> toReturn = new ArrayList<>();
+        for (String st: docsSerialID) {
+            toReturn.add(docDictionaryWithStemming.get(Integer.parseInt(st)).getDocID());
+        }
+        return toReturn;
+    }
+
     public void loadDictionaries(boolean useStemming, String outputFolder) throws IOException, ClassNotFoundException, ClassCastException {
         ObjectInputStream inDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' + (useStemming ? Indexer.withStemmingOutputFolderName : Indexer.noStemmingOutputFolderName) +'/'+ Indexer.dictionarySaveName )));
         ObjectInputStream inDocDictionary = new ObjectInputStream(new BufferedInputStream(new FileInputStream(outputFolder + '/' +

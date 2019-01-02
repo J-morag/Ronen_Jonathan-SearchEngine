@@ -64,6 +64,7 @@ public class Model {
             }
         };
 
+
     }
 
     public void setController(Controller controller) {
@@ -406,6 +407,7 @@ public class Model {
         result.setEntities(entities);
         result.setRelevantDocs(docsID);
         result.setEntRanking(rankedEnt);
+        results.add(result);
         return results;
 
     }
