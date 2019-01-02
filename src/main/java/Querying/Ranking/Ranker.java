@@ -23,6 +23,10 @@ public abstract class Ranker {
         this.averageDocumentLengthInCorpus = averageDocumentLengthInCorpus;
     }
 
+    public void setRankingParameters(RankingParameters rankingParameters) {
+        this.rankingParameters = rankingParameters;
+    }
+
     /**
      * Takes a list of postings for terms in the query, and a list of postings for terms derived semantically from the
      * query. Ranks them according to relevance.

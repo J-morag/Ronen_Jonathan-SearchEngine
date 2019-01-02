@@ -26,11 +26,8 @@ public class WeightedBM25Ranker extends BM25Ranker{
 
     double calculateRankForPosting(ExpandedPosting ePosting, boolean isExplicit) {
         return ((super.calculateRankForPosting(ePosting) /*BM25*/ * rankingParameters.frequencyWeight)
-                + getMetadataBonuses(ePosting) + getDateBonus(ePosting)) *
-                /* weight of 1 for explicit, calculated weight (<=1) for implicit*/
-                (isExplicit ? 1 :
-                /* slightly higher weight for closer neighbors*/
-                (rankingParameters.implicitTermMatchWeight + 0.1*((double)1-Math.abs(queryNeighbors.get(ePosting.term.toLowerCase())))));
+                + getMetadataBonuses(ePosting) + getRecencyBonus(ePosting)) *
+                getExplicitness(ePosting, isExplicit);
     }
 
     /**
@@ -54,14 +51,22 @@ public class WeightedBM25Ranker extends BM25Ranker{
      * @param expandedPosting information about a term's appearance in a document.
      * @return bonuses to a posting's relevance ranking, based on recency. 0 if expandedPosting.date is null.
      */
-    protected double getDateBonus(ExpandedPosting expandedPosting){
+    protected double getRecencyBonus(ExpandedPosting expandedPosting){
         if(expandedPosting.date == null) return 0;
         Date currDate = Calendar.getInstance().getTime();
         int monthDelta = currDate.getMonth() - expandedPosting.date.getMonth();
         int yearDelta = currDate.getYear() - expandedPosting.date.getYear();
         int totalMonthDelta = yearDelta*12 + monthDelta;
-        double normalizedTimeDelta = (double)totalMonthDelta/480.0; //normalize to the number of months in 40 years
+        double normalizedTimeDelta = (double)totalMonthDelta/360.0; //normalize to the number of months in 30 years
         return (normalizedTimeDelta < 0 ? 0 /*a negative value indicates an invalid, future date*/ :
                 1 - normalizedTimeDelta /*better bonuses for documents with a smaller delta (newer)*/) * rankingParameters.recencyWeight;
+    }
+
+    protected double getExplicitness(ExpandedPosting ePosting, boolean isExplicit){
+        return
+        /* weight of 1 for explicit, calculated weight (<=1) for implicit*/
+        isExplicit ? 1 :
+        /* slightly higher weight for closer neighbors*/
+        (rankingParameters.implicitTermMatchWeight + 0.1*((double)1-Math.abs(queryNeighbors.get(ePosting.term.toLowerCase()))));
     }
 }
