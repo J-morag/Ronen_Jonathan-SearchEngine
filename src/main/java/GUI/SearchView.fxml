@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
@@ -26,10 +25,6 @@
       <TextField fx:id="search_saveText" editable="false" layoutX="187.0" layoutY="294.0" prefHeight="35.0" prefWidth="303.0" promptText="Pick output location for result" />
       <Button fx:id="search_saveBrowse" layoutX="110.0" layoutY="294.0" mnemonicParsing="false" onAction="#onSaveBrowseCliked" prefHeight="35.0" prefWidth="75.0" text="Browse" />
       <Button fx:id="search_saveButton" layoutX="113.0" layoutY="341.0" mnemonicParsing="false" onAction="#onSaveButtonCliked" prefHeight="31.0" prefWidth="144.0" text="Save results" />
-      <Button fx:id="search_viewResultButton" layoutX="347.0" layoutY="341.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="144.0" text="View Results" onAction="#onViewResultsCliked" />
-      <Label fx:id="search_backLable" alignment="CENTER" layoutX="28.0" layoutY="32.0" prefHeight="21.0" prefWidth="100.0" text="Back to index" textAlignment="CENTER" onMouseClicked="#onBackCliked">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Label>
+      <Button fx:id="search_viewResultButton" layoutX="347.0" layoutY="341.0" mnemonicParsing="false" onAction="#onViewResultsCliked" prefHeight="31.0" prefWidth="144.0" text="View Results" />
    </children>
 </AnchorPane>

@@ -86,6 +86,9 @@ public class Controller {
                 res.add(new View.ObservableTuple(new SimpleStringProperty(keys[i]), new SimpleStringProperty(valuesAsStrings[i])));
             }
 
+            ObservableList<String> languages = FXCollections.observableArrayList(model.getLanguages());
+            view.setLanguages(languages);
+
             return res;
         }
     }

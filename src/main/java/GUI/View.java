@@ -11,8 +11,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -83,7 +85,7 @@ public class View {
         directoryChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         File corpusDir = directoryChooser.showDialog( btn_output_browse.getScene().getWindow());
         if(null != corpusDir){ //directory chosen
-            txtfld_output_location.textProperty().setValue(corpusDir.getAbsolutePath());
+            txtfld_output_location.setText(corpusDir.getAbsolutePath());
         }
     }
 
@@ -180,14 +182,26 @@ public class View {
     public void onSearchButtonClicked(){
         try{
 
-            FXMLLoader loader = new FXMLLoader();
-            AnchorPane pane = loader.load(getClass().getResource("SearchView.fxml").openStream());
-            root_pane.getChildren().setAll(pane);
-            SearchView searchView = loader.getController();
+//            FXMLLoader loader = new FXMLLoader();
+//            AnchorPane pane = loader.load(getClass().getResource("SearchView.fxml").openStream());
+//            root_pane.getChildren().setAll(pane);
+//            SearchView searchView = loader.getController();
+//            searchView.setController(controller);
+//            searchView.setUseStemming(chkbox_use_stemming.isSelected());
+//            searchView.setpathToOutpotFolder(txtfld_output_location.getText());
+//            txtfld_output_location.clear();
+//            searchView.setView();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SearchView.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene((Pane) loader.load()));
+            SearchView searchView = loader.<SearchView>getController();
             searchView.setController(controller);
             searchView.setUseStemming(chkbox_use_stemming.isSelected());
             searchView.setpathToOutpotFolder(txtfld_output_location.getText());
             searchView.setView();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
