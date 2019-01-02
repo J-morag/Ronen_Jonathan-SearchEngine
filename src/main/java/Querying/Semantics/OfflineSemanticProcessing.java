@@ -29,8 +29,8 @@ public class OfflineSemanticProcessing {
 
     public static void main(String[] args) {
         try {
-//            textGloVeToBinaryGloVe();
-            corpusToParsedWordVectors(true);
+            textGloVeToBinaryGloVe();
+//            corpusToParsedWordVectors(true);
 //            corpusToParsedWordVector(false);
         } catch (Exception e) {
             e.printStackTrace();
