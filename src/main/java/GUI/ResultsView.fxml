@@ -7,7 +7,7 @@
 
 <AnchorPane prefHeight="439.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.ResultView">
    <children>
-      <Button layoutY="393.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="321.0" text="Show Top 5 entities" textAlignment="CENTER" />
+      <Button fx:id="result_viewEntities" layoutY="393.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="321.0" text="Show Top 5 entities" textAlignment="CENTER"  onAction="#onViewEntitiesClicket"/>
       <TableView fx:id="result_Querytbl" layoutX="8.0" layoutY="7.0" prefHeight="375.0" prefWidth="150.0">
         <columns>
           <TableColumn fx:id="result_queryCol" prefWidth="100.0" sortable="false" text="Query num" />

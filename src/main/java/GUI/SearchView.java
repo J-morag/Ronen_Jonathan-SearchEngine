@@ -242,36 +242,43 @@ public class SearchView  {
         alert.showAndWait();
     }
 
-    public void onViewResultsCliked(){
+    public void onViewResultsCliked() {
+
+        if (result != null && result.size() > 0) {
+            List<ObservableCell> listOfQeries = new ArrayList<>();
+
+            for (QueryResult res : result) {
+                listOfQeries.add(new ObservableCell(new SimpleStringProperty(res.getQueryNum())));
+            }
 
 
-        List<ObservableCell> listOfQeries=new ArrayList<>();
+            Stage stage = new Stage();
+            stage.setTitle("Results");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            Parent root = null;
+            try {
+                root = fxmlLoader.load(getClass().getResource("ResultsView.fxml").openStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Scene scene = new Scene(root, 320, 439);
+            stage.setScene(scene);
 
-        for (QueryResult res: result) {
-            listOfQeries.add(new ObservableCell(new SimpleStringProperty(res.getQueryNum())));
+            ResultView resultView = fxmlLoader.getController();
+            resultView.setResult(result);
+            resultView.setTableData(listOfQeries);
+
+
+            stage.show();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("No Results Error");
+            alert.setContentText("There are NO result to show, you have to run a Query first");
+            alert.showAndWait();
         }
-
-
-        Stage stage = new Stage();
-        stage.setTitle("Results");
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        Parent root = null;
-        try {
-            root = fxmlLoader.load(getClass().getResource("ResultsView.fxml").openStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Scene scene = new Scene(root, 320, 439);
-        stage.setScene(scene);
-
-        ResultView resultView = fxmlLoader.getController();
-        resultView.setResult(result);
-        resultView.setTableData(listOfQeries);
-
-
-        stage.show();
-
     }
+
+
 
     static class ObservableCell{
         StringProperty data;
