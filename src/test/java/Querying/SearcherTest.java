@@ -54,8 +54,8 @@ class SearcherTest {
     @Test
     void EBM25Test() throws IOException, ClassNotFoundException, InterruptedException {
         boolean useStemming = true;
-        boolean withSemantics = true;
-        initialize(true, 5, new HashSet<>(),
+        boolean withSemantics = false;
+        initialize(useStemming, 5, new HashSet<>(),
                 new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75));
 
         List<QueryResult> qRes = new ArrayList<>();
@@ -106,8 +106,8 @@ class SearcherTest {
 
     @Test
     void statisticsForReport() throws IOException, ClassNotFoundException {
-        boolean useStemming = false;
-        boolean withSemantics = false;
+        boolean useStemming = true;
+        boolean withSemantics = true;
         initialize(useStemming, 5, new HashSet<>(),
                 new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75));
 
@@ -146,6 +146,7 @@ class SearcherTest {
         qTexts.add("orphan drugs ");
 
 
+
         PrintWriter cleaner = new PrintWriter("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\statisticForReport"
                 + (useStemming? "withStemming" : "") + (withSemantics? "withSemantics" : "") + ".txt");
         cleaner.close();
@@ -154,7 +155,7 @@ class SearcherTest {
         PrintWriter csvOut = new PrintWriter(new FileOutputStream(
                 new File("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\statisticForReport"
                         + (useStemming? "withStemming" : "") + (withSemantics? "withSemantics" : "") + ".csv"),false));
-        csvOut.println("qid,qtext,qPrecision,qRecall,pAt5,pAt15,pAt30,pAt50,Retrieved,Relevant,Rel_ret");
+        csvOut.println("qid,qtext,qPrecision,qRecall,pAt5,pAt15,pAt30,pAt50,Retrieved,Relevant,Rel_ret, MAP");
         for (QueryResult queryResult: qRes
              ) {
             List<QueryResult> queryInList = new ArrayList<>();
@@ -176,8 +177,8 @@ class SearcherTest {
 
             // read the output from the command and write to file
 
-            //                  qid,qtext,qPrecision,qRecall,pAt5,pAt15,pAt30,pAt50,Retrieved,Relevant,Rel_ret
-            String[] csvLine = {",",",",",",",",",",",",",",",",",",",",",", ""};
+            //                  qid,qtext,qPrecision,qRecall,pAt5,pAt15,pAt30,pAt50,Retrieved,Relevant,Rel_ret, map
+            String[] csvLine = {",",",",",",",",",",",",",",",",",",",",",", ",", ""};
             PrintWriter out = new PrintWriter(new FileOutputStream(
                     new File("C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\statisticForReport"
                             + (useStemming? "withStemming" : "") + (withSemantics? "withSemantics" : "") + ".txt"),true));
@@ -218,12 +219,17 @@ class SearcherTest {
                 if(s.contains("Rel_ret:")){
                     s = s.replace("Rel_ret:", "");
                     s = s.trim();
-                    csvLine[11] = (s);
+                    csvLine[11] = (s + ",");
+                }
+                if(s.contains("Average precision (non-interpolated) over all rel docs")){
+                    s = stdInput.readLine();
+                    s = s.trim();
+                    csvLine[12] = (s);
                 }
             }
             out.flush();
             out.close();
-            csvOut.println(csvLine[0]+csvLine[1]+csvLine[2]+csvLine[3]+csvLine[4]+csvLine[5]+csvLine[6]+csvLine[7]+csvLine[8]+csvLine[9]+csvLine[10]+csvLine[11]);
+            csvOut.println(csvLine[0]+csvLine[1]+csvLine[2]+csvLine[3]+csvLine[4]+csvLine[5]+csvLine[6]+csvLine[7]+csvLine[8]+csvLine[9]+csvLine[10]+csvLine[11]+csvLine[12]);
 
             // read any errors from the attempted command
             System.out.println("Here is the standard error of the command (if any):\n");
@@ -231,6 +237,72 @@ class SearcherTest {
                 System.out.println(s);
             }
         }
+
+        //now the totals
+
+        String[] csvLine = {",",",",",",",",",",",",",",",",",",",",",",",",",",",",""};
+        csvOut.println(csvLine[0]+csvLine[1]+csvLine[2]+csvLine[3]+csvLine[4]+csvLine[5]+csvLine[6]+csvLine[7]+csvLine[8]+csvLine[9]+csvLine[10]+csvLine[11]+csvLine[12]);
+
+        Searcher.outputResults(qRes, pathToResultsOutputFolder);
+
+        Runtime rt = Runtime.getRuntime();
+//        rt.exec("cd C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\");
+        String[] commands = {"C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\treceval.exe",
+                "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\qrels",
+                "C:\\Users\\John\\Downloads\\infoRetrieval\\test results\\queryResults\\results.txt"};
+        Process proc = rt.exec(commands);
+
+        BufferedReader stdInput = new BufferedReader(new
+                InputStreamReader(proc.getInputStream()));
+
+        BufferedReader stdError = new BufferedReader(new
+                InputStreamReader(proc.getErrorStream()));
+
+         //read the output from the command
+        csvLine[0] = "totals"+",";
+        csvLine[1] = "totals"+",";
+        String s = null;
+        while ((s = stdInput.readLine()) != null) {
+            System.out.println(s);
+            if(s.contains("At    5 docs:")){
+                s = s.replace("  At    5 docs:", "");
+                s = s.trim();
+                csvLine[4] =(s + ",");
+            }
+            if(s.contains("  At   15 docs:")){
+                s = s.replace("  At   15 docs:", "");
+                s = s.trim();
+                csvLine[5] = (s + ",");
+            }
+            if(s.contains("  At   30 docs:")){
+                s = s.replace("  At   30 docs:", "");
+                s = s.trim();
+                csvLine[6] = (s + ",");
+            }
+            if(s.contains("Retrieved:")){
+                s = s.replace("Retrieved:", "");
+                s = s.trim();
+                csvLine[8] = (s + ",");
+            }
+            if(s.contains("Relevant:")){
+                s = s.replace("Relevant:", "");
+                s = s.trim();
+                csvLine[9] = (s + ",");
+            }
+            if(s.contains("Rel_ret:")){
+                s = s.replace("Rel_ret:", "");
+                s = s.trim();
+                csvLine[10] = (s+ ",");
+            }
+            if(s.contains("Average precision (non-interpolated) over all rel docs")){
+                s = stdInput.readLine();
+                s = s.trim();
+                csvLine[11] = (s);
+                System.out.println(s);
+            }
+        }
+
+        csvOut.println(csvLine[0]+csvLine[1]+csvLine[2]+csvLine[3]+csvLine[4]+csvLine[5]+csvLine[6]+csvLine[7]+csvLine[8]+csvLine[9]+csvLine[10]+csvLine[11]+csvLine[12]);
 
         csvOut.flush();
         csvOut.close();
