@@ -131,6 +131,7 @@ public class SearchView  {
      search_queryFile.clear();
      search_saveText.clear();
      result=null;
+     search_viewResultButton.setDisable(true);
      search_saveButton.setDisable(true);
         for (MenuItem menuItem : search_cityComboBox.getItems() ) {
             CheckMenuItem checkMenuItem = (CheckMenuItem)menuItem;

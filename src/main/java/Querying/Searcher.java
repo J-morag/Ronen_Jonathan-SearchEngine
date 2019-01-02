@@ -191,6 +191,11 @@ public class Searcher {
         return relevantDocuments.size()>50 ? relevantDocuments.subList(0,50) : relevantDocuments ;
     }
 
+    /**
+     * this method  convert a Date represented by int number , to a Date object
+     * @param date  an int that represent a Date , the int is in format yyyymmdd
+     * @return Date Object
+     */
     private Date convertToDateFromInt(int date) {
         if (date>0) {
             String dateAsString = String.valueOf(date);

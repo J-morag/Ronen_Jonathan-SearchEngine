@@ -53,8 +53,6 @@ public class View {
         tooltip.setText("Checking this will prioritize using less system memory, but greatly increase runtime");
         chkbox_memory_saver.setTooltip(tooltip);
         view_search.setDisable(true);
-        //txtfld_output_location.
-
     }
 
     public CharSequence getOutputLocation(){
