@@ -53,9 +53,10 @@ class SearcherTest {
 
     @Test
     void EBM25Test() throws IOException, ClassNotFoundException, InterruptedException {
+        boolean useStemming = true;
+        boolean withSemantics = true;
         initialize(true, 5, new HashSet<>(),
                 new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75));
-        boolean withSemantics = true;
 
         List<QueryResult> qRes = new ArrayList<>();
 
@@ -105,7 +106,7 @@ class SearcherTest {
 
     @Test
     void statisticsForReport() throws IOException, ClassNotFoundException {
-        boolean useStemming = true;
+        boolean useStemming = false;
         boolean withSemantics = false;
         initialize(useStemming, 5, new HashSet<>(),
                 new RankingParameters(1.2, 0.2, 1, 0.35, 0, 1.6, 0.75));
@@ -113,35 +114,35 @@ class SearcherTest {
         List<QueryResult> qRes = new ArrayList<>();
         List<String> qTexts = new ArrayList<>();
 
-        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics))));
+        qRes.add(new QueryResult("351", convertFromSerialIDtoDocID( searcher.answerquery("Falkland petroleum exploration", withSemantics),useStemming)));
         qTexts.add("Falkland petroleum exploration");
-        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics))));
+        qRes.add(new QueryResult("352" , convertFromSerialIDtoDocID(searcher.answerquery("British Chunnel impact", withSemantics),useStemming)));
         qTexts.add("British Chunnel impact");
-        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics))));
+        qRes.add(new QueryResult("358" ,convertFromSerialIDtoDocID( searcher.answerquery("blood-alcohol fatalities", withSemantics),useStemming)));
         qTexts.add("blood-alcohol fatalities");
-        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics))));
+        qRes.add(new QueryResult("359" , convertFromSerialIDtoDocID( searcher.answerquery("mutual fund predictors ", withSemantics),useStemming)));
         qTexts.add("mutual fund predictors ");
-        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics))));
+        qRes.add(new QueryResult("362" , convertFromSerialIDtoDocID(searcher.answerquery("human smuggling ", withSemantics),useStemming)));
         qTexts.add("human smuggling ");
-        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics))));
+        qRes.add(new QueryResult("367" , convertFromSerialIDtoDocID(searcher.answerquery("piracy ", withSemantics),useStemming)));
         qTexts.add("piracy ");
-        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics))));
+        qRes.add(new QueryResult("373" , convertFromSerialIDtoDocID (searcher.answerquery("encryption equipment export ", withSemantics),useStemming)));
         qTexts.add("encryption equipment export ");
-        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics))));
+        qRes.add(new QueryResult("374" , convertFromSerialIDtoDocID (searcher.answerquery("Nobel prize winners ", withSemantics),useStemming)));
         qTexts.add("Nobel prize winners ");
-        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics))));
+        qRes.add(new QueryResult("377" , convertFromSerialIDtoDocID(searcher.answerquery("cigar smoking ", withSemantics),useStemming)));
         qTexts.add("cigar smoking ");
-        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics))));
+        qRes.add(new QueryResult("380" , convertFromSerialIDtoDocID(searcher.answerquery("obesity medical treatment ", withSemantics),useStemming)));
         qTexts.add("obesity medical treatment ");
-        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics))));
+        qRes.add(new QueryResult("384" , convertFromSerialIDtoDocID(searcher.answerquery("space station moon ", withSemantics),useStemming)));
         qTexts.add("space station moon ");
-        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics))));
+        qRes.add(new QueryResult("385" , convertFromSerialIDtoDocID(searcher.answerquery("hybrid fuel cars ", withSemantics),useStemming)));
         qTexts.add("hybrid fuel cars ");
-        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics))));
+        qRes.add(new QueryResult("387" , convertFromSerialIDtoDocID(searcher.answerquery("radioactive waste ", withSemantics),useStemming)));
         qTexts.add("radioactive waste ");
-        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics))));
+        qRes.add(new QueryResult("388" , convertFromSerialIDtoDocID(searcher.answerquery("organic soil enhancement ", withSemantics),useStemming)));
         qTexts.add("organic soil enhancement ");
-        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics))));
+        qRes.add(new QueryResult("390" , convertFromSerialIDtoDocID(searcher.answerquery("orphan drugs ", withSemantics),useStemming)));
         qTexts.add("orphan drugs ");
 
 
