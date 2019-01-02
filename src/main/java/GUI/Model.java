@@ -367,6 +367,17 @@ public class Model {
         return avargeDocSize;
     }
 
+    /**
+     * this method answer a singel query and return a list with one Qeury result object
+     * to answer a query this method uses a Searcher object and sends to is al the relvant data for answering the query
+     * @param query - the query needed tp be answer
+     * @param citiesFilter -
+     *  @param citiesFilter - a set of cities that the answers will be filtered by
+     * @param useSemantic - a boolean variable the indicates if semantic analysis need to be use
+     * @param isUsedStemming - a boolean variable the indicates if we using a dictionary the was stemmed or not
+     * @param pathToOutpotFolder - path of the locations of the postings file
+     * @return
+     */
     public List<QueryResult> aswerSingelQuery(String query , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming , String pathToOutpotFolder){
         Searcher searcher;
         List<QueryResult> results = new ArrayList<>();
@@ -412,6 +423,17 @@ public class Model {
 
     }
 
+    /**
+     * this method answer a set of Queries one by one .
+     * and add and creating a Query result object for each one of the queries and return a list of Query result object.
+     * to answer a query this method uses a Searcher object and sends to is al the relvant data for answering the query
+     * @param pathToQureyFile- path to a file contains a set of queries
+     * @param citiesFilter - a set of cities that the answers will be filtered by
+     * @param useSemantic - a boolean variable the indicates if semantic analysis need to be use
+     * @param isUsedStemming - a boolean variable the indicates if we using a dictionary the was stemmed or not
+     * @param pathToOutpotFolder - path of the locations of the postings file
+     * @return - a list of Query result objects  that represent the results of the queries from the pathToQueryFile
+     */
     public List<QueryResult> answerMultipleQueries (String pathToQureyFile , Set<String> citiesFilter , boolean useSemantic ,boolean isUsedStemming,String pathToOutpotFolder){
         Searcher searcher;
         List<QueryResult> results = new ArrayList<>();
@@ -462,9 +484,12 @@ public class Model {
     }
 
 
-
-
-
+    /**
+     * this method  read the query file and parses it into a pair of <queryNum , Query>
+     * and  adding it to a list
+     * @param pathToQureyFile - the path to the queryy file needed to be parsed
+     * @return - a list of pairs <queryNum , Query>
+     */
     private List<Pair<String,String>> parstQuerysFromQueryFile(String pathToQureyFile) {
         File file = new File(pathToQureyFile);
         FileInputStream fi ;
@@ -503,6 +528,11 @@ public class Model {
 
     }
 
+    /**
+     * this method save the Query results into a File
+     * @param resultOutputPath - the path for the file
+     * @param results - the results that need to be saved
+     */
     public void saveQueryResults(String resultOutputPath , List<QueryResult> results){
 
         try {

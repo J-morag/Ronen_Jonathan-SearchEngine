@@ -13,7 +13,8 @@ import java.util.stream.Stream;
 
 class SemanticEngineTest {
 
-    private static final String pathToGloveFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors";
+   // private static final String pathToGloveFilesFolder = "C:\\Users\\John\\Downloads\\infoRetrieval\\GloVe\\customVectors";
+    private static final String pathToGloveFilesFolder =" C:\\Users\\ronen\\IdeaProjects\\Ronen_Jonathan-SearchEngine\\resources\\Word2Vec";
 
 
     @Test
